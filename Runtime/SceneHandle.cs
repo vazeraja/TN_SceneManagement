@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 
 namespace ThunderNut.SceneManagement {
     
-    // Thunder 3
+    // Thunder 4
     [Serializable]
     public class PassageElement {
         public int sceneTag;
