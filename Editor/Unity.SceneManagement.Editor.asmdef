@@ -1,0 +1,18 @@
+{
+    "name": "Unity.SceneManagement.Editor",
+    "rootNamespace": "ThunderNut.SceneManagement.Editor",
+    "references": [
+        "Unity.SceneManagement"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
