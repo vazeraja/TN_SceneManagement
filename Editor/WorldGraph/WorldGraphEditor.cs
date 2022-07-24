@@ -1,39 +1,44 @@
 using UnityEditor;
+using UnityEditor.Callbacks;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
 
 namespace ThunderNut.SceneManagement.Editor {
     public class WorldGraphEditor : EditorWindow {
-        [MenuItem("Window/UI Toolkit/WorldGraphEditor")]
-        public static void ShowExample() {
+        
+        [MenuItem("World Graph/World Graph")]
+        public static void ShowWindow() {
             WorldGraphEditor wnd = GetWindow<WorldGraphEditor>();
-            wnd.titleContent = new GUIContent("WorldGraphEditor");
+            wnd.minSize = new Vector2(100, 150);
+            wnd.titleContent = new GUIContent("WorldGraph");
+            wnd.Show();
         }
+        [OnOpenAsset]
+        public static bool OnOpenAsset(int instanceId, int line)
+        {
+            if (!(Selection.activeObject is WorldGraph)) return false;
+            ShowWindow();
+            return true;
+        }
+
+        private const string visualTreePath = "Assets/TN_SceneManagement/Editor/WorldGraph/WorldGraphEditor.uxml";
+        private const string styleSheetPath = "Assets/TN_SceneManagement/Editor/WorldGraph/WorldGraphEditor.uss";
+
+        private ScrollViewCustomControl scrollView;
 
         public void CreateGUI() {
             // Each editor window contains a root VisualElement object
             VisualElement root = rootVisualElement;
 
-            // VisualElements objects can contain other VisualElement following a tree hierarchy.
-            VisualElement label = new Label("Hello World! From C#");
-            root.Add(label);
+            var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(visualTreePath);
+            visualTree.CloneTree(root);
 
-            // Import UXML
-            var visualTree =
-                AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-                    "Assets/TN_SceneManagement/Editor/WorldGraph/WorldGraphEditor.uxml");
-            VisualElement labelFromUXML = visualTree.Instantiate();
-            root.Add(labelFromUXML);
+            var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(styleSheetPath);
+            root.styleSheets.Add(styleSheet);
 
-            // A stylesheet can be added to a VisualElement.
-            // The style will be applied to the VisualElement and all of its children.
-            var styleSheet =
-                AssetDatabase.LoadAssetAtPath<StyleSheet>(
-                    "Assets/TN_SceneManagement/Editor/WorldGraph/WorldGraphEditor.uss");
-            VisualElement labelWithStyle = new Label("Hello World! With Style");
-            labelWithStyle.styleSheets.Add(styleSheet);
-            root.Add(labelWithStyle);
+            // scrollView = root.Q<ScrollViewCustomControl>();
+            //scrollView.DisplayScenes();
         }
     }
 }
