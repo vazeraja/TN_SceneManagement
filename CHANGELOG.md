@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.2...v1.0.3) (2022-07-24)
+
+
+### Bug Fixes
+
+* adding demo script ([0154ecb](https://github.com/vazeraja/TN_SceneManagement/commit/0154ecb6ed8799b6adc52577e2448d7335553f61))
+
 ## [1.0.2](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.1...v1.0.2) (2022-07-24)
 
 
