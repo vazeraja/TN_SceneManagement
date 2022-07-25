@@ -1,3 +1,4 @@
+using System;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine;
@@ -37,8 +38,8 @@ namespace ThunderNut.SceneManagement.Editor {
             var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(styleSheetPath);
             root.styleSheets.Add(styleSheet);
 
-            // scrollView = root.Q<ScrollViewCustomControl>();
-            //scrollView.DisplayScenes();
+            scrollView = root.Q<ScrollViewCustomControl>();
+            scrollView.CreateSceneGUI();
         }
     }
 }
