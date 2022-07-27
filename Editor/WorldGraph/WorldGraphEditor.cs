@@ -11,7 +11,7 @@ namespace ThunderNut.SceneManagement.Editor {
         [MenuItem("World Graph/World Graph")]
         public static void ShowWindow() {
             WorldGraphEditor wnd = GetWindow<WorldGraphEditor>();
-            wnd.minSize = new Vector2(100, 150);
+            wnd.minSize = new Vector2(200, 400);
             wnd.titleContent = new GUIContent("WorldGraph");
             wnd.Show();
         }
@@ -26,6 +26,7 @@ namespace ThunderNut.SceneManagement.Editor {
         private const string visualTreePath = "Assets/TN_SceneManagement/Editor/WorldGraph/WorldGraphEditor.uxml";
         private const string styleSheetPath = "Assets/TN_SceneManagement/Editor/WorldGraph/WorldGraphEditor.uss";
 
+        private TwoPaneCustomControl twoPaneCustomControl;
         private ScrollViewCustomControl scrollView;
 
         public void CreateGUI() {
@@ -38,8 +39,11 @@ namespace ThunderNut.SceneManagement.Editor {
             var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(styleSheetPath);
             root.styleSheets.Add(styleSheet);
 
-            scrollView = root.Q<ScrollViewCustomControl>();
-            scrollView.CreateSceneGUI();
+            twoPaneCustomControl = root.Q<TwoPaneCustomControl>();
+            var ve = twoPaneCustomControl.Q<VisualElement>("left-panel");
+
+            //scrollView = root.Q<ScrollViewCustomControl>();
+            //scrollView.CreateSceneGUI();
         }
     }
 }

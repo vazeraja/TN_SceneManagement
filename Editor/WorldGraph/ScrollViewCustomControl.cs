@@ -44,6 +44,8 @@ namespace ThunderNut.SceneManagement.Editor {
 
             var openButton = new Button(() => {
                 EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
+                SceneSelectorSettings.instance.PreviousScenePath = SceneManager.GetActiveScene().path;
+                Debug.Log(SceneSelectorSettings.instance.PreviousScenePath);
             }) {
                 text = "Open"
             };

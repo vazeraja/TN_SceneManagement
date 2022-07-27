@@ -6,7 +6,5 @@ namespace ThunderNut.SceneManagement {
 
     [CreateAssetMenu(fileName = "WorldGraph", menuName = "World Graph/World Graph")]
     public class WorldGraph : ScriptableObject {
-        
-
     }
 }
