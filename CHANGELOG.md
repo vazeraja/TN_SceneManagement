@@ -1,3 +1,10 @@
+## [1.0.5](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.4...v1.0.5) (2022-07-27)
+
+
+### Bug Fixes
+
+* redo scene selector editor ([e4f057f](https://github.com/vazeraja/TN_SceneManagement/commit/e4f057fc2fc8d626c90164aabd0d75aec3dda1f1))
+
 ## [1.0.4](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.3...v1.0.4) (2022-07-24)
 
 
