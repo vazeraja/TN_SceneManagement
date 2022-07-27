@@ -1,6 +1,0 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
-    <uie:Toolbar>
-        <uie:ToolbarMenu display-tooltip-when-elided="true" text="Assets" />
-        <uie:ToolbarButton text="Button" display-tooltip-when-elided="true" style="-unity-text-align: middle-center;" />
-    </uie:Toolbar>
-</ui:UXML>
