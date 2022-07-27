@@ -7,8 +7,8 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 namespace ThunderNut.SceneManagement.Editor {
-    public class ScrollViewCustomControl : ScrollView {
-        public new class UxmlFactory : UxmlFactory<ScrollViewCustomControl, ScrollView.UxmlTraits> { }
+    public class SceneSelectorCustomControl : ScrollView {
+        public new class UxmlFactory : UxmlFactory<SceneSelectorCustomControl, ScrollView.UxmlTraits> { }
         
         [InitializeOnLoadMethod]
         private static void RegisterCallbacks()
