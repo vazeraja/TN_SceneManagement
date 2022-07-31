@@ -1,3 +1,10 @@
+## [1.0.6](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.5...v1.0.6) (2022-07-31)
+
+
+### Bug Fixes
+
+* treeview ([6037d52](https://github.com/vazeraja/TN_SceneManagement/commit/6037d5255d1ca776bb616cf1abd4551148e5d7e3))
+
 ## [1.0.5](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.4...v1.0.5) (2022-07-27)
 
 

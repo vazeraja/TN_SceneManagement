@@ -1,6 +1,6 @@
 {
   "name": "com.thundernut.scenemanagement",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "displayName": "Scene Management System",
   "description": "Upgrade to the Unity SceneAsset object",
   "unity": "2021.1",
