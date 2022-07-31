@@ -35,9 +35,9 @@ public class WorldGraphEditor : EditorWindow {
         root.styleSheets.Add(styleSheet);
         
         twoPaneCustomControl = root.Q<TwoPaneCustomControl>();
-        var leftPanel = twoPaneCustomControl.Q<VisualElement>("left-panel");
+        var rightPanel = twoPaneCustomControl.Q<VisualElement>("right-panel");
         var scrollView = new SceneSelectorCustomControl();
-        leftPanel.Add(scrollView);
+        rightPanel.Add(scrollView);
         scrollView.CreateSceneGUI();
         
         
