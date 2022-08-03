@@ -1,3 +1,10 @@
+## [1.0.7](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.6...v1.0.7) (2022-08-03)
+
+
+### Bug Fixes
+
+* SceneHandleEditor.cs upgrade to assign scene on creation + fix null value bug ([055fa9a](https://github.com/vazeraja/TN_SceneManagement/commit/055fa9a6b2bdc15e9afd2ffe23b0a85c4e66c01e))
+
 ## [1.0.6](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.5...v1.0.6) (2022-07-31)
 
 
