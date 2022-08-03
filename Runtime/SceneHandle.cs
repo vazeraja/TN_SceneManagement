@@ -19,8 +19,11 @@ namespace ThunderNut.SceneManagement {
     public class SceneHandle : ScriptableObject {
         public SceneReference scene;
         
-        // Thunder ABC
-        public string[] sceneTags;
+        public string[] sceneTags = {"default_value1", "default_value2"};
         public List<PassageElement> passageElements;
+
+        private void OnEnable() {
+            
+        }
     }
 }

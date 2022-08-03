@@ -10,16 +10,12 @@ using UnityEngine.UIElements;
 using PopupWindow = UnityEditor.PopupWindow;
 
 namespace ThunderNut.SceneManagement.Editor {
-    class SimpleTreeView : TreeView
-    {
-        public SimpleTreeView(TreeViewState treeViewState)
-            : base(treeViewState)
-        {
+    class SimpleTreeView : TreeView {
+        public SimpleTreeView() : base(new TreeViewState()) {
             Reload();
         }
-        
-        protected override TreeViewItem BuildRoot ()
-        {
+
+        protected override TreeViewItem BuildRoot() {
             // BuildRoot is called every time Reload is called to ensure that TreeViewItems 
             // are created from data. Here we create a fixed set of items. In a real world example,
             // a data model should be passed into the TreeView and the items created from the model.
@@ -27,8 +23,7 @@ namespace ThunderNut.SceneManagement.Editor {
             // This section illustrates that IDs should be unique. The root item is required to 
             // have a depth of -1, and the rest of the items increment from that.
             var root = new TreeViewItem {id = 0, depth = -1, displayName = "Root"};
-            var allItems = new List<TreeViewItem> 
-            {
+            var allItems = new List<TreeViewItem> {
                 new TreeViewItem {id = 1, depth = 0, displayName = "Animals"},
                 new TreeViewItem {id = 2, depth = 1, displayName = "Mammals"},
                 new TreeViewItem {id = 3, depth = 2, displayName = "Tiger"},
@@ -39,54 +34,65 @@ namespace ThunderNut.SceneManagement.Editor {
                 new TreeViewItem {id = 8, depth = 2, displayName = "Crocodile"},
                 new TreeViewItem {id = 9, depth = 2, displayName = "Lizard"},
             };
-            
+
             // Utility method that initializes the TreeViewItem.children and .parent for all items.
-            SetupParentsAndChildrenFromDepths (root, allItems);
-            
+            SetupParentsAndChildrenFromDepths(root, allItems);
+
             // Return root of the tree
             return root;
         }
     }
+
     public class SceneSelectorCustomControl : ScrollView {
         public new class UxmlFactory : UxmlFactory<SceneSelectorCustomControl, ScrollView.UxmlTraits> { }
-        
+
         [InitializeOnLoadMethod]
-        private static void RegisterCallbacks()
-        {
+        private static void RegisterCallbacks() {
             EditorApplication.playModeStateChanged += ReturnToPreviousScene;
         }
-        private static void ReturnToPreviousScene(PlayModeStateChange change)
-        {
-            if (change == PlayModeStateChange.EnteredEditMode)
-            {
-                EditorSceneManager.OpenScene(SceneSelectorSettings.instance.PreviousScenePath, OpenSceneMode.Single);
+
+        private static void ReturnToPreviousScene(PlayModeStateChange change) {
+            switch (change) {
+                case PlayModeStateChange.EnteredEditMode:
+                    // EditorSceneManager.OpenScene(SceneSelectorSettings.instance.PreviousScenePath, OpenSceneMode.Single);
+                    break;
+                case PlayModeStateChange.EnteredPlayMode:
+                    break;
+                case PlayModeStateChange.ExitingEditMode:
+                    break;
+                case PlayModeStateChange.ExitingPlayMode:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(change), change, null);
             }
         }
 
+        Rect buttonRect;
         public void CreateSceneGUI() {
             string[] sceneGuids = Array.ConvertAll(UnityEditor.EditorBuildSettings.scenes, s => s.guid.ToString());
             foreach (string sceneGuid in sceneGuids) {
-                Add(CreateSceneButton(sceneGuid));
+                //Add(CreateSceneButton(sceneGuid));
             }
-        }
-        
-        Rect buttonRect;
-        private IMGUIContainer CreateSceneButton(string sceneGuid) {
-            IMGUIContainer container = new IMGUIContainer(() => {
+
+            Add(new IMGUIContainer(() => {
                 GUILayout.Label("Editor window with popup", EditorStyles.boldLabel);
-                if (GUILayout.Button("Popup", GUILayout.Width(200))) {
-                    var simpleTreeView = new SimpleTreeView(new TreeViewState());
-                    PopupWindow.Show(buttonRect, new TreeViewPopupWindow(simpleTreeView));
+                if (GUILayout.Button("Popup Window")) {
+                    PopupWindow.Show(buttonRect, new TreeViewPopupWindow(new SimpleTreeView(), buttonRect.width));
                 }
-                if (Event.current.type == EventType.Repaint) buttonRect = GUILayoutUtility.GetLastRect();
-            });
-            return container;
+
+                if (Event.current.type == EventType.Repaint)
+                    buttonRect = GUILayoutUtility.GetLastRect();
+            }));
+        }
+
+
+        private IMGUIContainer CreateSceneButton(string sceneGuid = "") {
+            var buttonGroup = new IMGUIContainer();
 
             // Scene Selector Code
             // string scenePath = AssetDatabase.GUIDToAssetPath(sceneGuid);
             // var sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath);
             //
-            // var buttonGroup = new IMGUIContainer();
             // buttonGroup.style.flexDirection = FlexDirection.Row;
             // buttonGroup.style.marginLeft = 3;
             //
@@ -112,11 +118,12 @@ namespace ThunderNut.SceneManagement.Editor {
             // };
             // buttonGroup.Add(playButton);
             //
-            // return buttonGroup;
+            return buttonGroup;
         }
     }
 
-    [FilePath("Assets/TN_SceneManagement/Editor/WorldGraph/SceneSelectorSettings.asset", FilePathAttribute.Location.ProjectFolder)]
+    [FilePath("Assets/TN_SceneManagement/Editor/WorldGraph/SceneSelectorSettings.asset",
+        FilePathAttribute.Location.ProjectFolder)]
     public class SceneSelectorSettings : ScriptableSingleton<SceneSelectorSettings> {
         public string PreviousScenePath;
         private void OnDestroy() => Save(true);

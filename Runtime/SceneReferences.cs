@@ -6,14 +6,13 @@ using UnityEngine;
 using Guid = System.String; // could use 128-bit int type to serialize, but it would be less legible in text assets
 
 namespace ThunderNut.SceneManagement {
-    
     ///<summary>SceneReferences contains the GUID to build index mapping, used to reference scenes at runtime.</summary>
     ///<remarks>This is auto-generated on build as a preloaded asset.</remarks>
     public class SceneReferences : ScriptableObject {
         ///<summary>The singleton instance, automatically preloaded at runtime.</summary>
         public static SceneReferences instance => asset
-        #if UNITY_EDITOR
-        ?? (asset = ScriptableObject.CreateInstance<SceneReferences>())
+                                                  #if UNITY_EDITOR
+                                                  ?? (asset = ScriptableObject.CreateInstance<SceneReferences>())
         #endif
         ;
 
@@ -59,6 +58,8 @@ namespace ThunderNut.SceneManagement {
         public SceneReference(Guid guid) {
             this.sceneGuid = guid;
         }
+
+        public SceneReference() { }
 
         ///<summary>The build index of this scene, which can be used to load it or to obtain scene info.</summary>
         #if UNITY_EDITOR

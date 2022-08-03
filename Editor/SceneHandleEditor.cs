@@ -9,20 +9,19 @@ using UnityEngine;
 using UnityEngine.LowLevel;
 
 namespace ThunderNut.SceneManagement.Editor {
-    
     [CustomEditor(typeof(SceneHandle))]
     public class SceneHandleEditor : UnityEditor.Editor {
         private SerializedProperty sceneTagsProperty;
         private SerializedProperty passageElementsProperty;
         private SerializedProperty sceneProperty;
-        
+
         private ReorderableList sceneTagsList;
         private ReorderableList passageElementsList;
 
         // Reference to the actual SceneHandle instance this Inspector belongs to
         private SceneHandle sceneHandle;
 
-        // Field for storing available options
+        // GUIContent field for storing available tag options
         private GUIContent[] availableOptions;
 
         // Called when the Inspector is opened / ScriptableObject is selected
@@ -150,16 +149,77 @@ namespace ThunderNut.SceneManagement.Editor {
 
                     sceneTag.intValue = -1;
                 },
+                
+                // Draw element callback for how fields should be drawn in a reorderable list
+                // All the important stuff happens here
+                drawElementCallback = (rect, index, focused, active) => {
+                    //get the current element's SerializedProperty
+                    var element = passageElementsProperty.GetArrayElementAtIndex(index);
+
+                    // Get the nested property fields of the passageElements class
+                    var sceneTag = element.FindPropertyRelative(nameof(PassageElement.sceneTag));
+                    var handle = element.FindPropertyRelative(nameof(PassageElement.sceneHandle));
+                    var handleTags = element.FindPropertyRelative(nameof(PassageElement.sceneHandleTags));
+
+                    var popUpHeight = EditorGUI.GetPropertyHeight(sceneTag);
+
+                    // store the original GUI.color
+                    var color = GUI.color;
+
+                    // if the value is invalid tint the next field red
+                    if (sceneTag.intValue < 0) GUI.color = Color.red;
+
+                    // Draw the Popup so you can select from the existing character names
+                    sceneTag.intValue = EditorGUI.Popup(new Rect(rect.x, rect.y, rect.width, popUpHeight),
+                        new GUIContent(sceneHandle.scene != null
+                            ? sceneHandle.scene.GetType().Name
+                            : sceneTag.displayName),
+                        sceneTag.intValue, availableOptions);
+
+                    // reset the GUI.color
+                    GUI.color = color;
+                    rect.y += popUpHeight + 10;
+
+                    var handleHeight = EditorGUI.GetPropertyHeight(handle);
+                    if (handle.objectReferenceValue == null) GUI.color = Color.red;
+
+                    EditorGUI.BeginChangeCheck();
+                    EditorGUI.PropertyField(new Rect(rect.x, rect.y, rect.width, handleHeight), handle,
+                        new GUIContent("Target Scene"));
+                    if (EditorGUI.EndChangeCheck()) {
+                        serializedObject.ApplyModifiedProperties();
+                    }
+
+                    // Stores tag options based on the chosen scene handle
+                    var handleOptions = handle.objectReferenceValue != null
+                        ? sceneHandle.passageElements[index].sceneHandle.sceneTags
+                            .Select(item => new GUIContent(item))
+                            .ToArray()
+                        : new GUIContent[] { };
+
+                    // reset the GUI.color
+                    GUI.color = color;
+                    rect.y += popUpHeight;
+
+                    EditorGUI.BeginDisabledGroup(handle.objectReferenceValue == null);
+                    handleTags.intValue = EditorGUI.Popup(new Rect(rect.x, rect.y, rect.width, popUpHeight),
+                        new GUIContent("Passage"), handleTags.intValue, handleOptions);
+                    EditorGUI.EndDisabledGroup();
+                }
             };
 
             // Get the existing character names as GuiContent[]
             availableOptions = sceneHandle.sceneTags.Select(item => new GUIContent(item)).ToArray();
         }
 
+        public override bool RequiresConstantRepaint() {
+            return base.RequiresConstantRepaint();
+        }
+
         public override void OnInspectorGUI() {
             DrawScriptField();
 
-            serializedObject.Update(); 
+            serializedObject.Update();
 
             sceneProperty = serializedObject.FindProperty("scene");
             EditorGUILayout.PropertyField(sceneProperty);
@@ -176,71 +236,9 @@ namespace ThunderNut.SceneManagement.Editor {
 
                 EditorUtility.SetDirty(target);
             }
-
-            passageElementsList.drawElementCallback = DrawPassageElementsFields;
             passageElementsList.DoLayoutList();
 
             serializedObject.ApplyModifiedProperties();
-        }
-
-        /// <summary>
-        /// Draw element callback for how fields should be drawn in a reorderable list
-        /// </summary>
-        /// <param name="rect"></param>
-        /// <param name="index"></param>
-        /// <param name="isActive"></param>
-        /// <param name="isFocused"></param>
-        private void DrawPassageElementsFields(Rect rect, int index, bool isActive, bool isFocused) {
-            //get the current element's SerializedProperty
-            var element = passageElementsProperty.GetArrayElementAtIndex(index);
-
-            // Get the nested property fields of the passageElements class
-            var sceneTag = element.FindPropertyRelative(nameof(PassageElement.sceneTag));
-            var handle = element.FindPropertyRelative(nameof(PassageElement.sceneHandle));
-            var handleTags = element.FindPropertyRelative(nameof(PassageElement.sceneHandleTags));
-
-            var popUpHeight = EditorGUI.GetPropertyHeight(sceneTag);
-
-            // store the original GUI.color
-            var color = GUI.color;
-
-            // if the value is invalid tint the next field red
-            if (sceneTag.intValue < 0) GUI.color = Color.red;
-
-            // Draw the Popup so you can select from the existing character names
-            sceneTag.intValue = EditorGUI.Popup(new Rect(rect.x, rect.y, rect.width, popUpHeight),
-                new GUIContent(sceneHandle.scene != null ? sceneHandle.scene.GetType().Name : sceneTag.displayName),
-                sceneTag.intValue, availableOptions);
-
-            // reset the GUI.color
-            GUI.color = color;
-            rect.y += popUpHeight + 10;
-
-            var handleHeight = EditorGUI.GetPropertyHeight(handle);
-            if (handle.objectReferenceValue == null) GUI.color = Color.red;
-
-            EditorGUI.BeginChangeCheck();
-            EditorGUI.PropertyField(new Rect(rect.x, rect.y, rect.width, handleHeight), handle,
-                new GUIContent("Target Scene"));
-            if (EditorGUI.EndChangeCheck()) {
-                serializedObject.ApplyModifiedProperties();
-            }
-
-            // Stores tag options based on the chosen scene handle
-            var handleOptions = handle.objectReferenceValue != null
-                ? sceneHandle.passageElements[index].sceneHandle.sceneTags
-                    .Select(item => new GUIContent(item))
-                    .ToArray()
-                : new GUIContent[] { };
-
-            // reset the GUI.color
-            GUI.color = color;
-            rect.y += popUpHeight;
-
-            EditorGUI.BeginDisabledGroup(handle.objectReferenceValue == null);
-            handleTags.intValue = EditorGUI.Popup(new Rect(rect.x, rect.y, rect.width, popUpHeight),
-                new GUIContent("Passage"), handleTags.intValue, handleOptions);
-            EditorGUI.EndDisabledGroup();
         }
 
         #region Other
@@ -250,9 +248,9 @@ namespace ThunderNut.SceneManagement.Editor {
             EditorGUILayout.ObjectField("Script", MonoScript.FromScriptableObject((SceneHandle) target),
                 typeof(SceneHandle), false);
             EditorGUI.EndDisabledGroup();
-
             EditorGUILayout.Space();
         }
+
 
         [MenuItem("Assets/Create/World Graph/Scene Handle (From Scene)", false, 400)]
         private static void CreateFromScene() {
@@ -261,9 +259,11 @@ namespace ThunderNut.SceneManagement.Editor {
             var scene = Selection.activeObject as SceneAsset;
 
             var asset = CreateInstance<SceneHandle>();
-            //asset.scene = scene;
             string baseName = trailingNumbersRegex.Replace(scene != null ? scene.name : string.Empty, "");
             asset.name = baseName + "Handle";
+            if (AssetDatabase.TryGetGUIDAndLocalFileIdentifier(scene, out string newGuid, out long _)) {
+                asset.scene = new SceneReference(newGuid);
+            }
 
             string assetPath = Path.GetDirectoryName(AssetDatabase.GetAssetPath(scene));
             AssetDatabase.CreateAsset(asset, Path.Combine(assetPath ?? Application.dataPath, asset.name + ".asset"));

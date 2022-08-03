@@ -11,10 +11,11 @@ namespace ThunderNut.SceneManagement.Editor {
 
         public float Width { get; set; }
 
-        public TreeViewPopupWindow(TreeView contents)
+        public TreeViewPopupWindow(TreeView contents, float width)
         {
             m_SearchField = new SearchField();
             m_TreeView = contents;
+            Width = width;
         }
 
         public override void OnGUI(Rect rect)

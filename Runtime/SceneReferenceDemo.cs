@@ -6,9 +6,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class SceneReferenceDemo : MonoBehaviour {
-    public SceneReference scene;
-
+    public SceneHandle sceneHandle;
     private void Awake() {
-        SceneManager.LoadScene(scene.sceneIndex);
+        SceneManager.LoadScene(sceneHandle.scene.sceneIndex);
     }
 }
