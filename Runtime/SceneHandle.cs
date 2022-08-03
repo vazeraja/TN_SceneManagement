@@ -7,23 +7,20 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace ThunderNut.SceneManagement {
-    
     [Serializable]
-    public class PassageElement {
-        public int sceneTag;
+    public class SceneConnection {
+        public int passage;
         public SceneHandle sceneHandle;
-        public int sceneHandleTags;
+        public int sceneHandlePassage;
     }
 
     [CreateAssetMenu(fileName = "SceneHandle", menuName = "World Graph/Scene Handle")]
     public class SceneHandle : ScriptableObject {
         public SceneReference scene;
-        
-        public string[] sceneTags = {"default_value1", "default_value2"};
-        public List<PassageElement> passageElements;
 
-        private void OnEnable() {
-            
-        }
+        public List<string> passages = new List<string> {"default_value1", "default_value2"};
+        public List<SceneConnection> sceneConnections;
+
+        private void OnEnable() { }
     }
 }

@@ -5,11 +5,19 @@ using UnityEditor.Callbacks;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class WorldGraphEditor : EditorWindow {
+public class WorldGraph_EditorWindow : EditorWindow {
     [MenuItem("World Graph/World Graph")]
-    public static void ShowWindow() {
-        WorldGraphEditor wnd = GetWindow<WorldGraphEditor>();
-        wnd.titleContent = new GUIContent("WorldGraphEditor");
+    public static WorldGraph_EditorWindow ShowWindow() {
+        WorldGraph_EditorWindow window = GetWindow<WorldGraph_EditorWindow>();
+        window.titleContent = new GUIContent("WorldGraphEditor");
+        
+        var position = window.position;
+        position.center = new Rect(0f, 0f, Screen.currentResolution.width, Screen.currentResolution.height).center;
+        window.position = position;
+        
+        window.Focus();
+        window.Repaint();
+        return window;
     }
     [OnOpenAsset]
     public static bool OnOpenAsset(int instanceId, int line)
@@ -19,8 +27,8 @@ public class WorldGraphEditor : EditorWindow {
         return true;
     }
 
-    private const string visualTreePath = "Assets/TN_SceneManagement/Editor/WorldGraph/WorldGraphEditor.uxml";
-    private const string styleSheetPath = "Assets/TN_SceneManagement/Editor/WorldGraph/WorldGraphEditor.uss";
+    private const string visualTreePath = "Assets/TN_SceneManagement/Editor/WorldGraph/WorldGraphEditorWindow.uxml";
+    private const string styleSheetPath = "Assets/TN_SceneManagement/Editor/WorldGraph/WorldGraphEditorWindow.uss";
 
     private TwoPaneCustomControl twoPaneCustomControl;
 
@@ -40,9 +48,5 @@ public class WorldGraphEditor : EditorWindow {
         rightPanel.Add(scrollView);
         scrollView.CreateSceneGUI();
         
-        
-
-        //scrollView = root.Q<ScrollViewCustomControl>();
-        //scrollView.CreateSceneGUI();
     }
 }
