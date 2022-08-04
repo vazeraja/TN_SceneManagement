@@ -66,5 +66,9 @@ public class WorldGraph_EditorWindow : EditorWindow {
         scrollViewCustomControl = root.Q<ScrollViewCustomControl>();
         
         scrollViewCustomControl.CreateSceneGUI();
+        var myList = WorldGraphUtility.FindAssetsByType<SceneHandle>();
+        foreach (var handle in myList) {
+            Debug.Log(handle.name);
+        }
     }
 }
