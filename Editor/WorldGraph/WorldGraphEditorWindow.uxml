@@ -4,6 +4,8 @@
         <ui:VisualElement name="left-panel">
             <ThunderNut.SceneManagement.Editor.WorldGraph_GraphView focusable="true" style="flex-grow: 1;" />
         </ui:VisualElement>
-        <ui:VisualElement name="right-panel" />
+        <ui:VisualElement name="right-panel">
+            <ThunderNut.SceneManagement.Editor.ScrollViewCustomControl style="flex-grow: 1;" />
+        </ui:VisualElement>
     </ThunderNut.SceneManagement.Editor.TwoPaneCustomControl>
 </ui:UXML>
