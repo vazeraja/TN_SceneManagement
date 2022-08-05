@@ -5,7 +5,9 @@
             <ThunderNut.SceneManagement.Editor.WorldGraph_GraphView focusable="true" style="flex-grow: 1;" />
         </ui:VisualElement>
         <ui:VisualElement name="right-panel">
-            <ThunderNut.SceneManagement.Editor.ScrollViewCustomControl style="flex-grow: 1;" />
+            <ThunderNut.SceneManagement.Editor.ScrollViewCustomControl style="flex-grow: 1;">
+                <ui:VisualElement name="TestVE" style="width: 259px; height: 170px; background-color: rgba(77, 33, 33, 255); left: 33px; top: 316px; justify-content: flex-end;" />
+            </ThunderNut.SceneManagement.Editor.ScrollViewCustomControl>
         </ui:VisualElement>
     </ThunderNut.SceneManagement.Editor.TwoPaneCustomControl>
 </ui:UXML>

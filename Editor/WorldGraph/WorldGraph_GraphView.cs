@@ -6,10 +6,14 @@ using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 namespace ThunderNut.SceneManagement.Editor {
+
     public class WorldGraph_GraphView : GraphView {
         public new class UxmlFactory : UxmlFactory<WorldGraph_GraphView, UxmlTraits> { }
         
         private const string styleSheetPath = "Assets/TN_SceneManagement/Editor/WorldGraph/WorldGraphEditorWindow.uss";
+
+        public WorldGraph graph;
+        
         public WorldGraph_GraphView() {
             var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(styleSheetPath);
             styleSheets.Add(styleSheet);
@@ -21,4 +25,5 @@ namespace ThunderNut.SceneManagement.Editor {
             this.AddManipulator(new RectangleSelector());
         }
     }
+    
 }

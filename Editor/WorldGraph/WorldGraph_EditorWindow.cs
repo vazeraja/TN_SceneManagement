@@ -5,16 +5,19 @@ using UnityEditor.Callbacks;
 using UnityEngine;
 using UnityEngine.UIElements;
 using System;
+using UnityEditor.Experimental.GraphView;
 
 public class WorldGraph_EditorWindow : EditorWindow {
     private const string visualTreePath = "Assets/TN_SceneManagement/Editor/WorldGraph/WorldGraphEditorWindow.uxml";
     private const string styleSheetPath = "Assets/TN_SceneManagement/Editor/WorldGraph/WorldGraphEditorWindow.uss";
 
-    // [NonSerialized] private bool m_Initialized;
+    [NonSerialized] private bool m_Initialized;
     private WorldGraph worldGraphAsset;
     private TwoPaneCustomControl twoPaneCustomControl;
     private ScrollViewCustomControl scrollViewCustomControl;
-    
+    private WorldGraph_GraphView worldGraphGraphView;
+
+
     [MenuItem("World Graph/World Graph")]
     public static WorldGraph_EditorWindow ShowWindow() {
         WorldGraph_EditorWindow window = GetWindow<WorldGraph_EditorWindow>();
@@ -37,7 +40,7 @@ public class WorldGraph_EditorWindow : EditorWindow {
         
         var window = ShowWindow();
         window.worldGraphAsset = worldGraphAsset;
-        // window.m_Initialized = false;
+        window.m_Initialized = false;
         return true;
     }
 
@@ -64,8 +67,11 @@ public class WorldGraph_EditorWindow : EditorWindow {
         
         twoPaneCustomControl = root.Q<TwoPaneCustomControl>();
         scrollViewCustomControl = root.Q<ScrollViewCustomControl>();
+        worldGraphGraphView = root.Q<WorldGraph_GraphView>();
         
-        scrollViewCustomControl.CreateSceneGUI();
+        // scrollViewCustomControl.CreateSceneGUI();
+        scrollViewCustomControl.Q<VisualElement>("TestVE").Add(new ResizableElement());
+        
         var myList = WorldGraphUtility.FindAssetsByType<SceneHandle>();
         foreach (var handle in myList) {
             Debug.Log(handle.name);
