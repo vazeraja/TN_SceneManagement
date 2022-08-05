@@ -25,13 +25,27 @@ namespace ThunderNut.SceneManagement {
     }
 
     public abstract class SceneHandle : ScriptableObject {
-        [SerializeField, HideInInspector] internal string nodeCustomName = null;
-        [NonSerialized] bool _needsInspector = false;
-        [HideInInspector] public string GUID;
-        [HideInInspector] public Rect position;
-        [HideInInspector] public bool expanded;
-        [HideInInspector] public bool debug;
-        [HideInInspector] public bool nodeLock;
+        [SerializeField, HideInInspector]
+        internal string nodeCustomName = null;
+
+        [NonSerialized]
+        bool _needsInspector = false;
+
+        [HideInInspector]
+        public string GUID;
+
+        [HideInInspector]
+        public Rect position;
+
+        [HideInInspector]
+        public bool expanded;
+
+        [HideInInspector]
+        public bool debug;
+
+        [HideInInspector]
+        public bool nodeLock;
+
         public virtual string m_Name => GetType().Name;
         public virtual Color color => Color.clear;
         public virtual string layoutStyle => string.Empty;
@@ -45,7 +59,7 @@ namespace ThunderNut.SceneManagement {
         public virtual bool isRenamable => false;
 
         [NonSerialized]
-        internal Dictionary<string, NodeFieldInformation> nodeFields = new Dictionary<string, NodeFieldInformation>();
+        Dictionary<string, NodeFieldInformation> nodeFields = new Dictionary<string, NodeFieldInformation>();
 
         internal class NodeFieldInformation {
             public string name;
@@ -68,15 +82,49 @@ namespace ThunderNut.SceneManagement {
             }
         }
 
-        [NonSerialized] public readonly NodeInputPortContainer inputPorts;
+        [NonSerialized]
+        public readonly NodeInputPortContainer inputPorts;
 
-        [NonSerialized] public readonly NodeOutputPortContainer outputPorts;
+        [NonSerialized]
+        public readonly NodeOutputPortContainer outputPorts;
 
         public event Action<SerializableEdge> onAfterEdgeConnected;
         public event Action<SerializableEdge> onAfterEdgeDisconnected;
 
-        public WorldGraph graph;
+        protected WorldGraph graph;
 
+        protected SceneHandle() {
+            inputPorts = new NodeInputPortContainer(this);
+            outputPorts = new NodeOutputPortContainer(this);
+        }
+
+        /// <summary>
+        /// Called when the node is enabled
+        /// </summary>
+        protected virtual void Enable() { }
+
+        /// <summary>
+        /// Called when the node is disabled
+        /// </summary>
+        protected virtual void Disable() { }
+
+        /// <summary>
+        /// Called when the node is removed
+        /// </summary>
+        protected virtual void Destroy() { }
+
+        // called by the BaseGraph when the node is added to the graph
+        public void Initialize(WorldGraph graph) {
+            this.graph = graph;
+
+            ExceptionToLog.Call(Enable);
+        }
+
+        /// <summary>
+        /// Called only when the node is created, not when instantiated
+        /// </summary>
+        public virtual void OnNodeCreated() => GUID = Guid.NewGuid().ToString();
+        
         public void OnEdgeConnected(SerializableEdge edge) {
             bool input = edge.inputNode == this;
             NodePortContainer portCollection = (input) ? (NodePortContainer) inputPorts : outputPorts;
@@ -109,12 +157,6 @@ namespace ThunderNut.SceneManagement {
             onAfterEdgeDisconnected?.Invoke(edge);
         }
 
-        /// <summary>
-        /// Add a port
-        /// </summary>
-        /// <param name="input">is input port</param>
-        /// <param name="fieldName">C# field name</param>
-        /// <param name="portData">Data of the port</param>
         public void AddPort(bool input, string fieldName, PortData portData) {
             // Fixup port data info if needed:
             if (portData.displayType == null)
@@ -126,11 +168,6 @@ namespace ThunderNut.SceneManagement {
                 outputPorts.Add(new NodePort(this, fieldName, portData));
         }
 
-        /// <summary>
-        /// Remove a port
-        /// </summary>
-        /// <param name="input">is input port</param>
-        /// <param name="port">the port to delete</param>
         public void RemovePort(bool input, NodePort port) {
             if (input)
                 inputPorts.Remove(port);
@@ -138,11 +175,6 @@ namespace ThunderNut.SceneManagement {
                 outputPorts.Remove(port);
         }
 
-        /// <summary>
-        /// Remove port(s) from field name
-        /// </summary>
-        /// <param name="input">is input</param>
-        /// <param name="fieldName">C# field name</param>
         public void RemovePort(bool input, string fieldName) {
             if (input)
                 inputPorts.RemoveAll(p => p.fieldName == fieldName);
@@ -150,31 +182,43 @@ namespace ThunderNut.SceneManagement {
                 outputPorts.RemoveAll(p => p.fieldName == fieldName);
         }
 
-        /// <summary>
-        /// Get all the nodes connected to the input ports of this node
-        /// </summary>
-        /// <returns>an enumerable of node</returns>
         public IEnumerable<SceneHandle> GetInputNodes() {
             return from port in inputPorts from edge in port.GetEdges() select edge.outputNode;
         }
 
-        /// <summary>
-        /// Get all the nodes connected to the output ports of this node
-        /// </summary>
-        /// <returns>an enumerable of node</returns>
         public IEnumerable<SceneHandle> GetOutputNodes() {
             return from port in outputPorts from edge in port.GetEdges() select edge.inputNode;
         }
 
-        /// <summary>
-        /// Get the port from field name and identifier
-        /// </summary>
         public NodePort GetPort(string fieldName, string identifier) {
             return inputPorts.Concat(outputPorts).FirstOrDefault(p => {
                 var bothNull = String.IsNullOrEmpty(identifier) && String.IsNullOrEmpty(p.portData.identifier);
                 return p.fieldName == fieldName && (bothNull || identifier == p.portData.identifier);
             });
         }
+
+        public IEnumerable<NodePort> GetAllPorts() {
+            foreach (var port in inputPorts)
+                yield return port;
+            foreach (var port in outputPorts)
+                yield return port;
+        }
+
+        public IEnumerable<SerializableEdge> GetAllEdges() {
+            foreach (var port in GetAllPorts())
+            foreach (var edge in port.GetEdges())
+                yield return edge;
+        }
+
+        internal void DisableInternal() {
+            // port containers are initialized in the OnEnable
+            inputPorts.Clear();
+            outputPorts.Clear();
+
+            ExceptionToLog.Call(Disable);
+        }
+
+        internal void DestroyInternal() => ExceptionToLog.Call(Destroy);
 
         public void SetCustomName(string customName) => nodeCustomName = customName;
         public string GetCustomName() => string.IsNullOrEmpty(nodeCustomName) ? name : nodeCustomName;

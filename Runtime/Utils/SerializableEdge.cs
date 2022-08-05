@@ -15,9 +15,6 @@ namespace ThunderNut.SceneManagement {
         [System.NonSerialized] public NodePort inputPort;
         [System.NonSerialized] public NodePort outputPort;
 
-        //temporary object used to send port to port data when a custom input/output function is used.
-        [System.NonSerialized] public object passThroughBuffer;
-
         [System.NonSerialized] public SceneHandle outputNode;
 
         public string inputFieldName;

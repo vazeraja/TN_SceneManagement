@@ -9,7 +9,9 @@ using UnityEngine;
 using UnityEngine.LowLevel;
 
 namespace ThunderNut.SceneManagement.Editor {
-    [CustomEditor(typeof(SceneHandle))]
+    [CustomEditor(typeof(DefaultSceneHandle))]
+    public class DefaultSceneHandleEditor : SceneHandleEditor { }
+
     public class SceneHandleEditor : UnityEditor.Editor {
         private SerializedProperty sceneProperty;
         private SerializedProperty passagesProperty;
@@ -207,7 +209,7 @@ namespace ThunderNut.SceneManagement.Editor {
                     EditorGUI.EndDisabledGroup();
                 }
             };
-            
+
             // Get the existing passages names as GUIContent[]
             availableOptions = sceneHandle.passages.Select(item => new GUIContent(item)).ToArray();
         }
@@ -246,7 +248,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
         private void DrawScriptField() {
             EditorGUI.BeginDisabledGroup(true);
-            EditorGUILayout.ObjectField("Script", MonoScript.FromScriptableObject((SceneHandle) target),
+            EditorGUILayout.ObjectField("Script", MonoScript.FromScriptableObject((DefaultSceneHandle) target),
                 typeof(SceneHandle), false);
             EditorGUI.EndDisabledGroup();
             EditorGUILayout.Space();
