@@ -1,30 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEditor;
 
-namespace ThunderNut.SceneManagement.Editor {
-    public static class WorldGraphUtility {
-        public static IEnumerable<T> FindAssetsByType<T>() where T : UnityEngine.Object {
-            string[] guids = AssetDatabase.FindAssets($"t:{typeof(T).ToString().Replace("UnityEngine.", "")}");
-            return guids.Select(AssetDatabase.GUIDToAssetPath).Select(AssetDatabase.LoadAssetAtPath<T>)
-                .Where(asset => asset != null).ToList();
-        }
-    }
-
+namespace ThunderNut.SceneManagement {
     [Serializable]
-    public struct JsonElement {
-        public string type;
-        public string jsonDatas;
+    public struct JsonElement
+    {
+        public string		type;
+        public string		jsonDatas;
 
-        public override string ToString() {
+        public override string ToString()
+        {
             return "type: " + type + " | JSON: " + jsonDatas;
         }
     }
 
-    public static class JsonSerializer {
-        public static JsonElement Serialize(object obj) {
-            JsonElement elem = new JsonElement();
+    public static class JsonSerializer
+    {
+        public static JsonElement	Serialize(object obj)
+        {
+            JsonElement	elem = new JsonElement();
 
             elem.type = obj.GetType().AssemblyQualifiedName;
             #if UNITY_EDITOR
@@ -36,11 +30,12 @@ namespace ThunderNut.SceneManagement.Editor {
             return elem;
         }
 
-        public static T Deserialize<T>(JsonElement e) {
+        public static T	Deserialize< T >(JsonElement e)
+        {
             if (typeof(T) != Type.GetType(e.type))
                 throw new ArgumentException("Deserializing type is not the same than Json element type");
 
-            var obj = Activator.CreateInstance<T>();
+            var obj = Activator.CreateInstance< T >();
             #if UNITY_EDITOR
             EditorJsonUtility.FromJsonOverwrite(e.jsonDatas, obj);
             #else
@@ -50,11 +45,13 @@ namespace ThunderNut.SceneManagement.Editor {
             return obj;
         }
 
-        public static JsonElement SerializeNode(SceneHandle node) {
+        public static JsonElement	SerializeNode(SceneHandle node)
+        {
             return Serialize(node);
         }
 
-        public static SceneHandle DeserializeNode(JsonElement e) {
+        public static SceneHandle	DeserializeNode(JsonElement e)
+        {
             try {
                 var baseNodeType = Type.GetType(e.type);
 
@@ -68,8 +65,7 @@ namespace ThunderNut.SceneManagement.Editor {
 				JsonUtility.FromJsonOverwrite(e.jsonDatas, node);
                 #endif
                 return node;
-            }
-            catch {
+            } catch {
                 return null;
             }
         }

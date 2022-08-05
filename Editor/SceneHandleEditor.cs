@@ -259,7 +259,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
             var scene = Selection.activeObject as SceneAsset;
 
-            var asset = CreateInstance<SceneHandle>();
+            var asset = CreateInstance<DefaultSceneHandle>();
             string baseName = trailingNumbersRegex.Replace(scene != null ? scene.name : string.Empty, "");
             asset.name = baseName + "Handle";
             if (AssetDatabase.TryGetGUIDAndLocalFileIdentifier(scene, out string newGuid, out long _)) {
