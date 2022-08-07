@@ -13,7 +13,7 @@ namespace ThunderNut.SceneManagement.Editor {
             {
                 if (obj is WorldGraph b)
                 {
-                    foreach (var graphWindow in Resources.FindObjectsOfTypeAll< WorldGraph_EditorWindow >())
+                    foreach (var graphWindow in Resources.FindObjectsOfTypeAll< WGEditorWindow >())
                         graphWindow.OnGraphDeleted();
 					
                     b.OnAssetDeleted();

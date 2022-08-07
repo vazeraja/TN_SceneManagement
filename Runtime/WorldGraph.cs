@@ -20,7 +20,7 @@ namespace ThunderNut.SceneManagement {
         public StickyNote removedStickyNotes;
     }
 
-    [CreateAssetMenu(fileName = "WorldGraph", menuName = "World Graph/World Graph")]
+    [CreateAssetMenu(fileName = "WorldGraph", menuName = "World Graph/World Graph"), Serializable]
     public class WorldGraph : ScriptableObject, ISerializationCallbackReceiver {
         [SerializeField, Obsolete("TODO")]
         public List<JsonElement> serializedNodes = new List<JsonElement>();
@@ -69,6 +69,7 @@ namespace ThunderNut.SceneManagement {
             if (isEnabled)
                 OnDisable();
 
+            Debug.Log("WorldGraph: OnEnable()");
             InitializeGraphElements();
             DestroyBrokenGraphElements();
 

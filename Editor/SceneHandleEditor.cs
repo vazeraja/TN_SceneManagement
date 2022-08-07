@@ -9,9 +9,8 @@ using UnityEngine;
 using UnityEngine.LowLevel;
 
 namespace ThunderNut.SceneManagement.Editor {
-    [CustomEditor(typeof(DefaultSceneHandle))]
-    public class DefaultSceneHandleEditor : SceneHandleEditor { }
-
+    
+    [CustomEditor(typeof(SceneHandle), true)]
     public class SceneHandleEditor : UnityEditor.Editor {
         private SerializedProperty sceneProperty;
         private SerializedProperty passagesProperty;
