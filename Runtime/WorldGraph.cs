@@ -34,6 +34,7 @@ namespace ThunderNut.SceneManagement {
         [SerializeField]
         public List<SerializableEdge> edges = new List<SerializableEdge>();
 
+        [NonSerialized]
         public Dictionary<string, SerializableEdge> edgesPerGUID = new Dictionary<string, SerializableEdge>();
 
         [SerializeField]
@@ -126,7 +127,8 @@ namespace ThunderNut.SceneManagement {
 
             nodes.Add(node);
             node.Initialize(this);
-
+            ExceptionToLog.Call(node.OnNodeCreated);
+            
             onGraphChanges?.Invoke(new GraphChanges {addedNode = node});
 
             return node;
@@ -137,7 +139,6 @@ namespace ThunderNut.SceneManagement {
             node.DestroyInternal();
 
             nodesPerGUID.Remove(node.GUID);
-
             nodes.Remove(node);
 
             onGraphChanges?.Invoke(new GraphChanges {removedNode = node});

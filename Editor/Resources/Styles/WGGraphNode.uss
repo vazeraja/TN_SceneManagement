@@ -1,0 +1,211 @@
+.switch #node-border {
+    background-color: rgb(33, 32, 32);
+    border-left-width: 4px;
+    border-right-width: 4px;
+    border-top-width: 2px;
+    border-bottom-width: 2px;
+    border-left-color: rgb(33, 32, 32);
+    border-right-color: rgb(33, 32, 32);
+    border-top-color: rgb(33, 32, 32);
+    border-bottom-color: rgb(239, 178, 79);
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    min-width: 175px;
+}
+
+.simpleAnimation #node-border {
+    background-color: rgb(33, 32, 32);
+    border-left-width: 4px;
+    border-right-width: 4px;
+    border-top-width: 2px;
+    border-bottom-width: 2px;
+    border-left-color: rgb(33, 32, 32);
+    border-right-color: rgb(33, 32, 32);
+    border-top-color: rgb(33, 32, 32);
+    border-bottom-color: rgb(30, 112, 207);
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    min-width: 175px;
+}
+
+.override #node-border {
+    background-color: rgb(33, 32, 32);
+    border-left-width: 4px;
+    border-right-width: 4px;
+    border-top-width: 2px;
+    border-bottom-width: 2px;
+    border-left-color: rgb(33, 32, 32);
+    border-right-color: rgb(33, 32, 32);
+    border-top-color: rgb(33, 32, 32);
+    border-bottom-color: rgb(207, 73, 72);
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    min-width: 175px;
+}
+
+.base #node-border {
+    background-color: rgb(33, 32, 32);
+    border-left-width: 4px;
+    border-right-width: 4px;
+    border-top-width: 2px;
+    border-bottom-width: 2px;
+    border-left-color: rgb(33, 32, 32);
+    border-right-color: rgb(33, 32, 32);
+    border-top-color: rgb(33, 32, 32);
+    border-bottom-color: rgb(255, 255, 255);
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    min-width: 175px;
+}
+
+#selection-border {
+    border-left-color: rgb(255, 255, 255);
+    border-right-color: rgb(255, 255, 255);
+    border-top-color: rgb(255, 255, 255);
+    border-bottom-color: rgb(255, 255, 255);
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+#title {
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
+
+#title-divider {
+    background-color: rgb(77, 77, 77);
+    min-height: 2px;
+    min-width: auto;
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+}
+
+:hover > #selection-border {
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-color: rgb(255, 255, 255);
+    border-right-color: rgb(255, 255, 255);
+    border-top-color: rgb(255, 255, 255);
+    border-bottom-color: rgb(255, 255, 255);
+}
+
+:selected > #selection-border {
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+}
+
+:hover:selected > #selection-border {
+    border-left-width: 1.5px;
+    border-right-width: 1.5px;
+    border-top-width: 1.5px;
+    border-bottom-width: 1.5px;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.switch #collapse-button {
+    align-items: stretch;
+    justify-content: flex-start;
+    border-left-color: rgb(239, 178, 79);
+    border-right-color: rgb(239, 178, 79);
+    border-top-color: rgb(239, 178, 79);
+    border-bottom-color: rgb(239, 178, 79);
+    width: 1px;
+    height: 1px;
+    margin-left: 3px;
+    margin-right: 3px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    padding-left: 3px;
+    padding-right: 3px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+.simpleAnimation #collapse-button {
+    align-items: stretch;
+    justify-content: flex-start;
+    border-left-color: rgb(30, 112, 207);
+    border-right-color: rgb(30, 112, 207);
+    border-top-color: rgb(30, 112, 207);
+    border-bottom-color: rgb(30, 112, 207);
+    width: 1px;
+    height: 1px;
+    margin-left: 3px;
+    margin-right: 3px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    padding-left: 3px;
+    padding-right: 3px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+.override #collapse-button {
+    align-items: stretch;
+    justify-content: flex-start;
+    border-left-color: rgb(207, 73, 72);
+    border-right-color: rgb(207, 73, 72);
+    border-top-color: rgb(207, 73, 72);
+    border-bottom-color: rgb(207, 73, 72);
+    width: 1px;
+    height: 1px;
+    margin-left: 3px;
+    margin-right: 3px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    padding-left: 3px;
+    padding-right: 3px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+.node {
+    min-width: 150px;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    min-height: auto;
+}

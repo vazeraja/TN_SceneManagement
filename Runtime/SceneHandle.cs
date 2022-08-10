@@ -16,14 +16,6 @@ namespace ThunderNut.SceneManagement {
         public int sceneHandlePassage;
     }
 
-    [CreateAssetMenu(fileName = "SceneHandle", menuName = "World Graph/Default Scene Handle")]
-    public class DefaultSceneHandle : SceneHandle {
-        protected override void ForceSwitchToScene() {
-            base.ForceSwitchToScene();
-            Debug.Log("");
-        }
-    }
-
     public abstract class SceneHandle : ScriptableObject {
         [SerializeField, HideInInspector]
         internal string nodeCustomName = null;
@@ -53,8 +45,8 @@ namespace ThunderNut.SceneManagement {
         public virtual bool isLocked => nodeLock;
         public virtual bool showControlsOnHover => false;
         public virtual bool deletable => true;
-        public bool createdFromDuplication { get; internal set; } = false;
-        public bool createdWithinGroup { get; internal set; } = false;
+        public bool createdFromDuplication { get; set; } = false;
+        public bool createdWithinGroup { get; set; } = false;
         public virtual bool needsInspector => _needsInspector;
         public virtual bool isRenamable => false;
 
@@ -124,6 +116,29 @@ namespace ThunderNut.SceneManagement {
         /// Called only when the node is created, not when instantiated
         /// </summary>
         public virtual void OnNodeCreated() => GUID = Guid.NewGuid().ToString();
+        
+        public static T CreateFromType< T >(Vector2 position) where T : SceneHandle
+        {
+            return CreateFromType(typeof(T), position) as T;
+        }
+
+        /// <summary>
+        /// Creates a node of type nodeType at a certain position
+        /// </summary>
+        /// <param name="position">position in the graph in pixels</param>
+        /// <typeparam name="nodeType">type of the node</typeparam>
+        /// <returns>the node instance</returns>
+        public static SceneHandle CreateFromType(Type nodeType, Vector2 position)
+        {
+            if (!nodeType.IsSubclassOf(typeof(SceneHandle)))
+                return null;
+
+            var node = Activator.CreateInstance(nodeType) as SceneHandle;
+
+            node.position = new Rect(position, new Vector2(100, 100));
+
+            return node;
+        }
         
         public void OnEdgeConnected(SerializableEdge edge) {
             bool input = edge.inputNode == this;

@@ -8,7 +8,7 @@ namespace ThunderNut.SceneManagement.Editor {
         public new class UxmlTraits : TwoPaneSplitView.UxmlTraits {
             public override void Init(VisualElement ve, IUxmlAttributes bag, CreationContext cc) {
                 base.Init(ve, bag, cc);
-                if (!(ve is TwoPaneCustomControl ate)) return;
+                if (ve is not TwoPaneCustomControl ate) return;
 
                 ate.fixedPaneInitialDimension = 950;
             }
