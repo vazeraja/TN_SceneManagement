@@ -4,6 +4,7 @@ using UnityEngine.UIElements;
 
 namespace ThunderNut.SceneManagement.Editor {
     public class WGGraphViewX : GraphView {
+        public new class UxmlFactory : UxmlFactory<WGGraphViewX, UxmlTraits> { }
         private readonly WorldGraph graph;
 
         public WGGraphViewX() {

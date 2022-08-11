@@ -70,10 +70,9 @@ namespace ThunderNut.SceneManagement {
             if (isEnabled)
                 OnDisable();
 
-            Debug.Log("WorldGraph: OnEnable()");
             InitializeGraphElements();
             DestroyBrokenGraphElements();
-
+            
             isEnabled = true;
             onEnabled?.Invoke();
         }
@@ -119,8 +118,13 @@ namespace ThunderNut.SceneManagement {
             foreach (var node in nodes)
                 node.DisableInternal();
         }
+        public virtual void OnAssetCreated() {
+            Debug.Log("WorldGraph SO Created");
+        }
 
-        public virtual void OnAssetDeleted() { }
+        public virtual void OnAssetDeleted() {
+            Debug.Log("WorldGraph SO Deleted");
+        }
 
         public SceneHandle AddNode(SceneHandle node) {
             nodesPerGUID[node.GUID] = node;

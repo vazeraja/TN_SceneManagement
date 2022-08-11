@@ -16,13 +16,15 @@ namespace ThunderNut.SceneManagement.Editor {
 
     public class WGEditorView : VisualElement, IDisposable {
         private EditorWindow m_EditorWindow;
-        private WGGraphViewX m_GraphViewX;
-        private WGGraphView m_GraphView;
+        private WGGraphViewX m_GraphView;
         private TwoPaneSplitView m_TwoPaneSplitView;
-        private VisualElement m_SplitViewLeftPanel;
-        private VisualElement m_SplitViewRightPanel;
         private WorldGraph m_Graph;
+
         private string m_AssetName;
+
+        private int m_FPIndex = 0;
+        private float m_FPInitialDimension = 928;
+        private TwoPaneSplitViewOrientation splitViewOrientation = TwoPaneSplitViewOrientation.Horizontal;
 
         private BaseEdgeConnectorListener connectorListener;
         private SearchWindowProvider m_SearchWindowProvider;
@@ -38,31 +40,7 @@ namespace ThunderNut.SceneManagement.Editor {
         const string k_UserViewSettings = "UnityEditor.ShaderGraph.ToggleSettings";
         public UserViewSettings viewSettings => m_UserViewSettings;
 
-        public WGGraphViewX graphViewX {
-            get => m_GraphViewX;
-            set => m_GraphViewX = value;
-        }
-        public WGGraphView graphView {
-            get => m_GraphView;
-            set {
-                if (m_GraphView != null) {
-                    m_GraphView.RemoveFromHierarchy();
-                    m_GraphView.Dispose();
-                }
-
-                m_GraphView = value;
-
-                // ReSharper disable once InvertIf
-                if (m_GraphView != null) {
-                    graphView.SetupZoom(0.05f, 8);
-                    graphView.AddManipulator(new ContentDragger());
-                    graphView.AddManipulator(new SelectionDragger());
-                    graphView.AddManipulator(new RectangleSelector());
-                    graphView.AddManipulator(new ClickSelector());
-                    m_TwoPaneSplitView.Q<VisualElement>("left-panel").Add(graphView);
-                }
-            }
-        }
+        public WGGraphViewX graphView => m_GraphView;
 
         public string assetName {
             get => m_AssetName;
@@ -122,34 +100,38 @@ namespace ThunderNut.SceneManagement.Editor {
             });
             Add(toolbar);
 
-            m_TwoPaneSplitView = new TwoPaneSplitView(0, 928, TwoPaneSplitViewOrientation.Horizontal) {
+            m_TwoPaneSplitView = new TwoPaneSplitView(m_FPIndex, m_FPInitialDimension, splitViewOrientation) {
                 name = "TwoPaneSplitView"
             };
             {
                 m_TwoPaneSplitView.Add(new VisualElement {name = "left-panel"});
                 {
-                    graphView = new WGGraphView(editorWindow) {
+                    m_GraphView = new WGGraphViewX(graph) {
                         name = "GraphView", viewDataKey = "MaterialGraphView"
                     };
+                    m_GraphView.SetupZoom(0.05f, 8);
+                    m_GraphView.AddManipulator(new ContentDragger());
+                    m_GraphView.AddManipulator(new SelectionDragger());
+                    m_GraphView.AddManipulator(new RectangleSelector());
+                    m_GraphView.AddManipulator(new ClickSelector());
+                    m_TwoPaneSplitView.Q<VisualElement>("left-panel").Add(m_GraphView);
                 }
                 m_TwoPaneSplitView.Add(new VisualElement {name = "right-panel"});
             }
-            // m_SearchWindowProvider = ScriptableObject.CreateInstance<WGSearcherProvider>();
-            // m_SearchWindowProvider.Initialize(m_EditorWindow, m_GraphViewX);
-            // m_GraphView.nodeCreationRequest = context => {
-            //     var displayPosition = (context.screenMousePosition - m_EditorWindow.position.position);
-            //     //only display the search window when current graph view is focused
-            //     if (EditorWindow.focusedWindow == m_EditorWindow) 
-            //     {
-            //         searcherWindow = SearcherWindow.ShowAndGet(m_EditorWindow,
-            //             (m_SearchWindowProvider as WGSearcherProvider).LoadSearchWindow(),
-            //             item => (m_SearchWindowProvider as WGSearcherProvider).OnSearcherSelectEntry(item,
-            //                 context.screenMousePosition - m_EditorWindow.position.position),
-            //             displayPosition, null,
-            //             new SearcherWindow.Alignment(SearcherWindow.Alignment.Vertical.Center,
-            //                 SearcherWindow.Alignment.Horizontal.Left));
-            //     }
-            // };
+
+            m_SearchWindowProvider = ScriptableObject.CreateInstance<WGSearcherProvider>();
+            m_SearchWindowProvider.Initialize(editorWindow, m_GraphView);
+            m_GraphView.nodeCreationRequest = c => {
+                if (EditorWindow.focusedWindow != m_EditorWindow) return;
+                var displayPosition = (c.screenMousePosition - m_EditorWindow.position.position);
+
+                m_SearchWindowProvider.target = c.target;
+                SearcherWindow.Show(m_EditorWindow,
+                    ((WGSearcherProvider) m_SearchWindowProvider).LoadSearchWindow(),
+                    item => ((WGSearcherProvider) m_SearchWindowProvider).OnSearcherSelectEntry(item,
+                        c.screenMousePosition - m_EditorWindow.position.position),
+                    displayPosition, null);
+            };
 
             Add(m_TwoPaneSplitView);
         }
@@ -157,7 +139,7 @@ namespace ThunderNut.SceneManagement.Editor {
         public void Dispose() {
             Debug.Log("Disposing Editor View");
 
-            if (graphView != null) {
+            if (m_GraphView != null) {
                 saveRequested = null;
                 saveAsRequested = null;
                 showInProjectRequested = null;
@@ -167,19 +149,13 @@ namespace ThunderNut.SceneManagement.Editor {
                 // foreach (var node in m_GraphView.Children().OfType<IShaderNodeView>())
                 //     node.Dispose();
 
-                // if (searcherWindow != null) {
-                //     searcherWindow.Close();
-                //     searcherWindow = null;
-                // }
-                // 
-                // if (m_SearchWindowProvider != null) {
-                //     Debug.Log("Window is closed but search provider is not.");
-                //     Object.DestroyImmediate(m_SearchWindowProvider);
-                //     m_SearchWindowProvider = null;
-                // }
+                m_GraphView.nodeCreationRequest = null;
+                m_GraphView = null;
+            }
 
-                graphView.nodeCreationRequest = null;
-                graphView = null;
+            if (m_SearchWindowProvider != null) {
+                Object.DestroyImmediate(m_SearchWindowProvider);
+                m_SearchWindowProvider = null;
             }
         }
     }

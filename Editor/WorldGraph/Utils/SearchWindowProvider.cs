@@ -4,12 +4,14 @@ using UnityEngine;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 using UnityEditor.Searcher;
+using UnityEditor.ShaderGraph;
 
 
 namespace ThunderNut.SceneManagement.Editor {
     public class SearchWindowProvider : ScriptableObject {
         internal EditorWindow m_EditorWindow;
         internal GraphView m_GraphView;
+        internal VisualElement target;
         internal Edge m_EdgeFilter;
         internal Port inputPort;
         internal Port outputPort;
@@ -29,17 +31,31 @@ namespace ThunderNut.SceneManagement.Editor {
 
         private void OnDestroy() {
             if (m_Icon == null) return;
-            DestroyImmediate(m_Icon); 
+            DestroyImmediate(m_Icon);
             m_Icon = null;
         }
     }
+
+    internal class SearchNodeItem : SearcherItem {
+        public readonly string identifier;
+
+        public SearchNodeItem(string name, string identifier = "", List<SearchNodeItem> newChildren = null,
+            Texture2D newIcon = null)
+            : base(name, icon: newIcon) {
+            this.identifier = identifier;
+        }
+    }
+
     public class WGSearcherProvider : SearchWindowProvider {
-        
         public Searcher LoadSearchWindow() {
+            
+            #region Setup Textures
+
             Texture2D bookTexture;
             Texture2D scienceTexture;
             Texture2D cookingTexture;
             Texture2D namesTexture;
+
             if (EditorGUIUtility.isProSkin) {
                 bookTexture = Resources.Load<Texture2D>("twotone_book_white_18dp");
                 scienceTexture = Resources.Load<Texture2D>("twotone_science_white_18dp");
@@ -52,14 +68,17 @@ namespace ThunderNut.SceneManagement.Editor {
                 cookingTexture = Resources.Load<Texture2D>("twotone_outdoor_grill_black_18dp");
                 namesTexture = Resources.Load<Texture2D>("twotone_emoji_people_black_18dp");
             }
-            
+
+            #endregion
+
             var searchOptions = new List<SearcherItem> {
-                new SearcherItem("Books", "Books Category", new List<SearcherItem> {
-                    new SearcherItem("Cooking", "Cooking Category", userData: "SceneHandle" ,icon: cookingTexture),
-                    new SearcherItem("Science Fiction", "Science Fiction Category", userData: "SceneHandle", icon: scienceTexture),
+                new SearcherItem("Books", "", new List<SearcherItem> {
+                    new SearchNodeItem("Cooking", "Cooking Category", newIcon: cookingTexture),
+                    new SearchNodeItem("Science Fiction", "Science Fiction Category", newIcon: scienceTexture),
+                    new SearchNodeItem("Names", "Names Category", newIcon: namesTexture)
                 }, icon: bookTexture)
             };
-            
+
             string databaseDir = Application.dataPath + "/../Library/Searcher";
             var nodeDatabase = SearcherDatabase.Create(searchOptions, databaseDir + "/WGNodeSearchOptions");
             return new Searcher(nodeDatabase, new SearchWindowAdapter("Create Node"));
@@ -67,16 +86,16 @@ namespace ThunderNut.SceneManagement.Editor {
 
         public bool OnSearcherSelectEntry(SearcherItem entry, Vector2 screenMousePosition) {
             var windowRoot = m_EditorWindow.rootVisualElement;
-            var windowMousePosition = windowRoot.ChangeCoordinatesTo(windowRoot.parent, screenMousePosition); //- m_EditorWindow.position.position);
+            var windowMousePosition =
+                windowRoot.ChangeCoordinatesTo(windowRoot.parent,
+                    screenMousePosition); //- m_EditorWindow.position.position);
             var graphMousePosition = m_GraphView.contentViewContainer.WorldToLocal(windowMousePosition);
 
-            switch (entry.UserData) {
-                case "SceneHandle":
-                    var WGGraphView = m_GraphView as WGGraphView;
-                    Debug.Log("TODO: A node should be created");
-                    return true;
+            if ((entry as SearchNodeItem)?.identifier == "Names Category") {
+                Debug.Log("Clicked Names Category");
+                return true;
             }
-            
+
             return true;
         }
     }

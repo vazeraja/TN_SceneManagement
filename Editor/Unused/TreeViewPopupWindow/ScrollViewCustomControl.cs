@@ -11,23 +11,27 @@ namespace ThunderNut.SceneManagement.Editor {
     public class ScrollViewCustomControl : ScrollView {
         public new class UxmlFactory : UxmlFactory<ScrollViewCustomControl, ScrollView.UxmlTraits> { }
 
-        // Rect buttonRect;
-        // public void CreateSceneGUI() {
-        //     Add(new IMGUIContainer(() => {
-        //         GUILayout.Label("Editor window with popup", EditorStyles.boldLabel);
-        //         if (GUILayout.Button("Popup Window")) {
-        //             PopupWindow.Show(buttonRect, new TreeViewPopupWindow(new SimpleTreeView(), buttonRect.width));
-        //         }
-        //
-        //         if (Event.current.type == EventType.Repaint)
-        //             buttonRect = GUILayoutUtility.GetLastRect();
-        //     }));
-        //     
-        //     string[] sceneGuids = Array.ConvertAll(UnityEditor.EditorBuildSettings.scenes, s => s.guid.ToString());
-        //     foreach (string sceneGuid in sceneGuids) {
-        //         Add(CreateSceneButton(sceneGuid));
-        //     }
-        // }
+        public ScrollViewCustomControl() {
+            Debug.Log("YEEHAW");
+        }
+
+        Rect buttonRect;
+        public void CreateSceneGUI() {
+            Add(new IMGUIContainer(() => {
+                GUILayout.Label("Editor window with popup", EditorStyles.boldLabel);
+                if (GUILayout.Button("Popup Window")) {
+                    PopupWindow.Show(buttonRect, new TreeViewPopupWindow(new SimpleTreeView(), buttonRect.width));
+                }
+        
+                if (Event.current.type == EventType.Repaint)
+                    buttonRect = GUILayoutUtility.GetLastRect();
+            }));
+            
+            // string[] sceneGuids = Array.ConvertAll(UnityEditor.EditorBuildSettings.scenes, s => s.guid.ToString());
+            // foreach (string sceneGuid in sceneGuids) {
+            //     Add(CreateSceneButton(sceneGuid));
+            // }
+        }
         
         // [InitializeOnLoadMethod]
         // private static void RegisterCallbacks() {

@@ -3,22 +3,18 @@ using UnityEditor;
 
 namespace ThunderNut.SceneManagement {
     [Serializable]
-    public struct JsonElement
-    {
-        public string		type;
-        public string		jsonDatas;
+    public struct JsonElement {
+        public string type;
+        public string jsonDatas;
 
-        public override string ToString()
-        {
+        public override string ToString() {
             return "type: " + type + " | JSON: " + jsonDatas;
         }
     }
 
-    public static class JsonSerializer
-    {
-        public static JsonElement	Serialize(object obj)
-        {
-            JsonElement	elem = new JsonElement();
+    public static class JsonSerializer {
+        public static JsonElement Serialize(object obj) {
+            JsonElement elem = new JsonElement();
 
             elem.type = obj.GetType().AssemblyQualifiedName;
             #if UNITY_EDITOR
@@ -30,12 +26,11 @@ namespace ThunderNut.SceneManagement {
             return elem;
         }
 
-        public static T	Deserialize< T >(JsonElement e)
-        {
+        public static T Deserialize<T>(JsonElement e) {
             if (typeof(T) != Type.GetType(e.type))
                 throw new ArgumentException("Deserializing type is not the same than Json element type");
 
-            var obj = Activator.CreateInstance< T >();
+            var obj = Activator.CreateInstance<T>();
             #if UNITY_EDITOR
             EditorJsonUtility.FromJsonOverwrite(e.jsonDatas, obj);
             #else
@@ -45,13 +40,11 @@ namespace ThunderNut.SceneManagement {
             return obj;
         }
 
-        public static JsonElement	SerializeNode(SceneHandle node)
-        {
+        public static JsonElement SerializeNode(SceneHandle node) {
             return Serialize(node);
         }
 
-        public static SceneHandle	DeserializeNode(JsonElement e)
-        {
+        public static SceneHandle DeserializeNode(JsonElement e) {
             try {
                 var baseNodeType = Type.GetType(e.type);
 
@@ -65,7 +58,8 @@ namespace ThunderNut.SceneManagement {
 				JsonUtility.FromJsonOverwrite(e.jsonDatas, node);
                 #endif
                 return node;
-            } catch {
+            }
+            catch {
                 return null;
             }
         }

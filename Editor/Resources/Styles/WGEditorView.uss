@@ -1,9 +1,9 @@
 WGEditorView > #TwoPaneSplitView {
     flex: 1;
-    flex-grow: 1;
 }
 WGEditorView > #TwoPaneSplitView > #left-panel > #GraphView {
     flex: 1;
+    flex-grow: 1;
 }
 
 /* 

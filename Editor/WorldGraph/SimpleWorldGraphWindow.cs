@@ -44,19 +44,12 @@ namespace ThunderNut.SceneManagement.Editor {
         }
 
         protected override void OnDestroy() {
-            // m_GraphView?.Dispose();
-            DestroyImmediate(tmpGraph);
         }
 
         protected override void InitializeWindow(WorldGraph graph) {
-            // Debug.Log("DefaultWorldGraphWindow: InitializeWindow()");
-            // titleContent = new GUIContent("Default Graph");
-            // m_GraphView ??= new WGGraphView(this);
-            // leftPanel.Add(m_GraphView);
         }
 
         protected override void InitializeGraphView(WGGraphView view) {
-            Debug.Log("DefaultWorldGraphWindow: InitializeGraphView()");
         }
     }
 }

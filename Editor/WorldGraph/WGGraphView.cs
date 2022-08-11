@@ -62,13 +62,11 @@ namespace ThunderNut.SceneManagement.Editor {
             if (EditorWindow.focusedWindow == m_EditorWindow) {
                 var displayPosition = (c.screenMousePosition - m_EditorWindow.position.position);
 
-                SearcherWindow.Show(m_EditorWindow,
-                    ((WGSearcherProvider) m_SearchWindowProvider).LoadSearchWindow(),
+                m_SearchWindowProvider.target = c.target;
+                SearcherWindow.Show(m_EditorWindow, ((WGSearcherProvider) m_SearchWindowProvider).LoadSearchWindow(),
                     item => ((WGSearcherProvider) m_SearchWindowProvider).OnSearcherSelectEntry(item,
                         c.screenMousePosition - m_EditorWindow.position.position),
-                    displayPosition, null,
-                    new SearcherWindow.Alignment(SearcherWindow.Alignment.Vertical.Center,
-                        SearcherWindow.Alignment.Horizontal.Left));
+                    displayPosition, null);
             }
         }
 

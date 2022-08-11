@@ -10,20 +10,23 @@ using Object = UnityEngine.Object;
 namespace ThunderNut.SceneManagement.Editor {
     [Serializable]
     public abstract class WGEditorWindow : EditorWindow {
-        [NonSerialized]
-        bool m_FrameAllAfterLayout;
+        [SerializeField] private string m_Selected;
+        [SerializeField] bool m_AssetMaybeChangedOnDisk;
+        [SerializeField] bool m_AssetMaybeDeleted;
+        [NonSerialized] bool m_FrameAllAfterLayout;
+        [NonSerialized] bool m_HasError;
+        [NonSerialized] bool m_ProTheme;
+        [SerializeField] string m_LastSerializedFileContents;
 
-        [SerializeField]
-        private string m_Selected;
         public string selectedGuid {
             get => m_Selected;
             private set => m_Selected = value;
         }
 
-        protected WorldGraph m_WorldGraph;
+        [SerializeField] protected WorldGraph m_WorldGraph;
         public WorldGraph worldGraph {
             get => m_WorldGraph;
-            set => m_WorldGraph = value;
+            set { m_WorldGraph = value; }
         }
 
         protected WGEditorView m_GraphEditorView;
@@ -40,8 +43,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 // ReSharper disable once InvertIf
                 if (m_GraphEditorView != null) {
                     // m_GraphEditorView.saveRequested += () => SaveAsset();
-                    // m_GraphEditorView.saveAsRequested += SaveAs;
-                    // m_GraphEditorView.convertToSubgraphRequested += ToSubGraph;
+                    m_GraphEditorView.saveAsRequested += SaveAs;
                     // m_GraphEditorView.isCheckedOut += IsGraphAssetCheckedOut;
                     // m_GraphEditorView.checkOut += CheckoutAsset;
                     m_GraphEditorView.showInProjectRequested += PingAsset;
@@ -59,13 +61,62 @@ namespace ThunderNut.SceneManagement.Editor {
             this.SetAntiAliasing(4);
         }
 
+        protected virtual void Update() {
+            if (m_HasError)
+                return;
+            
+            bool updateTitle = false;
+
+            if (m_AssetMaybeDeleted) {
+                m_AssetMaybeDeleted = false;
+                if (AssetFileExists()) {
+                    m_AssetMaybeChangedOnDisk = true;
+                }
+                else {
+                    DisplayDeletedFromDiskDialog();
+                }
+
+                updateTitle = true;
+            }
+
+            if (EditorGUIUtility.isProSkin != m_ProTheme) {
+                if (worldGraph != null) {
+                    updateTitle = true; // trigger icon swap
+                    m_ProTheme = EditorGUIUtility.isProSkin;
+                }
+            }
+
+            if (m_AssetMaybeChangedOnDisk) {
+                m_AssetMaybeChangedOnDisk = false;
+                
+                // if(worldGraph.graph != null){
+                //     // Do stuff here when we are actually serializing graph contents
+                //     // Such as checking if the contents serialized contents differ from the disk contents
+                // }
+                updateTitle = true;
+            }
+
+            try {
+                if (worldGraph == null && selectedGuid != null) {
+                    
+                }
+            }
+            catch (Exception e)
+            {
+                m_HasError = true;
+                m_GraphEditorView = null;
+                m_WorldGraph = null;
+                Debug.LogException(e);
+                throw;
+            }
+        }
+
         protected virtual void OnDisable() {
             worldGraph = null;
             graphEditorView = null;
-
-            // if (graph != null && m_GraphView != null)
-            //     m_GraphView.SaveGraphToDisk();
         }
+
+        public void Initialize(string assetGuid) { }
 
         public void Initialize(WorldGraph graph, string path, string assetGuid) {
             try {
@@ -74,6 +125,14 @@ namespace ThunderNut.SceneManagement.Editor {
 
                 using (GraphLoadMarker.Auto()) {
                     worldGraph = graph;
+
+                    // TODO: Replace with Custom WG Icon instead of SG icons
+                    Texture2D icon;
+                    {
+                        string theme = EditorGUIUtility.isProSkin ? "_dark" : "_light";
+                        icon = Resources.Load<Texture2D>("Icons/sg_graph_icon_gray" + theme);
+                    }
+                    titleContent = new GUIContent(graphName, icon);
                 }
 
                 using (CreateGraphEditorViewMarker.Auto()) {
@@ -83,17 +142,114 @@ namespace ThunderNut.SceneManagement.Editor {
                 }
             }
             catch (Exception) {
-                worldGraph = null;
-                graphEditorView = null;
+                m_HasError = true;
+                m_WorldGraph = null;
+                m_GraphEditorView = null;
                 throw;
             }
         }
 
+        public void UpdateTitle() {
+            string assetPath = AssetDatabase.GUIDToAssetPath(selectedGuid);
+            string graphName = Path.GetFileNameWithoutExtension(assetPath);
+
+            // update blackboard title (before we add suffixes)
+            if (graphEditorView != null)
+                graphEditorView.assetName = graphName;
+
+            string title = graphName;
+            if (worldGraph == null)
+                title += " (nothing loaded)";
+            else {
+                if (!AssetFileExists())
+                    title += " (deleted)";
+            }
+
+            // TODO: Replace with Custom WG Icon instead of SG icons
+            Texture2D icon;
+            {
+                string theme = EditorGUIUtility.isProSkin ? "_dark" : "_light";
+                icon = Resources.Load<Texture2D>("Icons/sg_graph_icon_gray" + theme);
+            }
+            titleContent = new GUIContent(title, icon);
+        }
+
+        private bool DisplayDeletedFromDiskDialog(bool reopen = true) {
+            // first double check if we've actually been deleted
+            bool saved = false;
+            bool okToClose = false;
+            string originalAssetPath = AssetDatabase.GUIDToAssetPath(selectedGuid);
+
+            while (true) {
+                int option = EditorUtility.DisplayDialogComplex(
+                    "Graph removed from project",
+                    "The file has been deleted or removed from the project folder.\n\n" +
+                    originalAssetPath +
+                    "\n\nWould you like to save your Graph Asset?",
+                    "Save As...", "Cancel", "Discard Graph and Close Window");
+
+                if (option == 0) {
+                    string savedPath = SaveAsImplementation(false);
+                    Debug.Log(savedPath);
+                    // if (savedPath != null)
+                    // {
+                    //     saved = true;
+                    // 
+                    //     // either close or reopen the local window editor
+                    //     worldGraph = null;
+                    //     selectedGuid = (reopen ? AssetDatabase.AssetPathToGUID(savedPath) : null);
+                    // 
+                    //     break;
+                    // }
+                }
+                else if (option == 1) {
+                    // continue in deleted state...
+                    break;
+                }
+                else if (option == 2) {
+                    okToClose = true;
+                    worldGraph = null;
+                    selectedGuid = null;
+                    break;
+                }
+            }
+
+            return (saved || okToClose);
+        }
+
+        public void SaveAs() {
+            SaveAsImplementation(true);
+        }
+
+        public string SaveAsImplementation(bool openWhenSaved) {
+            string savedFilePath = null;
+            if (openWhenSaved) {
+                Debug.Log("TODO: Implement SaveAsImplementation()");
+                return savedFilePath;
+            }
+            else {
+                return "TODO: Implement SaveAsImplementation()";
+            }
+        }
         public void PingAsset() {
             if (selectedGuid != null) {
                 var path = AssetDatabase.GUIDToAssetPath(selectedGuid);
                 var asset = AssetDatabase.LoadAssetAtPath<Object>(path);
                 EditorGUIUtility.PingObject(asset);
+            }
+        }
+
+        private bool AssetFileExists() => File.Exists(AssetDatabase.GUIDToAssetPath(selectedGuid));
+
+        public void AssetWasDeleted() {
+            m_AssetMaybeDeleted = true;
+            UpdateTitle();
+        }
+
+        public void CheckForChanges() {
+            if (!m_AssetMaybeDeleted && worldGraph != null) {
+                m_AssetMaybeChangedOnDisk = true;
+                UpdateTitle();
             }
         }
 
@@ -105,8 +261,7 @@ namespace ThunderNut.SceneManagement.Editor {
             // we immediately unregister it so it doesn't get called again
             graphEditorView.UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
             if (m_FrameAllAfterLayout) {
-                Debug.Log("FrameAll()");
-                //graphEditorView.graphView.FrameAll();
+                graphEditorView.graphView.FrameAll();
             }
 
             m_FrameAllAfterLayout = false;
@@ -130,96 +285,8 @@ namespace ThunderNut.SceneManagement.Editor {
         // public event Action<WorldGraph> graphLoaded;
         // public event Action<WorldGraph> graphUnloaded;
 
-        /// <summary>
-        /// OnGUI() - Runs frequently - whenever clicks are registered within the editor window and when repaints happen
-        /// CreateGUI() - Runs once - when the editor window is opened
-        /// CreateGUI() is also very similar to OnEnable()
-        /// </summary>
-        protected virtual void CreateGUI() {
-            // Debug.Log("CreateGUI: OnEnable()");
-            // InitializeRootView();
-            // LoadGraph();
-        }
-
-
-        protected virtual void Update() {
-            // if (reloadWorkaround && graph != null) {
-            //     LoadGraph();
-            //     reloadWorkaround = false;
-            // }
-        }
-
         protected virtual void OnDestroy() { }
-
-        private void InitializeRootView() {
-            // root = rootVisualElement; // Each editor window contains a root VisualElement object
-            // 
-            // var visualTree = Resources.Load<VisualTreeAsset>(visualTreePath);
-            // visualTree.CloneTree(root);
-            // 
-            // var styleSheet = Resources.Load<StyleSheet>(styleSheetPath);
-            // root.styleSheets.Add(styleSheet);
-            // 
-            // twoPaneCustomControl = root.Q<TwoPaneCustomControl>();
-            // scrollViewCustomControl = root.Q<ScrollViewCustomControl>();
-            // leftPanel = root.Q<VisualElement>("left-panel");
-            // rightPanel = root.Q<VisualElement>("right-panel");
-        }
-
-        private void LoadGraph() {
-            // if (graph != null) {
-            //     if (graph.isEnabled) // Sanity Check: make sure graph is enabled then initialize graph again
-            //         InitializeGraph(graph);
-            //     else
-            //         graph.onEnabled += () => InitializeGraph(graph);
-            // }
-            // else {
-            //     reloadWorkaround = true;
-            // }
-        }
-
-        public void InitializeGraph(WorldGraph graph) {
-            // if (this.graph != null && graph != this.graph) {
-            //     EditorUtility.SetDirty(this.graph); // Save the graph to the disk
-            //     AssetDatabase.SaveAssets();
-            //     graphUnloaded?.Invoke(this.graph); // Unload the graph
-            // }
-            // 
-            // graphLoaded?.Invoke(graph);
-            // this.graph = graph;
-            // 
-            // if (m_GraphView != null) 
-            //     leftPanel.Remove(m_GraphView);
-            // 
-            // InitializeWindow(graph);
-            // 
-            // m_GraphView = leftPanel.Q<WGGraphView>();
-            // 
-            // if (m_GraphView == null) {
-            //     Debug.LogError("GraphView has not been added to the left panel!");
-            //     return;
-            // }
-            // 
-            // m_GraphView.Initialize(graph);
-            // InitializeGraphView(m_GraphView);
-        }
-
-        private void OnSelectionChange() {
-            // // May not need to do this, if only one world graph per project
-            // var m_worldGraphAsset = Selection.activeObject as WorldGraph;
-            // if (m_worldGraphAsset != null && m_worldGraphAsset != graph) {
-            //     graph = m_worldGraphAsset;
-            //     Debug.Log(graph.name);
-            // }
-        }
-
-        public virtual void OnGraphDeleted() {
-            // if (graph != null && m_GraphView != null)
-            //     root.Remove(m_GraphView);
-            // 
-            // m_GraphView = null;
-        }
-
+        public virtual void OnGraphDeleted() { }
         protected abstract void InitializeWindow(WorldGraph graph);
         protected virtual void InitializeGraphView(WGGraphView view) { }
     }
