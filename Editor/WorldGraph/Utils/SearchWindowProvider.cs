@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEditor.Experimental.GraphView;
@@ -13,11 +14,13 @@ namespace ThunderNut.SceneManagement.Editor {
         internal VisualElement target;
         internal Texture2D m_Icon;
         internal string[] listItems;
+        internal Action<string> onSetIndexCallback;
 
-        public void Initialize(EditorWindow editorWindow, GraphView graphView = null, string[] items = null) {
+        public void Initialize(EditorWindow editorWindow, GraphView graphView = null, string[] items = null, Action<string> callback = null) {
             m_EditorWindow = editorWindow;
             m_GraphView = graphView;
             listItems = items;
+            onSetIndexCallback = callback;
 
             // Transparent icon to trick search window into indenting items
             m_Icon = new Texture2D(1, 1);

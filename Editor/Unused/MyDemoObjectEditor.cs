@@ -50,7 +50,9 @@ namespace ThunderNut.SceneManagement.Editor {
             inspectorWindow = Resources.FindObjectsOfTypeAll<EditorWindow>().ToList()
                 .Find(x => x.titleContent.ToString() == "Inspector");
             searchProvider = CreateInstance<StringListSearcherProvider>();
-            searchProvider.Initialize(inspectorWindow, items: Ingredients);
+            searchProvider.Initialize(inspectorWindow, items: Ingredients, callback: (x) => {
+                ((MyDemoObject) target).selectedItem = x;
+            });
         }
 
         public override void OnInspectorGUI() {

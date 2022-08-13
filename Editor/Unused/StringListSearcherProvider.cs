@@ -8,19 +8,6 @@ using UnityEditor.ShaderGraph;
 using UnityEngine;
 
 namespace ThunderNut.SceneManagement.Editor {
-    public class NodeEntry {
-        public string name = "default";
-        public List<NodeEntry> children;
-
-        public NodeEntry() {
-            children = new List<NodeEntry>();
-        }
-
-        public NodeEntry(string name) : this() {
-            this.name = name;
-        }
-    }
-
     public class StringListSearcherProvider : SearchWindowProvider {
         private static void BuildTree(IEnumerable<List<string>> entryItemsList, out List<SearcherItem> result) {
             var root = new SearcherItem("Main");
@@ -80,11 +67,7 @@ namespace ThunderNut.SceneManagement.Editor {
         }
 
         public bool OnSearcherSelectEntry(SearcherItem entry) {
-            if ((entry as SearchNodeItem)?.userData is "Civic") {
-                Debug.Log("Clicked 'Civic' item");
-                return true;
-            }
-
+            onSetIndexCallback?.Invoke((string)(entry as SearchNodeItem)?.userData);
             return true;
         }
     }
