@@ -3,6 +3,9 @@
 namespace ThunderNut.SceneManagement {
     public class MyDemoObject : MonoBehaviour {
         public string selectedItem;
-        public WorldGraph targetObject;
+
+        [SearchObject(typeof(MyDemoScriptableObject))]
+        public MyDemoScriptableObject targetObject;
+        
     }
 }

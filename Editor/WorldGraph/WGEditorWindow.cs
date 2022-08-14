@@ -64,7 +64,7 @@ namespace ThunderNut.SceneManagement.Editor {
         protected virtual void Update() {
             if (m_HasError)
                 return;
-            bool updateTitle = false;
+            var updateTitle = false;
 
             try {
                 if (worldGraph == null && selectedGuid != null) {

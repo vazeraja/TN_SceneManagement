@@ -2,8 +2,8 @@
 using UnityEditor.IMGUI.Controls;
 
 namespace ThunderNut.SceneManagement.Editor {
-    class SimpleTreeView : TreeView {
-        public SimpleTreeView() : base(new TreeViewState()) {
+    class WGSimpleTreeView : TreeView {
+        public WGSimpleTreeView() : base(new TreeViewState()) {
             Reload();
         }
 

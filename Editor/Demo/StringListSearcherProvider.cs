@@ -8,7 +8,13 @@ using UnityEditor.ShaderGraph;
 using UnityEngine;
 
 namespace ThunderNut.SceneManagement.Editor {
-    public class StringListSearcherProvider : SearchWindowProvider {
+    public class StringListSearcherProvider : ScriptableObject {
+        private string[] items;
+        private Action<string> callback;
+        public void Initialize(string[] items, Action<string> callback) {
+            this.items = items;
+            this.callback = callback;
+        }
         private static void BuildTree(IEnumerable<List<string>> entryItemsList, out List<SearcherItem> result) {
             var root = new SearcherItem("Main");
             var current = root;
@@ -40,7 +46,7 @@ namespace ThunderNut.SceneManagement.Editor {
         }
 
         public Searcher LoadSearchWindow() {
-            var sortedListItems = listItems.ToList();
+            var sortedListItems = items.ToList();
             sortedListItems.Sort((entry1, entry2) => {
                 string[] splits1 = entry1.Split('/');
                 string[] splits2 = entry2.Split('/');
@@ -57,8 +63,8 @@ namespace ThunderNut.SceneManagement.Editor {
 
                 return 0;
             });
-            
-            var tree = sortedListItems.Select(item => item.Split('/').ToList()).ToList();
+
+            List<List<string>> tree = sortedListItems.Select(item => item.Split('/').ToList()).ToList();
             BuildTree(tree, out var result);
 
             string databaseDir = Application.dataPath + "/../Library/Searcher";
@@ -67,7 +73,7 @@ namespace ThunderNut.SceneManagement.Editor {
         }
 
         public bool OnSearcherSelectEntry(SearcherItem entry) {
-            onSetIndexCallback?.Invoke((string)(entry as SearchNodeItem)?.userData);
+            callback?.Invoke((string) (entry as SearchNodeItem)?.userData);
             return true;
         }
     }

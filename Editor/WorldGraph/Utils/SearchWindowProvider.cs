@@ -13,14 +13,10 @@ namespace ThunderNut.SceneManagement.Editor {
         internal GraphView m_GraphView;
         internal VisualElement target;
         internal Texture2D m_Icon;
-        internal string[] listItems;
-        internal Action<string> onSetIndexCallback;
 
-        public void Initialize(EditorWindow editorWindow, GraphView graphView = null, string[] items = null, Action<string> callback = null) {
+        public void Initialize(EditorWindow editorWindow, GraphView graphView = null) {
             m_EditorWindow = editorWindow;
             m_GraphView = graphView;
-            listItems = items;
-            onSetIndexCallback = callback;
 
             // Transparent icon to trick search window into indenting items
             m_Icon = new Texture2D(1, 1);
@@ -40,7 +36,8 @@ namespace ThunderNut.SceneManagement.Editor {
         public readonly object userData;
 
         public SearchNodeItem(string name, string identifier = "", object userData = null,
-            List<SearchNodeItem> newChildren = null, Texture2D icon = null) : base(name, userData: userData, icon: icon) {
+            List<SearchNodeItem> newChildren = null, Texture2D icon = null) :
+            base(name, userData: userData, icon: icon) {
             this.identifier = identifier;
             this.userData = userData;
         }
