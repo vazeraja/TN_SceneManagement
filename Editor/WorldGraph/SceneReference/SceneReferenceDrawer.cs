@@ -11,7 +11,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
         private static readonly SceneReferencesEditorHelper helperAsset
             = AssetDatabase.LoadAssetAtPath<SceneReferencesEditorHelper>(
-                AssetDatabase.GUIDToAssetPath("3ac7dd1ff29545725a68360083d41e41"));
+                AssetDatabase.GUIDToAssetPath("8b48abec38b04801a893fee947448bc2"));
 
         private readonly SerializedObject helper = new SerializedObject(helperAsset);
         ~SceneReferenceDrawer() => helper.Dispose();

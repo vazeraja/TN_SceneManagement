@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using NUnit.Framework;
 using UnityEditor;
+using UnityEditor.IMGUI.Controls;
 using UnityEngine;
+using PropertyAttribute = UnityEngine.PropertyAttribute;
 
 namespace ThunderNut.SceneManagement.Editor {
 
@@ -42,6 +45,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 };
             }
         }
+
         public static void HorizontalScope(Action block) {
             EditorGUILayout.BeginHorizontal();
             block();
@@ -65,6 +69,8 @@ namespace ThunderNut.SceneManagement.Editor {
                 .Where(asset => asset != null).ToList();
         }
 
+        #region Serialized Property Extensions
+        
         public static T GetPropertyAttribute<T>(this SerializedProperty prop, bool inherit) where T : PropertyAttribute {
             if (prop == null) {
                 return null;
@@ -105,6 +111,8 @@ namespace ThunderNut.SceneManagement.Editor {
 
             return attributes is {Length: > 0} ? attributes[0] : null;
         }
+
+        #endregion
     }
 
 }

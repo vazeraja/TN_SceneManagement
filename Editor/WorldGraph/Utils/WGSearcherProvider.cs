@@ -31,9 +31,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
         public bool OnSearcherSelectEntry(SearcherItem entry, Vector2 screenMousePosition) {
             var windowRoot = m_EditorWindow.rootVisualElement;
-            var windowMousePosition =
-                windowRoot.ChangeCoordinatesTo(windowRoot.parent,
-                    screenMousePosition); //- m_EditorWindow.position.position);
+            var windowMousePosition = windowRoot.ChangeCoordinatesTo(windowRoot.parent, screenMousePosition); 
             var graphMousePosition = m_GraphView.contentViewContainer.WorldToLocal(windowMousePosition);
 
             if ((entry as SearchNodeItem)?.userData is "Names Category") {

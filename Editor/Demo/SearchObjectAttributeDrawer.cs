@@ -12,9 +12,8 @@ namespace ThunderNut.SceneManagement.Editor {
     [CustomPropertyDrawer(typeof(SearchObjectAttribute))]
     public class SearchObjectAttributeDrawer : PropertyDrawer {
         private SerializedProperty serializedProperty;
-        private EditorWindow inspectorWindow;
+        private EditorWindow editorWindow;
         private Type assetType;
-        private bool initialized = false;
 
         private static void BuildTree(IEnumerable<string> paths, out List<SearcherItem> result) {
             List<List<string>> entryItemsList = paths.Select(item => item.Split('/').ToList()).ToList();
@@ -67,8 +66,6 @@ namespace ThunderNut.SceneManagement.Editor {
 
             serializedProperty.objectReferenceValue = userData ? userData : serializedProperty.objectReferenceValue;
             serializedProperty.serializedObject.ApplyModifiedProperties();
-
-            initialized = false;
             return true;
         }
 
@@ -76,21 +73,14 @@ namespace ThunderNut.SceneManagement.Editor {
             serializedProperty = property;
             assetType = property.GetPropertyAttribute<SearchObjectAttribute>(true).searchObjectType;
 
-            if (!initialized) {
-                inspectorWindow = WGHelpers.GetEditorWindowByName("Inspector");
-                initialized = true;
-            }
-
             position.width -= 60;
             EditorGUI.ObjectField(position, property, label);
 
             position.x += position.width;
             position.width = 60;
             if (GUI.Button(position, new GUIContent("Find"))) {
-                SearcherWindow.Show(inspectorWindow, LoadSearchWindow(), OnSearcherSelectEntry,
-                    inspectorWindow.rootVisualElement.LocalToWorld(Event.current.mousePosition), null,
-                    new SearcherWindow.Alignment(SearcherWindow.Alignment.Vertical.Top,
-                        SearcherWindow.Alignment.Horizontal.Right));
+                SearcherWindow.Show(EditorWindow.focusedWindow, LoadSearchWindow(), OnSearcherSelectEntry,
+                    EditorWindow.focusedWindow.rootVisualElement.LocalToWorld(Event.current.mousePosition), null);
             }
         }
     }

@@ -1,19 +1,32 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEditor.IMGUI.Controls;
+using UnityEngine;
 
 namespace ThunderNut.SceneManagement.Editor {
-    class WGSimpleTreeView : TreeView {
+
+    public class WGSimpleTreeView : TreeView {
+        private Action closeWindowCallback;
+
         public WGSimpleTreeView() : base(new TreeViewState()) {
             Reload();
         }
 
-        protected override TreeViewItem BuildRoot() {
-            // BuildRoot is called every time Reload is called to ensure that TreeViewItems 
-            // are created from data. Here we create a fixed set of items. In a real world example,
-            // a data model should be passed into the TreeView and the items created from the model.
+        private WGSimpleTreeView(TreeViewState tvs, MultiColumnHeader mch, Action closeWindowCallback = null) : base(tvs, mch) {
+            Reload();
+            this.closeWindowCallback = closeWindowCallback;
+        }
 
-            // This section illustrates that IDs should be unique. The root item is required to 
-            // have a depth of -1, and the rest of the items increment from that.
+        protected override void DoubleClickedItem(int id) {
+            closeWindowCallback?.Invoke();
+            base.DoubleClickedItem(id);
+        }
+
+        protected override bool CanMultiSelect(TreeViewItem item) {
+            return true;
+        }
+
+        protected override TreeViewItem BuildRoot() {
             var root = new TreeViewItem {id = 0, depth = -1, displayName = "Root"};
             var allItems = new List<TreeViewItem> {
                 new TreeViewItem {id = 1, depth = 0, displayName = "Animals"},
@@ -27,11 +40,39 @@ namespace ThunderNut.SceneManagement.Editor {
                 new TreeViewItem {id = 9, depth = 2, displayName = "Lizard"},
             };
 
-            // Utility method that initializes the TreeViewItem.children and .parent for all items.
             SetupParentsAndChildrenFromDepths(root, allItems);
 
-            // Return root of the tree
             return root;
         }
+        
+
+        public static WGSimpleTreeView Create(ref TreeViewState tvs, ref MultiColumnHeaderState mchs, Action cwc = null) {
+            tvs ??= new TreeViewState();
+
+            var newHeaderState = CreateHeaderState();
+            if (MultiColumnHeaderState.CanOverwriteSerializedFields(mchs, newHeaderState))
+                MultiColumnHeaderState.OverwriteSerializedFields(mchs, newHeaderState);
+            mchs = newHeaderState;
+
+            var header = new MultiColumnHeader(mchs);
+            return new WGSimpleTreeView(tvs, header, cwc);
+        }
+
+        private static MultiColumnHeaderState CreateHeaderState() {
+            var columns = new[] {
+                new MultiColumnHeaderState.Column(),
+            };
+
+            columns[0].headerContent = new GUIContent("Assets", "Performance counters rendered in a chart");
+            columns[0].minWidth = 100;
+            columns[0].width = 250;
+            columns[0].maxWidth = 5000;
+            columns[0].headerTextAlignment = TextAlignment.Left;
+            columns[0].canSort = false;
+            columns[0].autoResize = false;
+
+            return new MultiColumnHeaderState(columns);
+        }
     }
+
 }

@@ -12,3 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 110f8b170ba24c8db581974896541c41, type: 3}
   m_Name: WorldGraph
   m_EditorClassIdentifier: 
+  selectedItem: Legs
+  DemoScriptableObject: {fileID: 11400000, guid: bd701b768d978c448801cc3f00a5b451, type: 2}

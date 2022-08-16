@@ -10,7 +10,7 @@ using UnityEngine.LowLevel;
 
 namespace ThunderNut.SceneManagement.Editor {
     
-    [CustomEditor(typeof(SceneHandle), true)]
+    [CustomEditor(typeof(BaseSceneNode), true)]
     public class SceneHandleEditor : UnityEditor.Editor {
         private SerializedProperty sceneProperty;
         private SerializedProperty passagesProperty;
@@ -20,18 +20,18 @@ namespace ThunderNut.SceneManagement.Editor {
         private ReorderableList sceneConnectionsList;
 
         // Reference to the actual SceneHandle instance this Inspector belongs to
-        private SceneHandle sceneHandle;
+        private BaseSceneNode baseSceneNode;
 
         // GUIContent field for storing available tag options
         private GUIContent[] availableOptions;
 
         // Called when the Inspector is opened / ScriptableObject is selected
         private void OnEnable() {
-            sceneHandle = (SceneHandle) target;
+            baseSceneNode = (BaseSceneNode) target;
 
             // Link in serialized fields to their according SerializedProperties
-            passagesProperty = serializedObject.FindProperty(nameof(SceneHandle.passages));
-            sceneConnectionsProperty = serializedObject.FindProperty(nameof(SceneHandle.sceneConnections));
+            passagesProperty = serializedObject.FindProperty(nameof(BaseSceneNode.passages));
+            sceneConnectionsProperty = serializedObject.FindProperty(nameof(BaseSceneNode.sceneConnections));
 
             // Setup and configure the sceneTagsList we will use to display the content of the sceneTagsList 
             passagesList = new ReorderableList(serializedObject, passagesProperty) {
@@ -54,7 +54,7 @@ namespace ThunderNut.SceneManagement.Editor {
                     var element = passagesProperty.GetArrayElementAtIndex(index);
 
                     // Get all characters as string[]
-                    var availableIDs = sceneHandle.passages;
+                    var availableIDs = baseSceneNode.passages;
 
                     // store the original GUI.color
                     var color = GUI.color;
@@ -88,7 +88,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 // Get the correct display height of elements in the list according to their values
                 elementHeightCallback = index => {
                     var element = passagesProperty.GetArrayElementAtIndex(index);
-                    var availableIDs = sceneHandle.passages;
+                    var availableIDs = baseSceneNode.passages;
 
                     var height = EditorGUI.GetPropertyHeight(element);
 
@@ -128,7 +128,7 @@ namespace ThunderNut.SceneManagement.Editor {
                     var element = sceneConnectionsProperty.GetArrayElementAtIndex(index);
 
                     var sceneTag = element.FindPropertyRelative(nameof(SceneConnection.passage));
-                    var handle = element.FindPropertyRelative(nameof(SceneConnection.sceneHandle));
+                    var handle = element.FindPropertyRelative(nameof(SceneConnection.baseSceneNode));
                     var handleTags = element.FindPropertyRelative(nameof(SceneConnection.sceneHandlePassage));
 
                     return EditorGUI.GetPropertyHeight(sceneTag) + EditorGUI.GetPropertyHeight(handle) +
@@ -145,7 +145,7 @@ namespace ThunderNut.SceneManagement.Editor {
                     var newElement =
                         list.serializedProperty.GetArrayElementAtIndex(list.serializedProperty.arraySize - 1);
                     var sceneTag = newElement.FindPropertyRelative(nameof(SceneConnection.passage));
-                    var handle = newElement.FindPropertyRelative(nameof(SceneConnection.sceneHandle));
+                    var handle = newElement.FindPropertyRelative(nameof(SceneConnection.baseSceneNode));
                     var text = newElement.FindPropertyRelative(nameof(SceneConnection.sceneHandlePassage));
 
                     sceneTag.intValue = -1;
@@ -159,7 +159,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
                     // Get the nested property fields of the passageElements class
                     var sceneTag = element.FindPropertyRelative(nameof(SceneConnection.passage));
-                    var handle = element.FindPropertyRelative(nameof(SceneConnection.sceneHandle));
+                    var handle = element.FindPropertyRelative(nameof(SceneConnection.baseSceneNode));
                     var handleTags = element.FindPropertyRelative(nameof(SceneConnection.sceneHandlePassage));
 
                     var popUpHeight = EditorGUI.GetPropertyHeight(sceneTag) + 4;
@@ -172,8 +172,8 @@ namespace ThunderNut.SceneManagement.Editor {
 
                     // Draw the Popup so you can select from the existing character names
                     sceneTag.intValue = EditorGUI.Popup(new Rect(rect.x, rect.y, rect.width, popUpHeight),
-                        new GUIContent(sceneHandle.scene != null
-                            ? sceneHandle.scene.GetType().Name
+                        new GUIContent(baseSceneNode.scene != null
+                            ? baseSceneNode.scene.GetType().Name
                             : sceneTag.displayName),
                         sceneTag.intValue, availableOptions);
 
@@ -193,7 +193,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
                     // Stores tag options based on the chosen scene handle
                     var handleOptions = handle.objectReferenceValue != null
-                        ? sceneHandle.sceneConnections[index].sceneHandle.passages
+                        ? baseSceneNode.sceneConnections[index].baseSceneNode.passages
                             .Select(item => new GUIContent(item))
                             .ToArray()
                         : new GUIContent[] { };
@@ -210,7 +210,7 @@ namespace ThunderNut.SceneManagement.Editor {
             };
 
             // Get the existing passages names as GUIContent[]
-            availableOptions = sceneHandle.passages.Select(item => new GUIContent(item)).ToArray();
+            availableOptions = baseSceneNode.passages.Select(item => new GUIContent(item)).ToArray();
         }
 
         public override bool RequiresConstantRepaint() {
@@ -231,7 +231,7 @@ namespace ThunderNut.SceneManagement.Editor {
             if (EditorGUI.EndChangeCheck()) {
                 serializedObject.ApplyModifiedProperties();
 
-                availableOptions = sceneHandle.passages
+                availableOptions = baseSceneNode.passages
                     .Select(item => new GUIContent(item))
                     .ToArray();
 
@@ -247,8 +247,8 @@ namespace ThunderNut.SceneManagement.Editor {
 
         private void DrawScriptField() {
             EditorGUI.BeginDisabledGroup(true);
-            EditorGUILayout.ObjectField("Script", MonoScript.FromScriptableObject((DefaultSceneHandle) target),
-                typeof(SceneHandle), false);
+            EditorGUILayout.ObjectField("Script", MonoScript.FromScriptableObject((DefaultSceneNode) target),
+                typeof(BaseSceneNode), false);
             EditorGUI.EndDisabledGroup();
             EditorGUILayout.Space();
         }
@@ -260,7 +260,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
             var scene = Selection.activeObject as SceneAsset;
 
-            var asset = CreateInstance<DefaultSceneHandle>();
+            var asset = CreateInstance<DefaultSceneNode>();
             string baseName = trailingNumbersRegex.Replace(scene != null ? scene.name : string.Empty, "");
             asset.name = baseName + "Handle";
             if (AssetDatabase.TryGetGUIDAndLocalFileIdentifier(scene, out string newGuid, out long _)) {

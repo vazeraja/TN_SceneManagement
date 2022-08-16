@@ -1,23 +1,25 @@
 ﻿using System;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
+using UnityEditor.IMGUI.Controls;
 using UnityEditor.Searcher;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
+using PopupWindow = UnityEditor.PopupWindow;
 
 namespace ThunderNut.SceneManagement.Editor {
+
     [Serializable]
-    internal class FloatingWindowsLayout
-    {
-        public WindowDockingLayout previewLayout = new WindowDockingLayout
-        {
+    internal class FloatingWindowsLayout {
+        public WindowDockingLayout previewLayout = new WindowDockingLayout {
             dockingTop = false,
             dockingLeft = false,
             verticalOffset = 8,
             horizontalOffset = 8
         };
     }
+
     [Serializable]
     internal class UserViewSettings {
         public bool isBlackboardVisible = true;
@@ -28,19 +30,24 @@ namespace ThunderNut.SceneManagement.Editor {
     internal class WGEditorView : VisualElement, IDisposable {
         private EditorWindow m_EditorWindow;
         private WGGraphView m_GraphView;
-        private WorldGraph m_Graph;
 
+        private WorldGraph m_Graph;
+        private SerializedObject serializedGraph { get; set; }
         private string m_AssetName;
 
         private TwoPaneSplitView m_TwoPaneSplitView;
         private int m_FPIndex = 0;
-        private float m_FPInitialDimension = 928;
+        private float m_FPInitialDimension = 825;
         private TwoPaneSplitViewOrientation splitViewOrientation = TwoPaneSplitViewOrientation.Horizontal;
 
         private BaseEdgeConnectorListener connectorListener;
         private SearchWindowProvider m_SearchWindowProvider;
         private SearcherWindow searcherWindow;
         private UserViewSettings m_UserViewSettings;
+
+        // Demo Variables for testing things in right-panel
+        private StringListSearcherProvider stringListSearcherProvider;
+        private Rect buttonRect;
 
         public Action saveRequested { get; set; }
         public Action saveAsRequested { get; set; }
@@ -50,7 +57,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
         const string k_UserViewSettings = "UnityEditor.ShaderGraph.ToggleSettings";
         public UserViewSettings viewSettings => m_UserViewSettings;
-        
+
         const string k_FloatingWindowsLayoutKey = "UnityEditor.ShaderGraph.FloatingWindowsLayout2";
         FloatingWindowsLayout m_FloatingWindowsLayout = new FloatingWindowsLayout();
 
@@ -71,6 +78,9 @@ namespace ThunderNut.SceneManagement.Editor {
             m_AssetName = graphName;
 
             styleSheets.Add(Resources.Load<StyleSheet>("Styles/WGEditorView"));
+
+            serializedGraph = new SerializedObject(m_Graph);
+
             var serializedSettings = EditorUserSettings.GetConfigValue(k_UserViewSettings);
             m_UserViewSettings = JsonUtility.FromJson<UserViewSettings>(serializedSettings) ?? new UserViewSettings();
 
@@ -89,7 +99,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 if (GUILayout.Button("Show In Project", EditorStyles.toolbarButton)) {
                     showInProjectRequested?.Invoke();
                 }
-                
+
                 GUILayout.FlexibleSpace();
                 EditorGUI.BeginChangeCheck();
 
@@ -128,14 +138,49 @@ namespace ThunderNut.SceneManagement.Editor {
                     m_GraphView.AddManipulator(new SelectionDragger());
                     m_GraphView.AddManipulator(new RectangleSelector());
                     m_GraphView.AddManipulator(new ClickSelector());
-                    
+
                     string serializedWindowLayout = EditorUserSettings.GetConfigValue(k_FloatingWindowsLayoutKey);
-                    
-                    
+
                     m_TwoPaneSplitView.Q<VisualElement>("left-panel").Add(m_GraphView);
                 }
                 m_TwoPaneSplitView.Add(new VisualElement {name = "right-panel"});
+                {
+                    var rightPanelIMGUI = new IMGUIContainer(() => {
+                        if (GUILayout.Button("MultiColumnTreeView PopupWindow")) {
+                            PopupWindow.Show(buttonRect, new TreeViewPopupWindow {Width = buttonRect.width});
+                        }
+
+                        EditorGUILayout.PropertyField(serializedGraph.FindProperty("DemoScriptableObject"),
+                            new GUIContent(" DemoSO"));
+
+                        WGHelpers.HorizontalScope(() => {
+                            GUILayout.Label("Selected Item");
+
+                            if (GUILayout.Button($"{serializedGraph.FindProperty("selectedItem").stringValue}",
+                                EditorStyles.popup, GUILayout.Width(175))) {
+                                SearcherWindow.Show(editorWindow, stringListSearcherProvider.LoadSearchWindow(),
+                                    searcherItem => stringListSearcherProvider.OnSearcherSelectEntry(searcherItem),
+                                    editorWindow.rootVisualElement.LocalToWorld(Event.current.mousePosition), null);
+                            }
+                        });
+
+                        if (Event.current.type == EventType.Repaint)
+                            buttonRect = GUILayoutUtility.GetLastRect();
+
+                        serializedGraph.ApplyModifiedProperties();
+                    });
+
+                    m_TwoPaneSplitView.Q<VisualElement>("right-panel").Add(rightPanelIMGUI);
+                }
             }
+
+            stringListSearcherProvider = ScriptableObject.CreateInstance<StringListSearcherProvider>();
+            stringListSearcherProvider.Initialize(WGHelpers.Ingredients,
+                x => {
+                    serializedGraph.FindProperty("selectedItem").stringValue =
+                        x ?? serializedGraph.FindProperty("selectedItem").stringValue;
+                });
+
 
             m_SearchWindowProvider = ScriptableObject.CreateInstance<WGSearcherProvider>();
             m_SearchWindowProvider.Initialize(editorWindow, m_GraphView);
@@ -165,6 +210,8 @@ namespace ThunderNut.SceneManagement.Editor {
                 // foreach (var node in m_GraphView.Children().OfType<IShaderNodeView>())
                 //     node.Dispose();
 
+                serializedGraph = null;
+
                 m_GraphView.nodeCreationRequest = null;
                 m_GraphView = null;
             }
@@ -173,6 +220,12 @@ namespace ThunderNut.SceneManagement.Editor {
                 Object.DestroyImmediate(m_SearchWindowProvider);
                 m_SearchWindowProvider = null;
             }
+
+            if (stringListSearcherProvider != null) {
+                Object.DestroyImmediate(stringListSearcherProvider);
+                stringListSearcherProvider = null;
+            }
         }
     }
+
 }

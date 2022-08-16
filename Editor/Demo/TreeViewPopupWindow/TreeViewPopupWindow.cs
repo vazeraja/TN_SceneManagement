@@ -1,28 +1,30 @@
-﻿using UnityEditor;
+﻿using System;
+using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
 namespace ThunderNut.SceneManagement.Editor {
-    public class TreeViewPopupWindow : PopupWindowContent
-    {
-        readonly SearchField m_SearchField;
-        readonly TreeView m_TreeView;
-        bool m_ShouldClose;
+
+    [Serializable]
+    public class TreeViewPopupWindow : PopupWindowContent {
+        private readonly SearchField m_SearchField;
+        private readonly TreeView m_TreeView;
+        private bool m_ShouldClose;
 
         public float Width { get; set; }
+        
+        private WGSimpleTreeView multiColumnTreeView;
+        [SerializeField] private TreeViewState multiColumnTreeViewState;
+        [SerializeField] private MultiColumnHeaderState multiColumnHeaderState;
 
-        public TreeViewPopupWindow(TreeView contents, float width)
-        {
+        public TreeViewPopupWindow() {
             m_SearchField = new SearchField();
-            m_TreeView = contents;
-            Width = width;
+            multiColumnTreeView = WGSimpleTreeView.Create(ref multiColumnTreeViewState, ref multiColumnHeaderState, ForceClose);
         }
 
-        public override void OnGUI(Rect rect)
-        {
+        public override void OnGUI(Rect rect) {
             // Escape closes the window
-            if (m_ShouldClose || Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Escape)
-            {
+            if (m_ShouldClose || Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Escape) {
                 GUIUtility.hotControl = 0;
                 editorWindow.Close();
                 GUIUtility.ExitGUI();
@@ -33,28 +35,30 @@ namespace ThunderNut.SceneManagement.Editor {
             const int searchHeight = 20;
             const int remainTop = topPadding + searchHeight + border;
             var searchRect = new Rect(border, topPadding, rect.width - border * 2, searchHeight);
-            var remainingRect = new Rect(border, topPadding + searchHeight + border, rect.width - border * 2, rect.height - remainTop - border);
+            var remainingRect = new Rect(border, topPadding + searchHeight + border, rect.width - border * 2,
+                rect.height - remainTop - border);
 
-            m_TreeView.searchString = m_SearchField.OnGUI(searchRect, m_TreeView.searchString);
-            m_TreeView.OnGUI(remainingRect);
-
-            if (m_TreeView.HasSelection())
-                ForceClose();
+            multiColumnTreeView.searchString = m_SearchField.OnGUI(searchRect, multiColumnTreeView.searchString);
+            multiColumnTreeView.OnGUI(remainingRect);
         }
 
-        public override Vector2 GetWindowSize()
-        {
+        public override Vector2 GetWindowSize() {
             var result = base.GetWindowSize();
             result.x = Width;
             return result;
         }
 
-        public override void OnOpen()
-        {
+        public override void OnOpen() {
             m_SearchField.SetFocus();
             base.OnOpen();
         }
 
+        public override void OnClose() {
+            multiColumnTreeView = null;
+            base.OnClose();
+        }
+
         public void ForceClose() => m_ShouldClose = true;
     }
+
 }

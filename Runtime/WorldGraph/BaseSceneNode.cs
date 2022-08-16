@@ -9,18 +9,12 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace ThunderNut.SceneManagement {
-    [Serializable]
-    public class SceneConnection {
-        public int passage;
-        public SceneHandle sceneHandle;
-        public int sceneHandlePassage;
-    }
-
-    public abstract class SceneHandle : ScriptableObject {
+    public abstract class BaseSceneNode : ScriptableObject {
+        
         #region Runtime Code
 
         public SceneReference scene;
-        public List<string> passages = new List<string> {"default_value1", "default_value2"};
+        public List<string> passages = new() {"default_value1", "default_value2"};
         public List<SceneConnection> sceneConnections;
 
         protected virtual void ForceSwitchToScene() {
@@ -28,5 +22,11 @@ namespace ThunderNut.SceneManagement {
         }
 
         #endregion
+    }
+    [Serializable]
+    public class SceneConnection {
+        public int passage;
+        public BaseSceneNode baseSceneNode;
+        public int sceneHandlePassage;
     }
 }
