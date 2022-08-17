@@ -11,7 +11,8 @@ namespace ThunderNut.SceneManagement {
         public MyDemoScriptableObject DemoScriptableObject;
         
         private void Awake() {
-            SceneManager.LoadScene(baseSceneHandle.scene.sceneIndex);
+            //SceneManager.LoadScene(baseSceneHandle.scene.sceneIndex);
+            worldGraph.SceneHandle.passages.ForEach(Debug.Log);
         }
     }
 }

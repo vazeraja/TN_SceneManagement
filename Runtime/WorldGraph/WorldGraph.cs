@@ -10,7 +10,7 @@ namespace ThunderNut.SceneManagement {
         [SearchObject(typeof(MyDemoScriptableObject))]
         public MyDemoScriptableObject DemoScriptableObject;
 
-        public List<BaseSceneHandle> SceneHandles;
+        public SceneHandle SceneHandle = new();
 
         private void OnEnable() {
         }

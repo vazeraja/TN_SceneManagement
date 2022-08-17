@@ -21,6 +21,14 @@ namespace ThunderNut.SceneManagement {
             SceneManager.LoadScene(scene.sceneIndex);
         }
     }
+    
+    [Serializable]
+    public class SceneHandle {
+        public SceneReference scene;
+        public List<string> passages = new() {"default_value1", "default_value2"};
+        public List<SceneConnection> sceneConnections;
+    }
+    
     [Serializable]
     public class SceneConnection {
         public int passage;
