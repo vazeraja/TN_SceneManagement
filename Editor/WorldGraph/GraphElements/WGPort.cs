@@ -4,7 +4,7 @@ using UnityEditor.Experimental.GraphView;
 
 namespace ThunderNut.SceneManagement.Editor {
     public class WGPort : Port {
-        public WGGraphNode owner { get; private set; }
+        public WGNodeView owner { get; private set; }
         protected FieldInfo fieldInfo;
         protected BaseEdgeConnectorListener listener;
 

@@ -4,12 +4,13 @@ using UnityEngine.UIElements;
 using System;
 using System.IO;
 using Unity.Profiling;
+using UnityEditor.Callbacks;
 using UnityEditor.UIElements;
 using Object = UnityEngine.Object;
 
 namespace ThunderNut.SceneManagement.Editor {
     [Serializable]
-    internal abstract class WGEditorWindow : EditorWindow {
+    class WGEditorWindow : EditorWindow {
         [SerializeField] private string m_Selected;
         [SerializeField] bool m_AssetMaybeChangedOnDisk;
         [SerializeField] bool m_AssetMaybeDeleted;
@@ -56,6 +57,34 @@ namespace ThunderNut.SceneManagement.Editor {
 
         private static readonly ProfilerMarker GraphLoadMarker = new("GraphLoad");
         private static readonly ProfilerMarker CreateGraphEditorViewMarker = new("CreateGraphEditorView");
+        
+        public static bool ShowWorldGraphEditorWindow(string path) {
+            string guid = AssetDatabase.AssetPathToGUID(path);
+            
+            foreach (var w in Resources.FindObjectsOfTypeAll<WGEditorWindow>()) {
+                if (w.selectedGuid != guid) continue;
+                w.Focus();
+                return true;
+            }
+            
+            var window = EditorWindow.CreateWindow<WGEditorWindow>(typeof(WGEditorWindow), typeof(SceneView));
+            window.minSize = new Vector2(1200, 600);
+            window.Initialize(guid);
+            window.Focus();
+
+            return true;
+        }
+
+        [OnOpenAsset(0)]
+        public static bool OnBaseGraphOpened(int instanceID, int line) {
+            var asset = EditorUtility.InstanceIDToObject(instanceID) as WorldGraph;
+            var path = AssetDatabase.GetAssetPath(instanceID);
+
+            if (asset == null || !AssetDatabase.GetAssetPath(asset).Contains("WorldGraph"))
+                return false;
+            
+            return ShowWorldGraphEditorWindow(path);
+        }
 
         protected virtual void OnEnable() {
             this.SetAntiAliasing(4);
@@ -174,7 +203,7 @@ namespace ThunderNut.SceneManagement.Editor {
         }
 
         public string SaveAsImplementation(bool openWhenSaved) {
-            string savedFilePath = null;
+            string savedFilePath = "";
             if (openWhenSaved) {
                 Debug.Log("TODO: Implement SaveAsImplementation()");
                 return savedFilePath;
@@ -207,7 +236,5 @@ namespace ThunderNut.SceneManagement.Editor {
 
             m_FrameAllAfterLayout = false;
         }
-
-        protected virtual void OnDestroy() { }
     }
 }

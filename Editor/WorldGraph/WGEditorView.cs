@@ -27,7 +27,7 @@ namespace ThunderNut.SceneManagement.Editor {
         public bool isInspectorVisible = true;
     }
 
-    internal class WGEditorView : VisualElement, IDisposable {
+    class WGEditorView : VisualElement, IDisposable {
         private EditorWindow m_EditorWindow;
         private WGGraphView m_GraphView;
 
@@ -37,13 +37,12 @@ namespace ThunderNut.SceneManagement.Editor {
 
         private TwoPaneSplitView m_TwoPaneSplitView;
         private int m_FPIndex = 0;
-        private float m_FPInitialDimension = 825;
+        private float m_FPInitialDimension = 750;
         private TwoPaneSplitViewOrientation splitViewOrientation = TwoPaneSplitViewOrientation.Horizontal;
 
         private BaseEdgeConnectorListener connectorListener;
         private SearchWindowProvider m_SearchWindowProvider;
         private SearcherWindow searcherWindow;
-        private UserViewSettings m_UserViewSettings;
 
         // Demo Variables for testing things in right-panel
         private StringListSearcherProvider stringListSearcherProvider;
@@ -55,11 +54,11 @@ namespace ThunderNut.SceneManagement.Editor {
         public Func<bool> isCheckedOut { get; set; }
         public Action checkOut { get; set; }
 
-        const string k_UserViewSettings = "UnityEditor.ShaderGraph.ToggleSettings";
-        public UserViewSettings viewSettings => m_UserViewSettings;
+        const string k_UserViewSettings = "TN.WorldGraph.ToggleSettings";
+        UserViewSettings m_UserViewSettings;
 
-        const string k_FloatingWindowsLayoutKey = "UnityEditor.ShaderGraph.FloatingWindowsLayout2";
-        FloatingWindowsLayout m_FloatingWindowsLayout = new FloatingWindowsLayout();
+        const string k_FloatingWindowsLayoutKey = "TN.WorldGraph.FloatingWindowsLayout2";
+        FloatingWindowsLayout m_FloatingWindowsLayout = new();
 
         public WGGraphView graphView => m_GraphView;
 
@@ -79,10 +78,10 @@ namespace ThunderNut.SceneManagement.Editor {
 
             styleSheets.Add(Resources.Load<StyleSheet>("Styles/WGEditorView"));
 
-            serializedGraph = new SerializedObject(m_Graph);
-
             var serializedSettings = EditorUserSettings.GetConfigValue(k_UserViewSettings);
             m_UserViewSettings = JsonUtility.FromJson<UserViewSettings>(serializedSettings) ?? new UserViewSettings();
+
+            serializedGraph = new SerializedObject(m_Graph);
 
             var toolbar = new IMGUIContainer(() => {
                 GUILayout.BeginHorizontal(EditorStyles.toolbar);
@@ -133,13 +132,18 @@ namespace ThunderNut.SceneManagement.Editor {
                     m_GraphView = new WGGraphView(graph) {
                         name = "GraphView", viewDataKey = "MaterialGraphView"
                     };
-                    m_GraphView.SetupZoom(0.05f, 8);
+                    m_GraphView.styleSheets.Add(Resources.Load<StyleSheet>("Styles/WGGraphView"));
                     m_GraphView.AddManipulator(new ContentDragger());
                     m_GraphView.AddManipulator(new SelectionDragger());
                     m_GraphView.AddManipulator(new RectangleSelector());
                     m_GraphView.AddManipulator(new ClickSelector());
+                    m_GraphView.SetupZoom(0.05f, 8);
 
                     string serializedWindowLayout = EditorUserSettings.GetConfigValue(k_FloatingWindowsLayoutKey);
+                    if (!string.IsNullOrEmpty(serializedWindowLayout))
+                    {
+                        m_FloatingWindowsLayout = JsonUtility.FromJson<FloatingWindowsLayout>(serializedWindowLayout);
+                    }
 
                     m_TwoPaneSplitView.Q<VisualElement>("left-panel").Add(m_GraphView);
                 }

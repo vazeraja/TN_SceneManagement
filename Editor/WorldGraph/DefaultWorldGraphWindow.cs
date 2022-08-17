@@ -2,22 +2,20 @@
 using UnityEditor.Callbacks;
 using UnityEngine;
 using UnityEditor.Search;
+using static UnityEditor.EditorWindow;
 
 namespace ThunderNut.SceneManagement.Editor {
-    internal class DefaultWorldGraphWindow : WGEditorWindow {
+    internal class DefaultWorldGraphWindow {
         public static bool ShowWorldGraphEditorWindow(string path) {
             string guid = AssetDatabase.AssetPathToGUID(path);
             
-            foreach (var w in Resources.FindObjectsOfTypeAll<WGEditorWindow>())
-            {
-                if (w.selectedGuid == guid)
-                {
-                    w.Focus();
-                    return true;
-                }
+            foreach (var w in Resources.FindObjectsOfTypeAll<WGEditorWindow>()) {
+                if (w.selectedGuid != guid) continue;
+                w.Focus();
+                return true;
             }
             
-            var window = CreateWindow<DefaultWorldGraphWindow>(typeof(WGEditorWindow), typeof(SceneView));
+            var window = CreateWindow<WGEditorWindow>(typeof(WGEditorWindow), typeof(SceneView));
             window.minSize = new Vector2(1200, 600);
             window.Initialize(guid);
             window.Focus();

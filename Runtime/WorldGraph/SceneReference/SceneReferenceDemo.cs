@@ -7,10 +7,13 @@ using UnityEngine.SceneManagement;
 
 namespace ThunderNut.SceneManagement {
     public class SceneReferenceDemo : MonoBehaviour {
-        public BaseSceneNode baseSceneNode;
+        public BaseSceneHandle baseSceneHandle;
+
+        public WorldGraph worldGraph;
+        
 
         private void Awake() {
-            SceneManager.LoadScene(baseSceneNode.scene.sceneIndex);
+            SceneManager.LoadScene(baseSceneHandle.scene.sceneIndex);
         }
     }
 }

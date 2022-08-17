@@ -9,7 +9,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace ThunderNut.SceneManagement {
-    public abstract class BaseSceneNode : ScriptableObject {
+    
+    [CreateAssetMenu(fileName = "SceneHandle", menuName = "World Graph/Scene Handle")]
+    public class BaseSceneHandle : ScriptableObject {
         
         #region Runtime Code
 
@@ -26,7 +28,7 @@ namespace ThunderNut.SceneManagement {
     [Serializable]
     public class SceneConnection {
         public int passage;
-        public BaseSceneNode baseSceneNode;
+        public BaseSceneHandle baseSceneHandle;
         public int sceneHandlePassage;
     }
 }
