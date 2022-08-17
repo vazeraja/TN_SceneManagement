@@ -13,17 +13,13 @@ namespace ThunderNut.SceneManagement {
     [CreateAssetMenu(fileName = "SceneHandle", menuName = "World Graph/Scene Handle")]
     public class BaseSceneHandle : ScriptableObject {
         
-        #region Runtime Code
-
         public SceneReference scene;
         public List<string> passages = new() {"default_value1", "default_value2"};
         public List<SceneConnection> sceneConnections;
 
-        protected virtual void ForceSwitchToScene() {
+        private void ForceSwitchToScene() {
             SceneManager.LoadScene(scene.sceneIndex);
         }
-
-        #endregion
     }
     [Serializable]
     public class SceneConnection {

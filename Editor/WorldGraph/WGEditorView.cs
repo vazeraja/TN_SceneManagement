@@ -140,8 +140,7 @@ namespace ThunderNut.SceneManagement.Editor {
                     m_GraphView.SetupZoom(0.05f, 8);
 
                     string serializedWindowLayout = EditorUserSettings.GetConfigValue(k_FloatingWindowsLayoutKey);
-                    if (!string.IsNullOrEmpty(serializedWindowLayout))
-                    {
+                    if (!string.IsNullOrEmpty(serializedWindowLayout)) {
                         m_FloatingWindowsLayout = JsonUtility.FromJson<FloatingWindowsLayout>(serializedWindowLayout);
                     }
 
@@ -154,14 +153,13 @@ namespace ThunderNut.SceneManagement.Editor {
                             PopupWindow.Show(buttonRect, new TreeViewPopupWindow {Width = buttonRect.width});
                         }
 
-                        EditorGUILayout.PropertyField(serializedGraph.FindProperty("DemoScriptableObject"),
-                            new GUIContent(" DemoSO"));
+                        EditorGUILayout.PropertyField(serializedGraph.FindProperty("DemoScriptableObject"), GUIContent.none);
 
                         WGHelpers.HorizontalScope(() => {
                             GUILayout.Label("Selected Item");
 
                             if (GUILayout.Button($"{serializedGraph.FindProperty("selectedItem").stringValue}",
-                                EditorStyles.popup, GUILayout.Width(175))) {
+                                EditorStyles.popup)) {
                                 SearcherWindow.Show(editorWindow, stringListSearcherProvider.LoadSearchWindow(),
                                     searcherItem => stringListSearcherProvider.OnSearcherSelectEntry(searcherItem),
                                     editorWindow.rootVisualElement.LocalToWorld(Event.current.mousePosition), null);
