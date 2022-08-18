@@ -1,3 +1,10 @@
+## [1.0.8](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.7...v1.0.8) (2022-08-18)
+
+
+### Bug Fixes
+
+* remove internals ([02bd791](https://github.com/vazeraja/TN_SceneManagement/commit/02bd79114d432b2a07fb2c7fbe2f67be3b427b94))
+
 ## [1.0.7](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.6...v1.0.7) (2022-08-03)
 
 
