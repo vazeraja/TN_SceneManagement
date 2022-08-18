@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 namespace ThunderNut.SceneManagement {
     
     [CreateAssetMenu(fileName = "SceneHandle", menuName = "World Graph/Scene Handle")]
-    public class BaseSceneHandle : ScriptableObject {
+    public class SceneHandle : ScriptableObject {
         
         public SceneReference scene;
         public List<string> passages = new() {"default_value1", "default_value2"};
@@ -21,18 +21,10 @@ namespace ThunderNut.SceneManagement {
             SceneManager.LoadScene(scene.sceneIndex);
         }
     }
-    
-    [Serializable]
-    public class SceneHandle {
-        public SceneReference scene;
-        public List<string> passages = new();
-        public List<SceneConnection> sceneConnections;
-    }
-    
     [Serializable]
     public class SceneConnection {
         public int passage;
-        public BaseSceneHandle baseSceneHandle;
+        public SceneHandle sceneHandle;
         public int sceneHandlePassage;
     }
 }

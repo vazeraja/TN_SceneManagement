@@ -17,5 +17,6 @@ MonoBehaviour:
   SceneHandle:
     scene:
       sceneGuid: 
-    passages: []
+    passages:
+    - 
     sceneConnections: []

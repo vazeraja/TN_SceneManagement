@@ -1,93 +1,98 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using UnityEditor;
-using UnityEditorInternal;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
+using PopupWindow = UnityEditor.PopupWindow;
 
 namespace ThunderNut.SceneManagement.Editor {
 
-    [CustomPropertyDrawer(typeof(SceneHandle))]
-    public class SceneHandlePropertyDrawer : PropertyDrawer {
-        private Dictionary<string, ReorderableList> reorderableLists = new();
+    public class SceneHandlePopupWindow : PopupWindowContent {
+        private SceneHandle m_SceneHandle;
+        private SceneHandleEditor m_SceneHandleEditor;
 
-        public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
-            SerializedProperty passages = property.FindPropertyRelative("passages");
+        private bool m_ShouldClose;
+        private Vector2 scrollPos;
 
-            if (!reorderableLists.ContainsKey(property.propertyPath) || reorderableLists[property.propertyPath].index >
-                reorderableLists[property.propertyPath].count - 1) {
-                var newList = new ReorderableList(
-                    passages.serializedObject, passages, false, true, true, true
-                );
-                newList.drawHeaderCallback += rect => {
-                    EditorGUI.LabelField(rect, passages.displayName);
-                    
-                };
-                newList.drawElementCallback += (rect, index, active, focused) => {
-                    var element = passages.GetArrayElementAtIndex(index);
-                    
-                    var duplicateCount = 0;
-                    for (var i = 0; i < passages.arraySize; i++) {
-                        if (element.stringValue == passages.GetArrayElementAtIndex(i).stringValue) {
-                            duplicateCount++;
-                        }
-                    }
+        public float Width;
+        public float Height;
 
-                    var color = GUI.color;
-                    if (string.IsNullOrWhiteSpace(element.stringValue) || duplicateCount > 1) 
-                    {
-                        GUI.color = new Color(0.69f, 0.41f, 0.18f);
-                    }
-
-                    EditorGUI.PropertyField(new Rect(rect.x, rect.y, rect.width, EditorGUI.GetPropertyHeight(element)),
-                        element);
-
-                    GUI.color = color;
-
-                    if (string.IsNullOrWhiteSpace(element.stringValue)) {
-                        rect.y += EditorGUI.GetPropertyHeight(element);
-                        EditorGUI.HelpBox(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
-                            "ID may not be empty!", MessageType.Error);
-                    }
-                    else if (duplicateCount > 1) {
-                        rect.y += EditorGUI.GetPropertyHeight(element);
-                        EditorGUI.HelpBox(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
-                            "Duplicate! ID has to be unique!", MessageType.Error);
-                    }
-                };
-                newList.elementHeightCallback += index => {
-                    var element = passages.GetArrayElementAtIndex(index);
-                    var height = EditorGUI.GetPropertyHeight(element);
-                    
-                    var duplicateCount = 0;
-                    for (var i = 0; i < passages.arraySize; i++) {
-                        if (element.stringValue == passages.GetArrayElementAtIndex(i).stringValue) {
-                            duplicateCount++;
-                        }
-                    }
-
-                    if (string.IsNullOrWhiteSpace(element.stringValue) || duplicateCount > 1) {
-                        height += EditorGUIUtility.singleLineHeight;
-                    }
-
-                    return height;
-                };
-                newList.onAddCallback += list => {
-                    list.serializedProperty.arraySize++;
-
-                    var newElement =
-                        list.serializedProperty.GetArrayElementAtIndex(list.serializedProperty.arraySize - 1);
-                    newElement.stringValue = "";
-                };
-
-                reorderableLists[property.propertyPath] = newList;
-            }
-
-            return reorderableLists[property.propertyPath].GetHeight();
+        public SceneHandlePopupWindow(SceneHandle sceneHandle) {
+            m_SceneHandle = sceneHandle;
+            m_SceneHandleEditor = UnityEditor.Editor.CreateEditor(m_SceneHandle) as SceneHandleEditor;
         }
 
+        public override void OnGUI(Rect rect) {
+            if (m_ShouldClose || Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Escape) {
+                GUIUtility.hotControl = 0;
+                editorWindow.Close();
+                GUIUtility.ExitGUI();
+            }
+
+            scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
+            {
+                using (new GUILayout.HorizontalScope(EditorStyles.toolbar)) {
+                    Texture2D sceneIcon =
+                        (Texture2D) EditorGUIUtility.ObjectContent(m_SceneHandle, m_SceneHandle.GetType()).image;
+                    GUIContent headerContent = new GUIContent(m_SceneHandle.name, sceneIcon);
+
+                    GUILayout.Label(headerContent, EditorStyles.boldLabel,GUILayout.ExpandHeight(true));
+                }
+
+                GUILayout.BeginArea(new Rect(12.5f, 25, (Width - 25), Height));
+                {
+                    m_SceneHandleEditor.drawScriptField = false;
+                    m_SceneHandleEditor.OnInspectorGUI();
+                }
+                GUILayout.EndArea();
+            }
+            EditorGUILayout.EndScrollView();
+        }
+
+        public override Vector2 GetWindowSize() {
+            var result = base.GetWindowSize();
+            result.x = Width;
+            result.y = Height;
+            return result;
+        }
+
+        public override void OnClose() {
+            Object.DestroyImmediate(m_SceneHandleEditor);
+            m_SceneHandleEditor = null;
+            m_SceneHandle = null;
+
+            base.OnClose();
+        }
+
+        public void ForceClose() => m_ShouldClose = true;
+    }
+
+    [CustomPropertyDrawer(typeof(SceneHandle), true)]
+    public class SceneHandlePropertyDrawer : PropertyDrawer {
+        private Rect buttonRect;
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
-            position = EditorGUI.IndentedRect(position);
-            reorderableLists[property.propertyPath].DoList(position);
+            position.width -= 60;
+            EditorGUI.ObjectField(position, property, label);
+
+            position.x += position.width;
+            position.width = 60;
+
+            GUIStyle style = new GUIStyle {
+                alignment = TextAnchor.MiddleCenter
+            };
+
+            if (GUI.Button(position, EditorGUIUtility.IconContent("d_SearchWindow"), style) &&
+                property.objectReferenceValue != null) {
+                PopupWindow.Show(new Rect(buttonRect.x, buttonRect.y + 10, buttonRect.width, buttonRect.height),
+                    new SceneHandlePopupWindow((SceneHandle) property.objectReferenceValue) {
+                        Width = buttonRect.width,
+                        Height = 400
+                    });
+            }
+
+            if (Event.current.type == EventType.Repaint)
+                buttonRect = GUILayoutUtility.GetLastRect();
         }
     }
 

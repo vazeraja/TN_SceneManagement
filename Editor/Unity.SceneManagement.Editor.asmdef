@@ -4,7 +4,8 @@
     "references": [
         "Unity.Searcher.Editor",
         "Unity.ShaderGraph.Editor",
-        "Unity.SceneManagement"
+        "Unity.SceneManagement",
+        "Unity.Addressables.Editor"
     ],
     "includePlatforms": [
         "Editor"

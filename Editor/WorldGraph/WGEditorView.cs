@@ -81,44 +81,45 @@ namespace ThunderNut.SceneManagement.Editor {
             var serializedSettings = EditorUserSettings.GetConfigValue(k_UserViewSettings);
             m_UserViewSettings = JsonUtility.FromJson<UserViewSettings>(serializedSettings) ?? new UserViewSettings();
 
-            // serializedGraph = new SerializedObject(m_Graph);
+            serializedGraph = new SerializedObject(m_Graph);
 
             var toolbar = new IMGUIContainer(() => {
                 GUILayout.BeginHorizontal(EditorStyles.toolbar);
-                if (GUILayout.Button("Save Asset", EditorStyles.toolbarButton)) {
-                    //saveRequested?.Invoke();
+                {
+                    if (GUILayout.Button("Save Asset", EditorStyles.toolbarButton)) {
+                        //saveRequested?.Invoke();
+                    }
+
+                    GUILayout.Space(6);
+                    if (GUILayout.Button("Save As...", EditorStyles.toolbarButton)) {
+                        saveAsRequested();
+                    }
+
+                    GUILayout.Space(6);
+                    if (GUILayout.Button("Show In Project", EditorStyles.toolbarButton)) {
+                        showInProjectRequested?.Invoke();
+                    }
+
+                    GUILayout.FlexibleSpace();
+                    EditorGUI.BeginChangeCheck();
+
+                    m_UserViewSettings.isBlackboardVisible = GUILayout.Toggle(m_UserViewSettings.isBlackboardVisible,
+                        "Blackboard", EditorStyles.toolbarButton);
+
+                    GUILayout.Space(6);
+
+                    m_UserViewSettings.isInspectorVisible = GUILayout.Toggle(m_UserViewSettings.isInspectorVisible,
+                        "Graph Inspector", EditorStyles.toolbarButton);
+
+                    GUILayout.Space(6);
+
+                    m_UserViewSettings.isPreviewVisible = GUILayout.Toggle(m_UserViewSettings.isPreviewVisible,
+                        "Main Preview", EditorStyles.toolbarButton);
+                    if (EditorGUI.EndChangeCheck()) {
+                        // Do something here such as showing/hiding those windows
+                        Debug.Log("Do something here such as showing/hiding windows");
+                    }
                 }
-
-                GUILayout.Space(6);
-                if (GUILayout.Button("Save As...", EditorStyles.toolbarButton)) {
-                    saveAsRequested();
-                }
-
-                GUILayout.Space(6);
-                if (GUILayout.Button("Show In Project", EditorStyles.toolbarButton)) {
-                    showInProjectRequested?.Invoke();
-                }
-
-                GUILayout.FlexibleSpace();
-                EditorGUI.BeginChangeCheck();
-
-                m_UserViewSettings.isBlackboardVisible = GUILayout.Toggle(m_UserViewSettings.isBlackboardVisible,
-                    "Blackboard", EditorStyles.toolbarButton);
-
-                GUILayout.Space(6);
-
-                m_UserViewSettings.isInspectorVisible = GUILayout.Toggle(m_UserViewSettings.isInspectorVisible,
-                    "Graph Inspector", EditorStyles.toolbarButton);
-
-                GUILayout.Space(6);
-
-                m_UserViewSettings.isPreviewVisible = GUILayout.Toggle(m_UserViewSettings.isPreviewVisible,
-                    "Main Preview", EditorStyles.toolbarButton);
-                if (EditorGUI.EndChangeCheck()) {
-                    // Do something here such as showing/hiding those windows
-                    Debug.Log("Do something here such as showing/hiding windows");
-                }
-
                 GUILayout.EndHorizontal();
             });
             Add(toolbar);
@@ -148,31 +149,31 @@ namespace ThunderNut.SceneManagement.Editor {
                 }
                 m_TwoPaneSplitView.Add(new VisualElement {name = "right-panel"});
                 {
-                    // var rightPanelIMGUI = new IMGUIContainer(() => {
-                    //     if (GUILayout.Button("MultiColumnTreeView PopupWindow")) {
-                    //         PopupWindow.Show(buttonRect, new TreeViewPopupWindow {Width = buttonRect.width});
-                    //     }
-                    // 
-                    //     EditorGUILayout.PropertyField(serializedGraph.FindProperty("DemoScriptableObject"), GUIContent.none);
-                    // 
-                    //     WGHelpers.HorizontalScope(() => {
-                    //         GUILayout.Label("Selected Item");
-                    // 
-                    //         if (GUILayout.Button($"{serializedGraph.FindProperty("selectedItem").stringValue}",
-                    //             EditorStyles.popup)) {
-                    //             SearcherWindow.Show(editorWindow, stringListSearcherProvider.LoadSearchWindow(),
-                    //                 searcherItem => stringListSearcherProvider.OnSearcherSelectEntry(searcherItem),
-                    //                 editorWindow.rootVisualElement.LocalToWorld(Event.current.mousePosition), null);
-                    //         }
-                    //     });
-                    // 
-                    //     if (Event.current.type == EventType.Repaint)
-                    //         buttonRect = GUILayoutUtility.GetLastRect();
-                    // 
-                    //     serializedGraph.ApplyModifiedProperties();
-                    // });
-                    // 
-                    // m_TwoPaneSplitView.Q<VisualElement>("right-panel").Add(rightPanelIMGUI);
+                    var rightPanelIMGUI = new IMGUIContainer(() => {
+                        if (GUILayout.Button("MultiColumnTreeView PopupWindow")) {
+                            PopupWindow.Show(buttonRect, new TreeViewPopupWindow {Width = buttonRect.width});
+                        }
+
+                        EditorGUILayout.PropertyField(serializedGraph.FindProperty("DemoScriptableObject"), GUIContent.none);
+
+                        WGHelpers.HorizontalScope(() => {
+                            GUILayout.Label("Selected Item");
+
+                            if (GUILayout.Button($"{serializedGraph.FindProperty("selectedItem").stringValue}",
+                                EditorStyles.popup)) {
+                                SearcherWindow.Show(editorWindow, stringListSearcherProvider.LoadSearchWindow(),
+                                    searcherItem => stringListSearcherProvider.OnSearcherSelectEntry(searcherItem),
+                                    editorWindow.rootVisualElement.LocalToWorld(Event.current.mousePosition), null);
+                            }
+                        });
+
+                        if (Event.current.type == EventType.Repaint)
+                            buttonRect = GUILayoutUtility.GetLastRect();
+
+                        serializedGraph.ApplyModifiedProperties();
+                    });
+
+                    m_TwoPaneSplitView.Q<VisualElement>("right-panel").Add(rightPanelIMGUI);
                 }
             }
 

@@ -88,7 +88,6 @@ namespace ThunderNut.SceneManagement.Editor {
         protected virtual void OnEnable() {
             this.SetAntiAliasing(4);
         }
-
         protected virtual void Update() {
             if (m_HasError)
                 return;
