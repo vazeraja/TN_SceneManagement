@@ -81,7 +81,7 @@ namespace ThunderNut.SceneManagement.Editor {
             var serializedSettings = EditorUserSettings.GetConfigValue(k_UserViewSettings);
             m_UserViewSettings = JsonUtility.FromJson<UserViewSettings>(serializedSettings) ?? new UserViewSettings();
 
-            serializedGraph = new SerializedObject(m_Graph);
+            // serializedGraph = new SerializedObject(m_Graph);
 
             var toolbar = new IMGUIContainer(() => {
                 GUILayout.BeginHorizontal(EditorStyles.toolbar);
@@ -148,31 +148,31 @@ namespace ThunderNut.SceneManagement.Editor {
                 }
                 m_TwoPaneSplitView.Add(new VisualElement {name = "right-panel"});
                 {
-                    var rightPanelIMGUI = new IMGUIContainer(() => {
-                        if (GUILayout.Button("MultiColumnTreeView PopupWindow")) {
-                            PopupWindow.Show(buttonRect, new TreeViewPopupWindow {Width = buttonRect.width});
-                        }
-
-                        EditorGUILayout.PropertyField(serializedGraph.FindProperty("DemoScriptableObject"), GUIContent.none);
-
-                        WGHelpers.HorizontalScope(() => {
-                            GUILayout.Label("Selected Item");
-
-                            if (GUILayout.Button($"{serializedGraph.FindProperty("selectedItem").stringValue}",
-                                EditorStyles.popup)) {
-                                SearcherWindow.Show(editorWindow, stringListSearcherProvider.LoadSearchWindow(),
-                                    searcherItem => stringListSearcherProvider.OnSearcherSelectEntry(searcherItem),
-                                    editorWindow.rootVisualElement.LocalToWorld(Event.current.mousePosition), null);
-                            }
-                        });
-
-                        if (Event.current.type == EventType.Repaint)
-                            buttonRect = GUILayoutUtility.GetLastRect();
-
-                        serializedGraph.ApplyModifiedProperties();
-                    });
-
-                    m_TwoPaneSplitView.Q<VisualElement>("right-panel").Add(rightPanelIMGUI);
+                    // var rightPanelIMGUI = new IMGUIContainer(() => {
+                    //     if (GUILayout.Button("MultiColumnTreeView PopupWindow")) {
+                    //         PopupWindow.Show(buttonRect, new TreeViewPopupWindow {Width = buttonRect.width});
+                    //     }
+                    // 
+                    //     EditorGUILayout.PropertyField(serializedGraph.FindProperty("DemoScriptableObject"), GUIContent.none);
+                    // 
+                    //     WGHelpers.HorizontalScope(() => {
+                    //         GUILayout.Label("Selected Item");
+                    // 
+                    //         if (GUILayout.Button($"{serializedGraph.FindProperty("selectedItem").stringValue}",
+                    //             EditorStyles.popup)) {
+                    //             SearcherWindow.Show(editorWindow, stringListSearcherProvider.LoadSearchWindow(),
+                    //                 searcherItem => stringListSearcherProvider.OnSearcherSelectEntry(searcherItem),
+                    //                 editorWindow.rootVisualElement.LocalToWorld(Event.current.mousePosition), null);
+                    //         }
+                    //     });
+                    // 
+                    //     if (Event.current.type == EventType.Repaint)
+                    //         buttonRect = GUILayoutUtility.GetLastRect();
+                    // 
+                    //     serializedGraph.ApplyModifiedProperties();
+                    // });
+                    // 
+                    // m_TwoPaneSplitView.Q<VisualElement>("right-panel").Add(rightPanelIMGUI);
                 }
             }
 

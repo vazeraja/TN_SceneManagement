@@ -9,11 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 110f8b170ba24c8db581974896541c41, type: 3}
+  m_Script: {fileID: 11500000, guid: 5b85ad94b6b588c4a9a1e4c57ebe2c01, type: 3}
   m_Name: WorldGraph
   m_EditorClassIdentifier: 
-  selectedItem: Hotdogs
-  DemoScriptableObject: {fileID: 11400000, guid: beb46c66d83babf448a3593a1d58782f, type: 2}
+  selectedItem: 
+  DemoScriptableObject: {fileID: 0}
   SceneHandle:
     scene:
       sceneGuid: 
