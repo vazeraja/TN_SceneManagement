@@ -25,7 +25,7 @@ namespace ThunderNut.SceneManagement {
     [Serializable]
     public class SceneHandle {
         public SceneReference scene;
-        public List<string> passages = new() {"default_value1", "default_value2"};
+        public List<string> passages = new();
         public List<SceneConnection> sceneConnections;
     }
     

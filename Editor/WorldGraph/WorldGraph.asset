@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 110f8b170ba24c8db581974896541c41, type: 3}
   m_Name: WorldGraph
   m_EditorClassIdentifier: 
-  selectedItem: Keyboard
-  DemoScriptableObject: {fileID: 11400000, guid: cff2e1d93fcb663499e7b8381b9052e7, type: 2}
+  selectedItem: Hotdogs
+  DemoScriptableObject: {fileID: 11400000, guid: beb46c66d83babf448a3593a1d58782f, type: 2}
   SceneHandle:
     scene:
       sceneGuid: 

@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 
 namespace ThunderNut.SceneManagement.Editor {
     [Serializable]
-    internal class WindowDockingLayout {
+    public class WindowDockingLayout {
         [SerializeField] bool m_DockingLeft;
 
         public bool dockingLeft {

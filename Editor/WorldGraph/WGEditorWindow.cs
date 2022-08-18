@@ -9,8 +9,7 @@ using UnityEditor.UIElements;
 using Object = UnityEngine.Object;
 
 namespace ThunderNut.SceneManagement.Editor {
-    [Serializable]
-    class WGEditorWindow : EditorWindow {
+    public class WGEditorWindow : EditorWindow {
         [SerializeField] private string m_Selected;
         [SerializeField] bool m_AssetMaybeChangedOnDisk;
         [SerializeField] bool m_AssetMaybeDeleted;
@@ -218,6 +217,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 var path = AssetDatabase.GUIDToAssetPath(selectedGuid);
                 var asset = AssetDatabase.LoadAssetAtPath<Object>(path);
                 EditorGUIUtility.PingObject(asset);
+                Selection.activeObject = asset;
             }
         }
 

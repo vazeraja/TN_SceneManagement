@@ -11,7 +11,7 @@ using PopupWindow = UnityEditor.PopupWindow;
 namespace ThunderNut.SceneManagement.Editor {
 
     [Serializable]
-    internal class FloatingWindowsLayout {
+    public class FloatingWindowsLayout {
         public WindowDockingLayout previewLayout = new WindowDockingLayout {
             dockingTop = false,
             dockingLeft = false,
@@ -21,13 +21,13 @@ namespace ThunderNut.SceneManagement.Editor {
     }
 
     [Serializable]
-    internal class UserViewSettings {
+    public class UserViewSettings {
         public bool isBlackboardVisible = true;
         public bool isPreviewVisible = true;
         public bool isInspectorVisible = true;
     }
 
-    class WGEditorView : VisualElement, IDisposable {
+    public class WGEditorView : VisualElement, IDisposable {
         private EditorWindow m_EditorWindow;
         private WGGraphView m_GraphView;
 
