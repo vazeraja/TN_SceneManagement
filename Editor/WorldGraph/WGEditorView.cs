@@ -45,12 +45,13 @@ namespace ThunderNut.SceneManagement.Editor {
         private SearcherWindow searcherWindow;
 
         // Demo Variables for testing things in right-panel
-        private StringListSearcherProvider stringListSearcherProvider;
+        private WorldGraphEditor m_WorldGraphEditor;
         private Rect buttonRect;
 
         public Action saveRequested { get; set; }
         public Action saveAsRequested { get; set; }
         public Action showInProjectRequested { get; set; }
+        public Action refreshRequested { get; set; }
         public Func<bool> isCheckedOut { get; set; }
         public Action checkOut { get; set; }
 
@@ -82,6 +83,7 @@ namespace ThunderNut.SceneManagement.Editor {
             m_UserViewSettings = JsonUtility.FromJson<UserViewSettings>(serializedSettings) ?? new UserViewSettings();
 
             serializedGraph = new SerializedObject(m_Graph);
+            m_WorldGraphEditor = UnityEditor.Editor.CreateEditor(m_Graph) as WorldGraphEditor;
 
             var toolbar = new IMGUIContainer(() => {
                 GUILayout.BeginHorizontal(EditorStyles.toolbar);
@@ -98,6 +100,11 @@ namespace ThunderNut.SceneManagement.Editor {
                     GUILayout.Space(6);
                     if (GUILayout.Button("Show In Project", EditorStyles.toolbarButton)) {
                         showInProjectRequested?.Invoke();
+                    }
+                    
+                    GUILayout.Space(6);
+                    if (GUILayout.Button("Refresh", EditorStyles.toolbarButton)) {
+                        refreshRequested?.Invoke();
                     }
 
                     GUILayout.FlexibleSpace();
@@ -150,40 +157,12 @@ namespace ThunderNut.SceneManagement.Editor {
                 m_TwoPaneSplitView.Add(new VisualElement {name = "right-panel"});
                 {
                     var rightPanelIMGUI = new IMGUIContainer(() => {
-                        if (GUILayout.Button("MultiColumnTreeView PopupWindow")) {
-                            PopupWindow.Show(buttonRect, new TreeViewPopupWindow {Width = buttonRect.width});
-                        }
-
-                        EditorGUILayout.PropertyField(serializedGraph.FindProperty("DemoScriptableObject"), GUIContent.none);
-
-                        WGHelpers.HorizontalScope(() => {
-                            GUILayout.Label("Selected Item");
-
-                            if (GUILayout.Button($"{serializedGraph.FindProperty("selectedItem").stringValue}",
-                                EditorStyles.popup)) {
-                                SearcherWindow.Show(editorWindow, stringListSearcherProvider.LoadSearchWindow(),
-                                    searcherItem => stringListSearcherProvider.OnSearcherSelectEntry(searcherItem),
-                                    editorWindow.rootVisualElement.LocalToWorld(Event.current.mousePosition), null);
-                            }
-                        });
-
-                        if (Event.current.type == EventType.Repaint)
-                            buttonRect = GUILayoutUtility.GetLastRect();
-
-                        serializedGraph.ApplyModifiedProperties();
+                        m_WorldGraphEditor.OnInspectorGUI();
                     });
 
                     m_TwoPaneSplitView.Q<VisualElement>("right-panel").Add(rightPanelIMGUI);
                 }
             }
-
-            stringListSearcherProvider = ScriptableObject.CreateInstance<StringListSearcherProvider>();
-            stringListSearcherProvider.Initialize(WGHelpers.Ingredients,
-                x => {
-                    serializedGraph.FindProperty("selectedItem").stringValue =
-                        x ?? serializedGraph.FindProperty("selectedItem").stringValue;
-                });
-
 
             m_SearchWindowProvider = ScriptableObject.CreateInstance<WGSearcherProvider>();
             m_SearchWindowProvider.Initialize(editorWindow, m_GraphView);
@@ -222,11 +201,6 @@ namespace ThunderNut.SceneManagement.Editor {
             if (m_SearchWindowProvider != null) {
                 Object.DestroyImmediate(m_SearchWindowProvider);
                 m_SearchWindowProvider = null;
-            }
-
-            if (stringListSearcherProvider != null) {
-                Object.DestroyImmediate(stringListSearcherProvider);
-                stringListSearcherProvider = null;
             }
         }
     }

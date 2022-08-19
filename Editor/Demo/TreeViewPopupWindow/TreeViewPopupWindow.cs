@@ -4,8 +4,7 @@ using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
 namespace ThunderNut.SceneManagement.Editor {
-
-    [Serializable]
+    
     public class TreeViewPopupWindow : PopupWindowContent {
         private readonly SearchField m_SearchField;
         private readonly TreeView m_TreeView;
@@ -14,8 +13,8 @@ namespace ThunderNut.SceneManagement.Editor {
         public float Width { get; set; }
         
         private WGSimpleTreeView multiColumnTreeView;
-        [SerializeField] private TreeViewState multiColumnTreeViewState;
-        [SerializeField] private MultiColumnHeaderState multiColumnHeaderState;
+        private TreeViewState multiColumnTreeViewState;
+        private MultiColumnHeaderState multiColumnHeaderState;
 
         public TreeViewPopupWindow() {
             m_SearchField = new SearchField();

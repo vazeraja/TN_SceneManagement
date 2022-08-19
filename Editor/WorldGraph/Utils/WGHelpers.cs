@@ -62,6 +62,14 @@ namespace ThunderNut.SceneManagement.Editor {
             return Resources.FindObjectsOfTypeAll<EditorWindow>().ToList()
                 .Find(x => x.titleContent.ToString() == name);
         }
+        public static void RepaintInspector(System.Type t) {
+            UnityEditor.Editor[] ed = Resources.FindObjectsOfTypeAll<UnityEditor.Editor>();
+            foreach (var t1 in ed) {
+                if (t1.GetType() != t) continue;
+                t1.Repaint();
+                return;
+            }
+        }
 
         public static IEnumerable<T> FindAssetsByType<T>() where T : UnityEngine.Object {
             string[] guids = AssetDatabase.FindAssets($"t:{typeof(T).ToString().Replace("UnityEngine.", "")}");

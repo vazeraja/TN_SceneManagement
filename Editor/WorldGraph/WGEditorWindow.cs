@@ -44,9 +44,10 @@ namespace ThunderNut.SceneManagement.Editor {
                 if (m_GraphEditorView != null) {
                     // m_GraphEditorView.saveRequested += () => SaveAsset();
                     m_GraphEditorView.saveAsRequested += SaveAs;
+                    m_GraphEditorView.showInProjectRequested += PingAsset;
+                    m_GraphEditorView.refreshRequested += OnDisable;
                     // m_GraphEditorView.isCheckedOut += IsGraphAssetCheckedOut;
                     // m_GraphEditorView.checkOut += CheckoutAsset;
-                    m_GraphEditorView.showInProjectRequested += PingAsset;
                     m_GraphEditorView.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
                     m_FrameAllAfterLayout = true;
                     rootVisualElement.Add(graphEditorView);
@@ -85,10 +86,10 @@ namespace ThunderNut.SceneManagement.Editor {
             return ShowWorldGraphEditorWindow(path);
         }
 
-        protected virtual void OnEnable() {
+        protected void OnEnable() {
             this.SetAntiAliasing(4);
         }
-        protected virtual void Update() {
+        protected void Update() {
             if (m_HasError)
                 return;
             var updateTitle = false;
@@ -130,7 +131,8 @@ namespace ThunderNut.SceneManagement.Editor {
             }
         }
 
-        protected virtual void OnDisable() {
+        protected void OnDisable() {
+            Debug.Log("OnDisable()");
             worldGraph = null;
             graphEditorView = null;
         }

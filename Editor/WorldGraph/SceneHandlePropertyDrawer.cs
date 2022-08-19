@@ -28,26 +28,25 @@ namespace ThunderNut.SceneManagement.Editor {
                 editorWindow.Close();
                 GUIUtility.ExitGUI();
             }
-            
 
-            using (new GUILayout.HorizontalScope(EditorStyles.toolbar)) {
+
+            using (var horizontalScope = new GUILayout.HorizontalScope(EditorStyles.toolbar)) {
                 Texture2D sceneIcon =
                     (Texture2D) EditorGUIUtility.ObjectContent(m_SceneHandle, m_SceneHandle.GetType()).image;
                 GUIContent headerContent = new GUIContent(m_SceneHandle.name, sceneIcon);
-            
+
                 GUILayout.Label(headerContent, EditorStyles.boldLabel, GUILayout.ExpandHeight(true));
             }
             
-            GUILayout.BeginArea(new Rect(12.5f, 25, (Width - 25), Height));
+            using (var areaScope = new GUILayout.AreaScope(new Rect(12.5f, 25, (Width - 25), Height - 35)))
             {
-                scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
-                {
+                using (var scrollViewScope = new GUILayout.ScrollViewScope(scrollPos)) {
+                    scrollPos = scrollViewScope.scrollPosition;
+
                     m_SceneHandleEditor.drawScriptField = false;
                     m_SceneHandleEditor.OnInspectorGUI();
                 }
-                EditorGUILayout.EndScrollView();
             }
-            GUILayout.EndArea();
         }
 
         public override Vector2 GetWindowSize() {
@@ -93,19 +92,19 @@ namespace ThunderNut.SceneManagement.Editor {
 
             position.width -= 60;
             EditorGUI.ObjectField(position, property, label);
-            
+
             position.x += position.width;
             position.width = 60;
-            
+
             if (GUI.Button(position, EditorGUIUtility.IconContent("d_SearchWindow"),
                 new GUIStyle {alignment = TextAnchor.MiddleCenter}) && property.objectReferenceValue != null) {
                 PopupWindow.Show(new Rect(buttonRect.x, buttonRect.y + 10, buttonRect.width, buttonRect.height),
                     new SceneHandlePopupWindow((SceneHandle) property.objectReferenceValue) {
                         Width = buttonRect.width,
-                        Height = 350
+                        Height = 400
                     });
             }
-            
+
             if (Event.current.type == EventType.Repaint)
                 buttonRect = GUILayoutUtility.GetLastRect();
         }

@@ -6,6 +6,8 @@ namespace ThunderNut.SceneManagement {
 
     [CreateAssetMenu(fileName = "WorldGraph", menuName = "World Graph/World Graph")]
     public class WorldGraph : ScriptableObject, ISerializationCallbackReceiver {
+        public WorldGraph worldGraph => this;
+        
         public string selectedItem;
         
         [SearchObject(typeof(MyDemoScriptableObject))]
