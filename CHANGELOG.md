@@ -1,3 +1,10 @@
+## [1.0.9](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.8...v1.0.9) (2022-08-18)
+
+
+### Bug Fixes
+
+* popup window button for scene handles ([04700f0](https://github.com/vazeraja/TN_SceneManagement/commit/04700f018b968944baec0d97792068068139277e))
+
 ## [1.0.8](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.7...v1.0.8) (2022-08-18)
 
 
