@@ -28,25 +28,26 @@ namespace ThunderNut.SceneManagement.Editor {
                 editorWindow.Close();
                 GUIUtility.ExitGUI();
             }
+            
 
-            scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
+            using (new GUILayout.HorizontalScope(EditorStyles.toolbar)) {
+                Texture2D sceneIcon =
+                    (Texture2D) EditorGUIUtility.ObjectContent(m_SceneHandle, m_SceneHandle.GetType()).image;
+                GUIContent headerContent = new GUIContent(m_SceneHandle.name, sceneIcon);
+            
+                GUILayout.Label(headerContent, EditorStyles.boldLabel, GUILayout.ExpandHeight(true));
+            }
+            
+            GUILayout.BeginArea(new Rect(12.5f, 25, (Width - 25), Height));
             {
-                using (new GUILayout.HorizontalScope(EditorStyles.toolbar)) {
-                    Texture2D sceneIcon =
-                        (Texture2D) EditorGUIUtility.ObjectContent(m_SceneHandle, m_SceneHandle.GetType()).image;
-                    GUIContent headerContent = new GUIContent(m_SceneHandle.name, sceneIcon);
-
-                    GUILayout.Label(headerContent, EditorStyles.boldLabel,GUILayout.ExpandHeight(true));
-                }
-
-                GUILayout.BeginArea(new Rect(12.5f, 25, (Width - 25), Height));
+                scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
                 {
                     m_SceneHandleEditor.drawScriptField = false;
                     m_SceneHandleEditor.OnInspectorGUI();
                 }
-                GUILayout.EndArea();
+                EditorGUILayout.EndScrollView();
             }
-            EditorGUILayout.EndScrollView();
+            GUILayout.EndArea();
         }
 
         public override Vector2 GetWindowSize() {
@@ -72,25 +73,39 @@ namespace ThunderNut.SceneManagement.Editor {
         private Rect buttonRect;
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
+            // position.width -= 400;
+            // EditorGUI.LabelField(position, label);
+            // 
+            // position.x += position.width;
+            // position.width = 50;
+            // if (GUI.Button(position, EditorGUIUtility.IconContent("d_SearchWindow")) && property.objectReferenceValue != null) {
+            //     PopupWindow.Show(new Rect(buttonRect.x, buttonRect.y + 10, buttonRect.width, buttonRect.height),
+            //         new SceneHandlePopupWindow((SceneHandle) property.objectReferenceValue) {
+            //             Width = buttonRect.width,
+            //             Height = 250
+            //         });
+            // }
+            // 
+            // position.x += position.width;
+            // position.width = 450;
+            // EditorGUI.ObjectField(position, property, GUIContent.none);
+
+
             position.width -= 60;
             EditorGUI.ObjectField(position, property, label);
-
+            
             position.x += position.width;
             position.width = 60;
-
-            GUIStyle style = new GUIStyle {
-                alignment = TextAnchor.MiddleCenter
-            };
-
-            if (GUI.Button(position, EditorGUIUtility.IconContent("d_SearchWindow"), style) &&
-                property.objectReferenceValue != null) {
+            
+            if (GUI.Button(position, EditorGUIUtility.IconContent("d_SearchWindow"),
+                new GUIStyle {alignment = TextAnchor.MiddleCenter}) && property.objectReferenceValue != null) {
                 PopupWindow.Show(new Rect(buttonRect.x, buttonRect.y + 10, buttonRect.width, buttonRect.height),
                     new SceneHandlePopupWindow((SceneHandle) property.objectReferenceValue) {
                         Width = buttonRect.width,
-                        Height = 400
+                        Height = 350
                     });
             }
-
+            
             if (Event.current.type == EventType.Repaint)
                 buttonRect = GUILayoutUtility.GetLastRect();
         }

@@ -37,7 +37,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
         private TwoPaneSplitView m_TwoPaneSplitView;
         private int m_FPIndex = 0;
-        private float m_FPInitialDimension = 750;
+        private float m_FPInitialDimension = 600;
         private TwoPaneSplitViewOrientation splitViewOrientation = TwoPaneSplitViewOrientation.Horizontal;
 
         private BaseEdgeConnectorListener connectorListener;

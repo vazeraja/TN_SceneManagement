@@ -12,11 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b85ad94b6b588c4a9a1e4c57ebe2c01, type: 3}
   m_Name: WorldGraph
   m_EditorClassIdentifier: 
-  selectedItem: 
-  DemoScriptableObject: {fileID: 0}
-  SceneHandle:
-    scene:
-      sceneGuid: 
-    passages:
-    - 
-    sceneConnections: []
+  selectedItem: Joint
+  DemoScriptableObject: {fileID: 11400000, guid: 08eaf9bd7eff1b4458382f2cc0533994, type: 2}
+  SceneHandle: {fileID: 11400000, guid: 3c3bb3a1f98f958408f5d5597bd3b206, type: 2}

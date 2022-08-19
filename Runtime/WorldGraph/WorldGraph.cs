@@ -4,13 +4,13 @@ using UnityEngine;
 
 namespace ThunderNut.SceneManagement {
 
-    [CreateAssetMenu(fileName = "WorldGraph", menuName = "World Graph/World Graph"), Serializable]
+    [CreateAssetMenu(fileName = "WorldGraph", menuName = "World Graph/World Graph")]
     public class WorldGraph : ScriptableObject, ISerializationCallbackReceiver {
         public string selectedItem;
+        
         [SearchObject(typeof(MyDemoScriptableObject))]
         public MyDemoScriptableObject DemoScriptableObject;
-
-
+        
         public SceneHandle SceneHandle;
         private void OnEnable() {
         }
