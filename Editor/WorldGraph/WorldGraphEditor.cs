@@ -8,49 +8,48 @@ using PopupWindow = UnityEditor.PopupWindow;
 
 namespace ThunderNut.SceneManagement.Editor {
 
-    [CustomEditor(typeof(WorldGraph))]
+    [CustomEditor(typeof(WorldGraph), true)]
     public class WorldGraphEditor : UnityEditor.Editor {
-        private StringListSearcherProvider stringListSearcherProvider;
         private Rect buttonRect;
 
+        public SerializedObject worldGraphSerializedObject;
+
+        private SerializedProperty selectedItemProp;
+        private SerializedProperty demoScriptableObjectProp;
+        private SerializedProperty sceneHandleProp;
+
+        private SceneHandle handle;
+
+        private bool _settingsMenuDropdown;
+
         private void OnEnable() {
-            stringListSearcherProvider = CreateInstance<StringListSearcherProvider>();
-            stringListSearcherProvider.Initialize(WGHelpers.Ingredients,
-                x => {
-                    serializedObject.FindProperty("selectedItem").stringValue =
-                        x ?? serializedObject.FindProperty("selectedItem").stringValue;
-                });
+            demoScriptableObjectProp = serializedObject.FindProperty("DemoScriptableObject");
+            sceneHandleProp = serializedObject.FindProperty("SceneHandle");
+
+            handle = sceneHandleProp.objectReferenceValue as SceneHandle;
         }
 
         public override void OnInspectorGUI() {
+            serializedObject.Update();
+
             if (GUILayout.Button("MultiColumnTreeView PopupWindow")) {
                 PopupWindow.Show(buttonRect, new TreeViewPopupWindow {Width = buttonRect.width});
             }
+            
+            WGHelpers.DrawSection("Yeehaw");
+            WGHelpers.DrawSimpleHeader(ref _settingsMenuDropdown, ref handle.Active, "Settings");
 
-            WGHelpers.HorizontalScope(() => {
-                EditorGUILayout.LabelField("Selected Item");
-
-                if (GUILayout.Button($"{serializedObject.FindProperty("selectedItem").stringValue}", EditorStyles.popup)) {
-                    SearcherWindow.Show(EditorWindow.focusedWindow, stringListSearcherProvider.LoadSearchWindow(),
-                        searcherItem => stringListSearcherProvider.OnSearcherSelectEntry(searcherItem),
-                        EditorWindow.focusedWindow.rootVisualElement.LocalToWorld(Event.current.mousePosition), null);
-                }
-            });
-
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("DemoScriptableObject"));
-
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("SceneHandle"));
+            if (_settingsMenuDropdown) {
+                EditorGUILayout.PropertyField(demoScriptableObjectProp);
+                EditorGUILayout.PropertyField(sceneHandleProp);
+            }
 
             if (Event.current.type == EventType.Repaint)
                 buttonRect = GUILayoutUtility.GetLastRect();
 
-            serializedObject.ApplyModifiedProperties();
-        }
-
-        private void OnDisable() {
-            DestroyImmediate(stringListSearcherProvider);
-            stringListSearcherProvider = null;
+            if (serializedObject.ApplyModifiedProperties()) {
+                Debug.Log("something changed");
+            }
         }
     }
-
 }

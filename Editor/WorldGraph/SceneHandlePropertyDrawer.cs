@@ -33,7 +33,7 @@ namespace ThunderNut.SceneManagement.Editor {
             using (var horizontalScope = new GUILayout.HorizontalScope(EditorStyles.toolbar)) {
                 Texture2D sceneIcon =
                     (Texture2D) EditorGUIUtility.ObjectContent(m_SceneHandle, m_SceneHandle.GetType()).image;
-                GUIContent headerContent = new GUIContent(m_SceneHandle.name, sceneIcon);
+                GUIContent headerContent = new GUIContent($"{m_SceneHandle.name} ({m_SceneHandle.GetType().Name})", sceneIcon);
 
                 GUILayout.Label(headerContent, EditorStyles.boldLabel, GUILayout.ExpandHeight(true));
             }
@@ -72,24 +72,6 @@ namespace ThunderNut.SceneManagement.Editor {
         private Rect buttonRect;
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
-            // position.width -= 400;
-            // EditorGUI.LabelField(position, label);
-            // 
-            // position.x += position.width;
-            // position.width = 50;
-            // if (GUI.Button(position, EditorGUIUtility.IconContent("d_SearchWindow")) && property.objectReferenceValue != null) {
-            //     PopupWindow.Show(new Rect(buttonRect.x, buttonRect.y + 10, buttonRect.width, buttonRect.height),
-            //         new SceneHandlePopupWindow((SceneHandle) property.objectReferenceValue) {
-            //             Width = buttonRect.width,
-            //             Height = 250
-            //         });
-            // }
-            // 
-            // position.x += position.width;
-            // position.width = 450;
-            // EditorGUI.ObjectField(position, property, GUIContent.none);
-
-
             position.width -= 60;
             EditorGUI.ObjectField(position, property, label);
 

@@ -3,15 +3,15 @@ using UnityEditor;
 #endif
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace ThunderNut.SceneManagement {
     
     [CreateAssetMenu(fileName = "SceneHandle", menuName = "World Graph/Scene Handle")]
     public class SceneHandle : ScriptableObject {
+        
+        [Tooltip("Whether or not this handle is active")]
+        public bool Active = true;
         
         public SceneReference scene;
         public List<string> passages = new() {"default_value1", "default_value2"};

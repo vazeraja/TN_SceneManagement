@@ -9,11 +9,11 @@ using UnityEngine;
 using UnityEngine.LowLevel;
 
 namespace ThunderNut.SceneManagement.Editor {
-    
+
     [CustomEditor(typeof(SceneHandle), true)]
     public class SceneHandleEditor : UnityEditor.Editor {
-        public bool drawScriptField = true; 
-        
+        public bool drawScriptField = true;
+
         private SerializedProperty sceneProperty;
         private SerializedProperty passagesProperty;
         private SerializedProperty sceneConnectionsProperty;
@@ -220,10 +220,12 @@ namespace ThunderNut.SceneManagement.Editor {
         }
 
         public override void OnInspectorGUI() {
-            if(drawScriptField)
+            if (drawScriptField)
                 DrawScriptField();
 
             serializedObject.Update();
+
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("Active"));
 
             sceneProperty = serializedObject.FindProperty("scene");
             EditorGUILayout.PropertyField(sceneProperty);
@@ -280,4 +282,5 @@ namespace ThunderNut.SceneManagement.Editor {
 
         #endregion
     }
+
 }

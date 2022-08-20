@@ -5,10 +5,10 @@ using UnityEngine;
 namespace ThunderNut.SceneManagement.Editor {
     public class BaseEdgeConnectorListener : IEdgeConnectorListener {
         readonly WorldGraph m_Graph;
-        readonly SearchWindowProvider m_SearchWindowProvider;
+        readonly WGSearcherProvider m_SearchWindowProvider;
         readonly EditorWindow m_editorWindow;
         
-        public BaseEdgeConnectorListener(WorldGraph graph, SearchWindowProvider searchWindowProvider, EditorWindow editorWindow)
+        public BaseEdgeConnectorListener(WorldGraph graph, WGSearcherProvider searchWindowProvider, EditorWindow editorWindow)
         {
             m_Graph = graph;
             m_SearchWindowProvider = searchWindowProvider;

@@ -9,14 +9,12 @@ using UnityEditor.UIElements;
 using Object = UnityEngine.Object;
 
 namespace ThunderNut.SceneManagement.Editor {
+
     public class WGEditorWindow : EditorWindow {
         [SerializeField] private string m_Selected;
-        [SerializeField] bool m_AssetMaybeChangedOnDisk;
-        [SerializeField] bool m_AssetMaybeDeleted;
         [NonSerialized] bool m_FrameAllAfterLayout;
         [NonSerialized] bool m_HasError;
         [NonSerialized] bool m_ProTheme;
-        [SerializeField] string m_LastSerializedFileContents;
 
         public string selectedGuid {
             get => m_Selected;
@@ -45,7 +43,7 @@ namespace ThunderNut.SceneManagement.Editor {
                     // m_GraphEditorView.saveRequested += () => SaveAsset();
                     m_GraphEditorView.saveAsRequested += SaveAs;
                     m_GraphEditorView.showInProjectRequested += PingAsset;
-                    m_GraphEditorView.refreshRequested += OnDisable;
+                    m_GraphEditorView.refreshRequested += Refresh;
                     // m_GraphEditorView.isCheckedOut += IsGraphAssetCheckedOut;
                     // m_GraphEditorView.checkOut += CheckoutAsset;
                     m_GraphEditorView.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
@@ -57,16 +55,16 @@ namespace ThunderNut.SceneManagement.Editor {
 
         private static readonly ProfilerMarker GraphLoadMarker = new("GraphLoad");
         private static readonly ProfilerMarker CreateGraphEditorViewMarker = new("CreateGraphEditorView");
-        
+
         public static bool ShowWorldGraphEditorWindow(string path) {
             string guid = AssetDatabase.AssetPathToGUID(path);
-            
+
             foreach (var w in Resources.FindObjectsOfTypeAll<WGEditorWindow>()) {
                 if (w.selectedGuid != guid) continue;
                 w.Focus();
                 return true;
             }
-            
+
             var window = EditorWindow.CreateWindow<WGEditorWindow>(typeof(WGEditorWindow), typeof(SceneView));
             window.minSize = new Vector2(1200, 600);
             window.Initialize(guid);
@@ -82,13 +80,14 @@ namespace ThunderNut.SceneManagement.Editor {
 
             if (asset == null || !AssetDatabase.GetAssetPath(asset).Contains("WorldGraph"))
                 return false;
-            
+
             return ShowWorldGraphEditorWindow(path);
         }
 
         protected void OnEnable() {
             this.SetAntiAliasing(4);
         }
+
         protected void Update() {
             if (m_HasError)
                 return;
@@ -111,7 +110,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
                     string graphName = Path.GetFileNameWithoutExtension(assetPath);
                     var asset = AssetDatabase.LoadAssetAtPath<WorldGraph>(assetPath);
-
+                    
                     graphEditorView = new WGEditorView(this, asset, graphName) {
                         viewDataKey = selectedGuid,
                     };
@@ -132,7 +131,6 @@ namespace ThunderNut.SceneManagement.Editor {
         }
 
         protected void OnDisable() {
-            Debug.Log("OnDisable()");
             worldGraph = null;
             graphEditorView = null;
         }
@@ -222,6 +220,11 @@ namespace ThunderNut.SceneManagement.Editor {
             }
         }
 
+        public void Refresh() {
+            OnDisable();
+            OnEnable();
+        }
+
         private bool AssetFileExists() => File.Exists(AssetDatabase.GUIDToAssetPath(selectedGuid));
 
         private void OnGeometryChanged(GeometryChangedEvent evt) {
@@ -238,4 +241,5 @@ namespace ThunderNut.SceneManagement.Editor {
             m_FrameAllAfterLayout = false;
         }
     }
+
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.IMGUI.Controls;
@@ -32,7 +33,6 @@ namespace ThunderNut.SceneManagement.Editor {
         private WGGraphView m_GraphView;
 
         private WorldGraph m_Graph;
-        private SerializedObject serializedGraph { get; set; }
         private string m_AssetName;
 
         private TwoPaneSplitView m_TwoPaneSplitView;
@@ -41,7 +41,7 @@ namespace ThunderNut.SceneManagement.Editor {
         private TwoPaneSplitViewOrientation splitViewOrientation = TwoPaneSplitViewOrientation.Horizontal;
 
         private BaseEdgeConnectorListener connectorListener;
-        private SearchWindowProvider m_SearchWindowProvider;
+        private WGSearcherProvider m_SearchWindowProvider;
         private SearcherWindow searcherWindow;
 
         // Demo Variables for testing things in right-panel
@@ -82,8 +82,7 @@ namespace ThunderNut.SceneManagement.Editor {
             var serializedSettings = EditorUserSettings.GetConfigValue(k_UserViewSettings);
             m_UserViewSettings = JsonUtility.FromJson<UserViewSettings>(serializedSettings) ?? new UserViewSettings();
 
-            serializedGraph = new SerializedObject(m_Graph);
-            m_WorldGraphEditor = UnityEditor.Editor.CreateEditor(m_Graph) as WorldGraphEditor;
+            m_WorldGraphEditor = UnityEditor.Editor.CreateEditor(graph) as WorldGraphEditor;
 
             var toolbar = new IMGUIContainer(() => {
                 GUILayout.BeginHorizontal(EditorStyles.toolbar);
@@ -101,7 +100,7 @@ namespace ThunderNut.SceneManagement.Editor {
                     if (GUILayout.Button("Show In Project", EditorStyles.toolbarButton)) {
                         showInProjectRequested?.Invoke();
                     }
-                    
+
                     GUILayout.Space(6);
                     if (GUILayout.Button("Refresh", EditorStyles.toolbarButton)) {
                         refreshRequested?.Invoke();
@@ -156,29 +155,38 @@ namespace ThunderNut.SceneManagement.Editor {
                 }
                 m_TwoPaneSplitView.Add(new VisualElement {name = "right-panel"});
                 {
-                    var rightPanelIMGUI = new IMGUIContainer(() => {
+                    var rightPanelIMGUI = new IMGUIContainer();
+                    rightPanelIMGUI.onGUIHandler += () => {
                         m_WorldGraphEditor.OnInspectorGUI();
-                    });
+                    };
 
                     m_TwoPaneSplitView.Q<VisualElement>("right-panel").Add(rightPanelIMGUI);
                 }
             }
 
             m_SearchWindowProvider = ScriptableObject.CreateInstance<WGSearcherProvider>();
-            m_SearchWindowProvider.Initialize(editorWindow, m_GraphView);
-            m_GraphView.nodeCreationRequest = c => {
-                if (EditorWindow.focusedWindow != m_EditorWindow) return;
-                var displayPosition = (c.screenMousePosition - m_EditorWindow.position.position);
-
-                m_SearchWindowProvider.target = c.target;
-                SearcherWindow.Show(m_EditorWindow,
-                    ((WGSearcherProvider) m_SearchWindowProvider).LoadSearchWindow(),
-                    item => ((WGSearcherProvider) m_SearchWindowProvider).OnSearcherSelectEntry(item,
-                        c.screenMousePosition - m_EditorWindow.position.position),
-                    displayPosition, null);
-            };
+            m_SearchWindowProvider.Initialize(editorWindow, m_GraphView, ItemSelectedCallback);
+            m_GraphView.nodeCreationRequest = GraphViewNodeCreationRequest;
 
             Add(m_TwoPaneSplitView);
+        }
+
+        private void ItemSelectedCallback(Type type) {
+            Debug.Log("creating node");
+            var node = new WGNodeView();
+            node.Initialize(graphView);
+
+            graphView.AddElement(node);
+            Debug.Log(m_GraphView.nodes.OfType<IWorldGraphNodeView>().Count());
+        }
+
+        private void GraphViewNodeCreationRequest(NodeCreationContext c) {
+            if (EditorWindow.focusedWindow != m_EditorWindow) return;
+            var displayPosition = (c.screenMousePosition - m_EditorWindow.position.position);
+
+            m_SearchWindowProvider.target = c.target;
+            SearcherWindow.Show(m_EditorWindow, m_SearchWindowProvider.LoadSearchWindow(),
+                item => m_SearchWindowProvider.OnSearcherSelectEntry(item, displayPosition), displayPosition, null);
         }
 
         public void Dispose() {
@@ -188,11 +196,12 @@ namespace ThunderNut.SceneManagement.Editor {
                 showInProjectRequested = null;
                 isCheckedOut = null;
                 checkOut = null;
-                // // Get all nodes and remove them from the graphView
-                // foreach (var node in m_GraphView.Children().OfType<IShaderNodeView>())
-                //     node.Dispose();
 
-                serializedGraph = null;
+                // Get all nodes and dispose
+                //Debug.Log(m_GraphView.graphElements.OfType<IWorldGraphNodeView>().Count());
+                foreach (var node in m_GraphView.graphElements.OfType<IWorldGraphNodeView>())
+                    node.Dispose();
+                //Debug.Log(m_GraphView.graphElements.OfType<IWorldGraphNodeView>().Count());
 
                 m_GraphView.nodeCreationRequest = null;
                 m_GraphView = null;
