@@ -83,7 +83,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 PopupWindow.Show(new Rect(buttonRect.x, buttonRect.y + 10, buttonRect.width, buttonRect.height),
                     new SceneHandlePopupWindow((SceneHandle) property.objectReferenceValue) {
                         Width = buttonRect.width,
-                        Height = 400
+                        Height = 300
                     });
             }
 

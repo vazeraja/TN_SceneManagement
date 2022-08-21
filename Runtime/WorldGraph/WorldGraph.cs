@@ -5,21 +5,11 @@ using UnityEngine;
 namespace ThunderNut.SceneManagement {
 
     [CreateAssetMenu(fileName = "WorldGraph", menuName = "World Graph/World Graph")]
-    public class WorldGraph : ScriptableObject, ISerializationCallbackReceiver {
+    public class WorldGraph : SingletonScriptableObject<WorldGraph> {
         
-        [SearchObject(typeof(MyDemoScriptableObject))]
-        public MyDemoScriptableObject DemoScriptableObject;
-        
-        public SceneHandle SceneHandle;
+        public List<SceneHandle> sceneHandles;
 
-        private void OnEnable() {
-        }
-        private void OnDisable() {
-        }
-
-        public void OnBeforeSerialize() { }
-
-        public void OnAfterDeserialize() { }
+        protected override void ScriptableObjectAwake() => Debug.Log($"{GetType().Name} created.");
     }
 
 }

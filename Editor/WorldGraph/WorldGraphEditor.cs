@@ -1,55 +1,102 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
-using UnityEditor.Searcher;
+using UnityEditorInternal;
 using UnityEngine;
-using UnityEngine.UIElements;
-using Object = UnityEngine.Object;
-using PopupWindow = UnityEditor.PopupWindow;
 
 namespace ThunderNut.SceneManagement.Editor {
 
-    [CustomEditor(typeof(WorldGraph), true)]
+    [CustomEditor(typeof(WorldGraph))]
     public class WorldGraphEditor : UnityEditor.Editor {
-        private Rect buttonRect;
-
-        public SerializedObject worldGraphSerializedObject;
-
-        private SerializedProperty selectedItemProp;
-        private SerializedProperty demoScriptableObjectProp;
-        private SerializedProperty sceneHandleProp;
-
-        private SceneHandle handle;
-
         private bool _settingsMenuDropdown;
 
-        private void OnEnable() {
-            demoScriptableObjectProp = serializedObject.FindProperty("DemoScriptableObject");
-            sceneHandleProp = serializedObject.FindProperty("SceneHandle");
+        private SerializedProperty _sceneHandles;
+        private ReorderableList list;
+        private readonly List<string> typeDisplays = new();
 
-            handle = sceneHandleProp.objectReferenceValue as SceneHandle;
+        private void OnEnable() {
+            // -------------------------------
+            _sceneHandles = serializedObject.FindProperty("sceneHandles");
+
+            typeDisplays.Add("Add new SceneHandle...");
+            typeDisplays.AddRange(WGNodeTypeCache.knownNodeTypes.Select(type => type.Name));
+
+            list = new ReorderableList(serializedObject, _sceneHandles) {
+                displayAdd = false,
+                displayRemove = false,
+                draggable = false,
+
+                drawHeaderCallback = rect => { EditorGUI.LabelField(rect, _sceneHandles.displayName); },
+                elementHeightCallback = index => EditorGUI.GetPropertyHeight(_sceneHandles.GetArrayElementAtIndex(index)),
+                drawElementCallback = (rect, index, active, focused) => {
+                    var element = _sceneHandles.GetArrayElementAtIndex(index);
+                    var propertyRect = new Rect(rect.x, rect.y, rect.width, EditorGUI.GetPropertyHeight(element));
+                    EditorGUI.PropertyField(propertyRect, element);
+                },
+                onAddCallback = thisList => {
+                    SceneHandle newHandle = CreateInstance<SceneHandle>();
+                    Undo.RecordObject((WorldGraph) target, "WorldGraph");
+
+                    thisList.serializedProperty.arraySize++;
+
+                    var newElement =
+                        thisList.serializedProperty.GetArrayElementAtIndex(thisList.serializedProperty.arraySize - 1);
+                    newElement.objectReferenceValue = newHandle;
+
+                    Undo.RegisterCreatedObjectUndo(newHandle, "WorldGraph");
+                    AssetDatabase.SaveAssets();
+                }
+            };
+
+
+            // -------------------------------
         }
 
         public override void OnInspectorGUI() {
             serializedObject.Update();
-
-            if (GUILayout.Button("MultiColumnTreeView PopupWindow")) {
-                PopupWindow.Show(buttonRect, new TreeViewPopupWindow {Width = buttonRect.width});
-            }
             
-            WGHelpers.DrawSection("Yeehaw");
-            WGHelpers.DrawSimpleHeader(ref _settingsMenuDropdown, ref handle.Active, "Settings");
+            EditorGUILayout.HelpBox($"Select SceneHandles from the 'Add new SceneHandle...' button", MessageType.None);
 
-            if (_settingsMenuDropdown) {
-                EditorGUILayout.PropertyField(demoScriptableObjectProp);
-                EditorGUILayout.PropertyField(sceneHandleProp);
+            WGHelpers.DrawSection("Settings");
+            EditorGUILayout.BeginHorizontal();
+            {
+                int newItem = EditorGUILayout.Popup(0, typeDisplays.ToArray());
+                if (newItem >= 1) {
+                    Debug.Log(typeDisplays[newItem]);
+                    list.onAddCallback(list);
+                }
             }
+            EditorGUILayout.EndHorizontal();
 
-            if (Event.current.type == EventType.Repaint)
-                buttonRect = GUILayoutUtility.GetLastRect();
+            list.DoLayoutList();
 
-            if (serializedObject.ApplyModifiedProperties()) {
-                Debug.Log("something changed");
-            }
+            serializedObject.ApplyModifiedProperties();
+        }
+
+        private SceneHandle AddSceneHandle() {
+            SceneHandle newHandle = CreateInstance<SceneHandle>();
+            Undo.RecordObject(target as WorldGraph, "WorldGraph");
+
+            var newEditor = AddEditor(newHandle);
+
+            list.serializedProperty.arraySize++;
+            var newElement = list.serializedProperty.GetArrayElementAtIndex(list.serializedProperty.arraySize - 1);
+            newElement.objectReferenceValue = newHandle;
+
+            Undo.RegisterCreatedObjectUndo(newHandle, "WorldGraph");
+            AssetDatabase.SaveAssets();
+
+            return newHandle;
+        }
+
+        private UnityEditor.Editor AddEditor(SceneHandle handle) {
+            if (handle == null)
+                return null;
+
+            UnityEditor.Editor editor = null;
+            CreateCachedEditor(handle, null, ref editor);
+            return editor;
         }
     }
+
 }

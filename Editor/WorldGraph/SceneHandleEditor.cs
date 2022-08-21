@@ -112,7 +112,7 @@ namespace ThunderNut.SceneManagement.Editor {
                     var newElement =
                         list.serializedProperty.GetArrayElementAtIndex(list.serializedProperty.arraySize - 1);
                     newElement.stringValue = "";
-                }
+                },
             };
 
             // Set up PassageElements List as Reorderable list

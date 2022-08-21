@@ -12,5 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b85ad94b6b588c4a9a1e4c57ebe2c01, type: 3}
   m_Name: WorldGraph
   m_EditorClassIdentifier: 
-  DemoScriptableObject: {fileID: 11400000, guid: a82c9119030ae4b438f5f1ebd1f77edc, type: 2}
-  SceneHandle: {fileID: 11400000, guid: 3ecf05a828246364b9a5e20d246be56e, type: 2}
+  sceneHandles: []

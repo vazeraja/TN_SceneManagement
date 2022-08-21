@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Resources;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
@@ -13,41 +14,7 @@ using PropertyAttribute = UnityEngine.PropertyAttribute;
 namespace ThunderNut.SceneManagement.Editor {
 
     public static class WGHelpers {
-        public static string[] Ingredients {
-            get {
-                return new[] {
-                    "Car/Honda/Civic",
-                    "Car/Honda/CRV",
-                    "Car/BMW/328i",
-                    "Electronics/Computer/Keyboard",
-                    "Electronics/Computer/Mouse",
-                    "Electronics/Computer/Monitor",
-                    "Electronics/Computer/Headset",
-                    "Electronics/Computer/Microphone",
-                    "Meat/Chicken/Roasted",
-                    "Meat/Chicken/Tenders",
-                    "Meat/Chicken/Wings",
-                    "Meat/Chicken/Legs",
-                    "Meat/Chicken/Thigh",
-                    "Meat/Chicken/Frozen",
-                    "Meat/Pork/Joint",
-                    "Meat/Pork/Slices",
-                    "Meat/Pork/Shoulder",
-                    "Meat/Pork/Assorted",
-                    "Meat/Pork/Mixed",
-                    "Meat/Sausages/Sliced",
-                    "Meat/Sausages/Hotdogs",
-                    "Meat/Sausages/Froze",
-                    "Meat/Sausages/Butcher",
-                    "Meat/Sausages/Pizza",
-                    "Meat/Sausages/Italian",
-                    "Meat/Turkey/Sliced",
-                    "Meat/Turkey/Full",
-                    "Meat/Turkey/Roasted",
-                };
-            }
-        }
-
+        
         // public static readonly GUIStyle SmallTickbox = new("ShurikenToggle");
 
         static readonly Color _splitterdark = new Color(0.12f, 0.12f, 0.12f, 1.333f);
@@ -96,6 +63,7 @@ namespace ThunderNut.SceneManagement.Editor {
             DrawSplitter();
 
             EditorGUILayout.Space();
+            EditorGUILayout.Space();
 
             EditorGUILayout.LabelField(title, EditorStyles.boldLabel);
         }
@@ -120,7 +88,7 @@ namespace ThunderNut.SceneManagement.Editor {
          /// <summary>
         /// Draw a header similar to the one used for the post-process stack
         /// </summary>
-        public static Rect DrawSimpleHeader(ref bool expanded, ref bool activeField, string title)
+        public static Rect DrawSimpleHeader(ref bool expanded, ref bool activeField, string title, Action<GenericMenu> fillGenericMenu)
         {
             var e = Event.current;
 
@@ -150,7 +118,7 @@ namespace ThunderNut.SceneManagement.Editor {
             toggleRect.height = 13f;
 
             var menuIcon = PaneOptionsIcon;
-            var menuRect = new Rect(labelRect.xMax + 4f, labelRect.y + 4f, menuIcon.width, menuIcon.height);
+            var menuRect = new Rect(labelRect.xMax + 4f, labelRect.y + 1f, menuIcon.width, menuIcon.height);
             
             // Background rect should be full-width
             backgroundRect.xMin = 0f;
@@ -169,7 +137,20 @@ namespace ThunderNut.SceneManagement.Editor {
             GUIStyle SmallTickbox = new("ShurikenToggle");
             activeField = GUI.Toggle(toggleRect, activeField, GUIContent.none, SmallTickbox);
             
+            // Dropdown menu icon
+            GUI.DrawTexture(menuRect, menuIcon);
+            
             // Handle events
+            if (e.type == EventType.MouseDown)
+            {
+                if (menuRect.Contains(e.mousePosition))
+                {
+                    var menu = new GenericMenu();
+                    fillGenericMenu(menu);
+                    menu.DropDown(new Rect(new Vector2(menuRect.x, menuRect.yMax), Vector2.zero));
+                    e.Use();
+                }
+            }
             
             if (e.type == EventType.MouseDown && labelRect.Contains(e.mousePosition) && e.button == 0)
             {

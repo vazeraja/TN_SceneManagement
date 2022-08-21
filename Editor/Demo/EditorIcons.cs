@@ -253,7 +253,7 @@
         }
 
         static GUIContent iconSelected;
-        static GUIStyle iconBtnStyle = null;
+        // static GUIStyle iconBtnStyle = null;
         static List<GUIContent> iconContentListAll;
         static List<GUIContent> iconContentListSmall;
         static List<GUIContent> iconContentListBig;

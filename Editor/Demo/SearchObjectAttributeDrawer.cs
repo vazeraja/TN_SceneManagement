@@ -11,6 +11,42 @@ namespace ThunderNut.SceneManagement.Editor {
 
     [CustomPropertyDrawer(typeof(SearchObjectAttribute))]
     public class SearchObjectAttributeDrawer : PropertyDrawer {
+        
+        public static string[] Ingredients {
+            get {
+                return new[] {
+                    "Car/Honda/Civic",
+                    "Car/Honda/CRV",
+                    "Car/BMW/328i",
+                    "Electronics/Computer/Keyboard",
+                    "Electronics/Computer/Mouse",
+                    "Electronics/Computer/Monitor",
+                    "Electronics/Computer/Headset",
+                    "Electronics/Computer/Microphone",
+                    "Meat/Chicken/Roasted",
+                    "Meat/Chicken/Tenders",
+                    "Meat/Chicken/Wings",
+                    "Meat/Chicken/Legs",
+                    "Meat/Chicken/Thigh",
+                    "Meat/Chicken/Frozen",
+                    "Meat/Pork/Joint",
+                    "Meat/Pork/Slices",
+                    "Meat/Pork/Shoulder",
+                    "Meat/Pork/Assorted",
+                    "Meat/Pork/Mixed",
+                    "Meat/Sausages/Sliced",
+                    "Meat/Sausages/Hotdogs",
+                    "Meat/Sausages/Froze",
+                    "Meat/Sausages/Butcher",
+                    "Meat/Sausages/Pizza",
+                    "Meat/Sausages/Italian",
+                    "Meat/Turkey/Sliced",
+                    "Meat/Turkey/Full",
+                    "Meat/Turkey/Roasted",
+                };
+            }
+        }
+        
         private SerializedProperty serializedProperty;
         private EditorWindow editorWindow;
         private Type assetType;
@@ -75,7 +111,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
             position.width -= 60;
             EditorGUI.ObjectField(position, property, label);
-
+            
             position.x += position.width;
             position.width = 60;
             if (GUI.Button(position, new GUIContent("Find"))) {
