@@ -192,7 +192,7 @@ namespace ThunderNut.SceneManagement.Editor {
             }
 
             if (wasRemoved) {
-                foreach (var handle in _worldGraph.sceneHandles) {
+                foreach (var handle in _worldGraph.SceneHandles) {
                     if (handle != null) {
                         handle.hideFlags = HideFlags.None;
                     }
@@ -248,7 +248,7 @@ namespace ThunderNut.SceneManagement.Editor {
                     _debugView = GUILayout.Toggle(_debugView, "Debug View", EditorStyles.miniButtonRight);
 
                     if (EditorGUI.EndChangeCheck()) {
-                        foreach (var f in _worldGraph.sceneHandles)
+                        foreach (var f in _worldGraph.SceneHandles)
                             f.hideFlags = _debugView ? HideFlags.HideInInspector : HideFlags.None;
                         UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
                     }

@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEditor;
 
 namespace ThunderNut.SceneManagement.Editor {
+
     [CustomPropertyDrawer(typeof(SceneReference))]
     public class SceneReferenceDrawer : PropertyDrawer {
         static readonly Regex rArrayItemProp = new Regex(@"\.Array\.data\[(\d+)\]$");
@@ -14,7 +15,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 AssetDatabase.GUIDToAssetPath("8afce0d2be2b4b0fb1b75991c120b771"));
 
         private readonly SerializedObject helper = new SerializedObject(helperAsset);
-        
+
         ~SceneReferenceDrawer() => helper.Dispose();
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
@@ -32,8 +33,7 @@ namespace ThunderNut.SceneManagement.Editor {
             SceneAsset oldObj = AssetDatabase.LoadAssetAtPath<SceneAsset>(oldPath), newObj;
             try {
                 var helperProp = oldObj == null && oldGuid != null && oldGuid.Length > 0 // refers to missing GUID
-                    ? helper.FindProperty(nameof(SceneReferencesEditorHelper
-                        .missingScene)) // draw missing scene property
+                    ? helper.FindProperty(nameof(SceneReferencesEditorHelper.missingScene)) // draw missing scene property
                     : helper.FindProperty(nameof(SceneReferencesEditorHelper.nullScene)); // draw null scene property
                 if (oldObj != null) helperProp.objectReferenceValue = oldObj;
                 EditorGUI.ObjectField(position, helperProp, typeof(SceneAsset), label);
@@ -55,4 +55,5 @@ namespace ThunderNut.SceneManagement.Editor {
                 property.stringValue = newGuid;
         }
     }
+
 }

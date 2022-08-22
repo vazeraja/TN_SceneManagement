@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -7,7 +8,22 @@ namespace ThunderNut.SceneManagement {
 
     [CreateAssetMenu(fileName = "WorldGraph", menuName = "World Graph/World Graph")]
     public class WorldGraph : SingletonScriptableObject<WorldGraph> {
-        public List<SceneHandle> sceneHandles;
+        
+        [SerializeField] private List<SceneHandle> sceneHandles;
+        public List<SceneHandle> SceneHandles {
+            get => sceneHandles;
+            set => sceneHandles = value;
+        }
+
+        public SceneReference firstScene {
+            get {
+                if (sceneHandles.First().scene == null) {
+                    throw new NullReferenceException();
+                }
+
+                return sceneHandles.First().scene;
+            }
+        }
 
         public string settingA;
         public string settingB;
@@ -28,8 +44,9 @@ namespace ThunderNut.SceneManagement {
             if (!Application.isPlaying) {
                 AssetDatabase.AddObjectToAsset(newHandle, this);
             }
+
             Undo.RegisterCreatedObjectUndo(newHandle, name);
-            
+
             AssetDatabase.SaveAssets();
 
             return newHandle;

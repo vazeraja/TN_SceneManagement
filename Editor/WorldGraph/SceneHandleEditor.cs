@@ -219,7 +219,7 @@ namespace ThunderNut.SceneManagement.Editor {
         private void DrawScriptField() {
             EditorGUI.BeginDisabledGroup(true);
             EditorGUILayout.ObjectField("Script", MonoScript.FromScriptableObject((SceneHandle) target),
-                typeof(SceneHandle), false);
+                ((SceneHandle) target).GetType(), false);
             EditorGUI.EndDisabledGroup();
             EditorGUILayout.Space();
         }

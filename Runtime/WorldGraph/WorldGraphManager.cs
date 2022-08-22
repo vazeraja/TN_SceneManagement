@@ -1,24 +1,27 @@
 ﻿#if UNITY_EDITOR
 using UnityEditor;
 #endif
+using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement;
 using UnityEngine.ResourceManagement.Exceptions;
+using UnityEngine.SceneManagement;
 
 namespace ThunderNut.SceneManagement {
 
     public class WorldGraphManager : MonoBehaviour {
-        public WorldGraph worldGraph;
-
         private void Awake() {
             #if UNITY_EDITOR
             ResourceManager.ExceptionHandler = (handle, exception) => {
                 if (exception.GetType() == typeof(InvalidKeyException) || exception.GetType() == typeof(OperationException)) { }
             };
             #endif
+        }
 
-            Debug.Log(worldGraph.sceneHandles.Count);
+        private void Start() {
+            SceneManager.LoadScene(WorldGraph.Instance.firstScene.sceneIndex);
         }
     }
 
