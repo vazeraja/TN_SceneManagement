@@ -1,3 +1,10 @@
+## [1.0.10](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.9...v1.0.10) (2022-08-22)
+
+
+### Bug Fixes
+
+* created WorldGraphEditor.cs to mimic PostProcessing styling to add sceneHandles ([db8b674](https://github.com/vazeraja/TN_SceneManagement/commit/db8b674a2f25b1c3d47920912c904c6f7850fbdd))
+
 ## [1.0.9](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.8...v1.0.9) (2022-08-18)
 
 
