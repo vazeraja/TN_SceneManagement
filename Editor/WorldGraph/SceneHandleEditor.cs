@@ -21,60 +21,43 @@ namespace ThunderNut.SceneManagement.Editor {
         private ReorderableList passagesList;
         private ReorderableList sceneConnectionsList;
 
-        // Reference to the actual SceneHandle instance this Inspector belongs to
         private SceneHandle m_SceneHandle;
 
-        // GUIContent field for storing available tag options
         private GUIContent[] availableOptions;
 
-        // Called when the Inspector is opened / ScriptableObject is selected
         private void OnEnable() {
-            m_SceneHandle = (SceneHandle) target;
+            // ------------------------------- Initialize Properties -------------------------------
+            m_SceneHandle = target as SceneHandle;
 
-            // Link in serialized fields to their according SerializedProperties
+            sceneProperty = serializedObject.FindProperty("scene");
             passagesProperty = serializedObject.FindProperty(nameof(SceneHandle.passages));
             sceneConnectionsProperty = serializedObject.FindProperty(nameof(SceneHandle.sceneConnections));
 
-            // Setup and configure the sceneTagsList we will use to display the content of the sceneTagsList 
+            // ------------------------------- Configure ReorderableLists -------------------------------
             passagesList = new ReorderableList(serializedObject, passagesProperty) {
                 displayAdd = true,
                 displayRemove = true,
-                draggable = false, // for now disable reorder feature since we later go by index!
-
-                // As the header we simply want to see the usual display name 
-                drawHeaderCallback = rect => {
-                    // GUIStyle style = new GUIStyle(EditorStyles.label) {
-                    //     normal = {textColor = Color.white}
-                    // };
-
-                    EditorGUI.LabelField(rect, passagesProperty.displayName);
-                },
-
-                // How shall elements be displayed
+                draggable = false,
+                
+                drawHeaderCallback = rect => { EditorGUI.LabelField(rect, passagesProperty.displayName); },
                 drawElementCallback = (rect, index, focused, active) => {
-                    // get the current element's SerializedProperty
                     var element = passagesProperty.GetArrayElementAtIndex(index);
-
-                    // Get all characters as string[]
                     var availableIDs = m_SceneHandle.passages;
 
-                    // store the original GUI.color
                     var color = GUI.color;
-                    // Tint the field in red for invalid values
-                    // either because it is empty or a duplicate
                     if (string.IsNullOrWhiteSpace(element.stringValue) ||
                         availableIDs.Count(item => string.Equals(item, element.stringValue)) > 1) {
                         GUI.color = new Color(0.69f, 0.41f, 0.18f);
                     }
 
                     // Draw the property which automatically will select the correct drawer -> a single line text field
-                    EditorGUI.PropertyField(new Rect(rect.x, rect.y, rect.width, EditorGUI.GetPropertyHeight(element)),
-                        element);
+                    var elementRect = new Rect(rect.x, rect.y, rect.width, EditorGUI.GetPropertyHeight(element));
+                    EditorGUI.PropertyField(elementRect, element);
 
-                    // reset to the default color
+                    // Reset to the default color
                     GUI.color = color;
 
-                    // If the value is invalid draw a HelpBox to explain why it is invalid
+                    // If the value is invalid draw a HelpBox
                     if (string.IsNullOrWhiteSpace(element.stringValue)) {
                         rect.y += EditorGUI.GetPropertyHeight(element);
                         EditorGUI.HelpBox(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
@@ -86,14 +69,13 @@ namespace ThunderNut.SceneManagement.Editor {
                             "Duplicate! ID has to be unique!", MessageType.Error);
                     }
                 },
-
-                // Get the correct display height of elements in the list according to their values
                 elementHeightCallback = index => {
                     var element = passagesProperty.GetArrayElementAtIndex(index);
                     var availableIDs = m_SceneHandle.passages;
 
-                    var height = EditorGUI.GetPropertyHeight(element);
-
+                    float height = EditorGUI.GetPropertyHeight(element);
+                    
+                    // Increase height for invalid values
                     if (string.IsNullOrWhiteSpace(element.stringValue) ||
                         availableIDs.Count(item => string.Equals(item, element.stringValue)) > 1) {
                         height += EditorGUIUtility.singleLineHeight;
@@ -101,17 +83,11 @@ namespace ThunderNut.SceneManagement.Editor {
 
                     return height;
                 },
-
-                // Overwrite what shall be done when an element is added via the +
-                // Reset all values to the defaults for new added elements
-                // By default Unity would clone the values from the last or selected element otherwise
                 onAddCallback = list => {
-                    // This adds the new element but copies all values of the select or last element in the list
                     list.serializedProperty.arraySize++;
 
-                    var newElement =
-                        list.serializedProperty.GetArrayElementAtIndex(list.serializedProperty.arraySize - 1);
-                    newElement.stringValue = "";
+                    var e = list.serializedProperty.GetArrayElementAtIndex(list.serializedProperty.arraySize - 1);
+                    e.stringValue = "";
                 },
             };
 
@@ -210,13 +186,9 @@ namespace ThunderNut.SceneManagement.Editor {
                     EditorGUI.EndDisabledGroup();
                 }
             };
-
-            // Get the existing passages names as GUIContent[]
-            availableOptions = m_SceneHandle.passages.Select(item => new GUIContent(item)).ToArray();
-        }
-
-        public override bool RequiresConstantRepaint() {
-            return base.RequiresConstantRepaint();
+            
+            // ------------------------------- Initialize Passage Names -------------------------------
+            availableOptions = (target as SceneHandle)?.passages.Select(item => new GUIContent(item)).ToArray();
         }
 
         public override void OnInspectorGUI() {
@@ -225,9 +197,12 @@ namespace ThunderNut.SceneManagement.Editor {
 
             serializedObject.Update();
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("Active"));
+            const bool disabled = true;
+            using (var scope = new EditorGUI.DisabledGroupScope(disabled)) {
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("Active"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("guid"));
+            }
 
-            sceneProperty = serializedObject.FindProperty("scene");
             EditorGUILayout.PropertyField(sceneProperty);
             EditorGUILayout.Space();
 
@@ -247,9 +222,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
             serializedObject.ApplyModifiedProperties();
         }
-
-        #region Other
-
+        
         private void DrawScriptField() {
             EditorGUI.BeginDisabledGroup(true);
             EditorGUILayout.ObjectField("Script", MonoScript.FromScriptableObject((SceneHandle) target),
@@ -258,6 +231,7 @@ namespace ThunderNut.SceneManagement.Editor {
             EditorGUILayout.Space();
         }
 
+        #region Old/Unused Code
 
         [MenuItem("Assets/Create/World Graph/Scene Handle (From Scene)", false, 400)]
         private static void CreateFromScene() {
@@ -281,6 +255,7 @@ namespace ThunderNut.SceneManagement.Editor {
         private static bool CreateFromSceneValidation() => Selection.activeObject as SceneAsset;
 
         #endregion
+        
     }
 
 }

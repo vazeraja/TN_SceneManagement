@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEditor;
 using UnityEngine.Profiling;
 
@@ -8,7 +7,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
     public abstract class ContextFilterableAttribute : Attribute { }
-    
+
     /// <summary>
     /// Use this attribute on classes which inherit from AbstractSceneNode.
     /// The last item in the path must be the same name as the class in order for the WorldGraph to recognize it
@@ -29,31 +28,25 @@ namespace ThunderNut.SceneManagement.Editor {
     }
 
     [Serializable]
-    public abstract class AbstractSceneNode {
-    }
+    public abstract class AbstractSceneNode { }
 
     [Path("Basic/DefaultNode", "Default")]
-    public class DefaultNode : AbstractSceneNode {
-    }
+    public class DefaultNode : AbstractSceneNode { }
 
     [Path("Basic/CutsceneNode", "Cutscene")]
-    public class CutsceneNode : AbstractSceneNode {
-    }
+    public class CutsceneNode : AbstractSceneNode { }
 
     [Path("Special/BattleNode", "Battle")]
-    public class BattleNode : AbstractSceneNode {
-    }
+    public class BattleNode : AbstractSceneNode { }
 
     [Path("I/Love/Big/Cox/YeehawNode", "YeehawNode")]
-    public class YeehawNode : AbstractSceneNode {
-    }
+    public class YeehawNode : AbstractSceneNode { }
 
     [InitializeOnLoad]
     public static class WGNodeTypeCache {
         static WGNodeTypeCache() {
             ReCacheKnownNodeTypes();
         }
-        
 
         public static Dictionary<Type, List<ContextFilterableAttribute>> m_KnownNodeTypeLookupTable { get; set; }
         public static IEnumerable<Type> knownNodeTypes => m_KnownNodeTypeLookupTable.Keys;
@@ -91,6 +84,7 @@ namespace ThunderNut.SceneManagement.Editor {
                     int alphaOrder = splits1.Length < splits2.Length ? -1 : 1;
                     return alphaOrder;
                 }
+
                 return 0;
             });
             return sortedListItems;

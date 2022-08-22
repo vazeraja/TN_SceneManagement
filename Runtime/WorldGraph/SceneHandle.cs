@@ -12,11 +12,15 @@ namespace ThunderNut.SceneManagement {
         
         [Tooltip("Whether or not this handle is active")]
         public bool Active = true;
+        public string guid;
+        #if UNITY_EDITOR
+        public Color FeedbackColor => WGSceneHandleInspectorColors.GameObjectColor;
+        #endif
         
+
         public SceneReference scene;
         public List<string> passages = new() {"default_value1", "default_value2"};
         public List<SceneConnection> sceneConnections;
-        
     }
 
     [Serializable]

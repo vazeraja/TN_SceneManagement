@@ -157,7 +157,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 {
                     var rightPanelIMGUI = new IMGUIContainer();
                     rightPanelIMGUI.onGUIHandler += () => {
-                        m_WorldGraphEditor.OnInspectorGUI();
+                        // m_WorldGraphEditor.OnInspectorGUI();
                     };
 
                     m_TwoPaneSplitView.Q<VisualElement>("right-panel").Add(rightPanelIMGUI);
