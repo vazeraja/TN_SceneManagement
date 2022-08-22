@@ -11,7 +11,6 @@ namespace ThunderNut.SceneManagement.Editor {
 
     [CustomPropertyDrawer(typeof(SearchObjectAttribute))]
     public class SearchObjectAttributeDrawer : PropertyDrawer {
-        
         public static string[] Ingredients {
             get {
                 return new[] {
@@ -46,10 +45,9 @@ namespace ThunderNut.SceneManagement.Editor {
                 };
             }
         }
-        
+
         private SerializedProperty serializedProperty;
         private EditorWindow editorWindow;
-        private Type assetType;
 
         private static void BuildTree(IEnumerable<string> paths, out List<SearcherItem> result) {
             List<List<string>> entryItemsList = paths.Select(item => item.Split('/').ToList()).ToList();
@@ -86,7 +84,7 @@ namespace ThunderNut.SceneManagement.Editor {
             result = root.Children.Select(child => new SearcherItem(child.Name, children: child.Children)).ToList();
         }
 
-        private Searcher LoadSearchWindow() {
+        private Searcher LoadSearchWindow(Type assetType) {
             string[] assetGuids = AssetDatabase.FindAssets($"t:{assetType.Name}");
             List<string> paths = assetGuids.Select(AssetDatabase.GUIDToAssetPath).ToList();
             BuildTree(paths, out var result);
@@ -97,26 +95,29 @@ namespace ThunderNut.SceneManagement.Editor {
         }
 
 
-        private bool OnSearcherSelectEntry(SearcherItem entry) {
+        private bool OnSearcherSelectEntry(SearcherItem entry, SerializedProperty serializedProperty) {
             UnityEngine.Object userData = (UnityEngine.Object) (entry as SearchNodeItem)?.userData;
 
             serializedProperty.objectReferenceValue = userData ? userData : serializedProperty.objectReferenceValue;
             serializedProperty.serializedObject.ApplyModifiedProperties();
+
             return true;
         }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
-            serializedProperty = property;
-            assetType = property.GetPropertyAttribute<SearchObjectAttribute>(true).searchObjectType;
-
             position.width -= 60;
             EditorGUI.ObjectField(position, property, label);
-            
+
             position.x += position.width;
             position.width = 60;
             if (GUI.Button(position, new GUIContent("Find"))) {
-                SearcherWindow.Show(EditorWindow.focusedWindow, LoadSearchWindow(), OnSearcherSelectEntry,
-                    EditorWindow.focusedWindow.rootVisualElement.LocalToWorld(Event.current.mousePosition), null);
+                //Type t = property.GetPropertyAttribute<SearchObjectAttribute>(true).searchObjectType;
+                Type t = (attribute as SearchObjectAttribute)?.searchObjectType;
+
+                SearcherWindow.Show(EditorWindow.focusedWindow, LoadSearchWindow(t),
+                    item => OnSearcherSelectEntry(item, property),
+                    EditorWindow.focusedWindow.rootVisualElement.LocalToWorld(Event.current.mousePosition), 
+                    null);
             }
         }
     }

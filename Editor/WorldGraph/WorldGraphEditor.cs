@@ -10,7 +10,7 @@ namespace ThunderNut.SceneManagement.Editor {
         private WorldGraph _worldGraph;
         private SerializedProperty _sceneHandles;
 
-        Dictionary<SceneHandle, UnityEditor.Editor> _editors;
+        private Dictionary<SceneHandle, UnityEditor.Editor> _editors;
         private readonly List<string> typeDisplays = new();
         private bool _settingsMenuDropdown;
         private static bool _debugView = false;
@@ -110,7 +110,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 bool isExpanded = property.isExpanded;
                 string label = handle.name;
 
-                WGStyling.DrawSimpleHeader(ref isExpanded, ref handle.Active, label, handle.FeedbackColor, menu => {
+                WGStyling.DrawSimpleHeader(ref isExpanded, ref handle.Active, label, handle.HandleColor, menu => {
                     if (Application.isPlaying)
                         menu.AddItem(new GUIContent("Play"), false, () => Debug.Log("Play"));
                     else
@@ -127,6 +127,7 @@ namespace ThunderNut.SceneManagement.Editor {
                         EditorGUILayout.Space();
 
                         if (!_editors.ContainsKey(handle)) AddEditor(handle);
+                        
                         UnityEditor.Editor editor = _editors[handle];
                         CreateCachedEditor(handle, handle.GetType(), ref editor);
 
@@ -192,7 +193,7 @@ namespace ThunderNut.SceneManagement.Editor {
             }
 
             if (wasRemoved) {
-                foreach (var handle in _worldGraph.SceneHandles) {
+                foreach (var handle in _worldGraph.sceneHandles) {
                     if (handle != null) {
                         handle.hideFlags = HideFlags.None;
                     }
@@ -211,9 +212,9 @@ namespace ThunderNut.SceneManagement.Editor {
             EditorGUILayout.BeginHorizontal();
             {
                 // -------------------------- Initialize --------------------------
-                if (GUILayout.Button("Initialize", EditorStyles.miniButtonLeft)) {
-                    Debug.Log("Initialize");
-                }
+                // if (GUILayout.Button("Initialize", EditorStyles.miniButtonLeft)) {
+                //     Debug.Log("Initialize");
+                // }
 
                 //  -------------------------- Play button --------------------------
                 if (GUILayout.Button("Play", EditorStyles.miniButtonMid)) {
@@ -221,9 +222,9 @@ namespace ThunderNut.SceneManagement.Editor {
                 }
 
                 // -------------------------- Pause button --------------------------
-                if (GUILayout.Button("Pause", EditorStyles.miniButtonMid)) {
-                    Debug.Log("Pause");
-                }
+                // if (GUILayout.Button("Pause", EditorStyles.miniButtonMid)) {
+                //     Debug.Log("Pause");
+                // }
 
                 // -------------------------- Stop button --------------------------
                 if (GUILayout.Button("Stop", EditorStyles.miniButtonMid)) {
@@ -231,16 +232,16 @@ namespace ThunderNut.SceneManagement.Editor {
                 }
 
                 // -------------------------- Reset button --------------------------
-                if (GUILayout.Button("Reset", EditorStyles.miniButtonMid)) {
-                    Debug.Log("Reset");
-                }
+                // if (GUILayout.Button("Reset", EditorStyles.miniButtonMid)) {
+                //     Debug.Log("Reset");
+                // }
 
                 EditorGUI.EndDisabledGroup();
 
                 // -------------------------- Revert button --------------------------
-                if (GUILayout.Button("Revert", EditorStyles.miniButtonMid)) {
-                    Debug.Log("Revert");
-                }
+                // if (GUILayout.Button("Revert", EditorStyles.miniButtonMid)) {
+                //     Debug.Log("Revert");
+                // }
 
                 // -------------------------- Debug button --------------------------
                 EditorGUI.BeginChangeCheck();
@@ -248,7 +249,7 @@ namespace ThunderNut.SceneManagement.Editor {
                     _debugView = GUILayout.Toggle(_debugView, "Debug View", EditorStyles.miniButtonRight);
 
                     if (EditorGUI.EndChangeCheck()) {
-                        foreach (var f in _worldGraph.SceneHandles)
+                        foreach (var f in _worldGraph.sceneHandles)
                             f.hideFlags = _debugView ? HideFlags.HideInInspector : HideFlags.None;
                         UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
                     }
@@ -259,7 +260,6 @@ namespace ThunderNut.SceneManagement.Editor {
 
         private SceneHandle AddSceneHandle(System.Type type) {
             SceneHandle newHandle = _worldGraph.CreateSubAsset(type);
-
             AddEditor(newHandle);
             return newHandle;
         }

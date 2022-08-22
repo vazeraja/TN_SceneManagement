@@ -93,7 +93,7 @@ namespace ThunderNut.SceneManagement.Editor {
             var selectedEntryType = ((SearchNodeItem) entry)?.type;
 
             // ReSharper disable once InvertIf
-            if (selectedEntryType != null && selectedEntryType.IsSubclassOf(typeof(AbstractSceneNode))) {
+            if (selectedEntryType != null && selectedEntryType.IsSubclassOf(typeof(SceneHandle))) {
                 itemSelectedCallback?.Invoke(((SearchNodeItem) entry).type);
                 return true;
             }

@@ -5,43 +5,6 @@ using UnityEngine.Profiling;
 
 namespace ThunderNut.SceneManagement.Editor {
 
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
-    public abstract class ContextFilterableAttribute : Attribute { }
-
-    /// <summary>
-    /// Use this attribute on classes which inherit from AbstractSceneNode.
-    /// The last item in the path must be the same name as the class in order for the WorldGraph to recognize it
-    /// </summary>
-    /// <example>
-    /// [Path("Basic/DefaultNode", "Default")]
-    /// public class DefaultNode : AbstractSceneNode {}
-    /// </example>
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Class)]
-    public class PathAttribute : ContextFilterableAttribute {
-        public readonly string path;
-        public readonly string dropdownTitle;
-
-        public PathAttribute(string path, string dropdownTitle) {
-            this.path = path;
-            this.dropdownTitle = dropdownTitle;
-        }
-    }
-
-    [Serializable]
-    public abstract class AbstractSceneNode { }
-
-    [Path("Basic/DefaultNode", "Default")]
-    public class DefaultNode : AbstractSceneNode { }
-
-    [Path("Basic/CutsceneNode", "Cutscene")]
-    public class CutsceneNode : AbstractSceneNode { }
-
-    [Path("Special/BattleNode", "Battle")]
-    public class BattleNode : AbstractSceneNode { }
-
-    [Path("I/Love/Big/Cox/YeehawNode", "YeehawNode")]
-    public class YeehawNode : AbstractSceneNode { }
-
     [InitializeOnLoad]
     public static class WGNodeTypeCache {
         static WGNodeTypeCache() {
@@ -55,7 +18,7 @@ namespace ThunderNut.SceneManagement.Editor {
         private static void ReCacheKnownNodeTypes() {
             Profiler.BeginSample("NodeTypeCache: Re-caching all known node types");
             m_KnownNodeTypeLookupTable = new Dictionary<Type, List<ContextFilterableAttribute>>();
-            foreach (Type nodeType in TypeCache.GetTypesDerivedFrom<AbstractSceneNode>()) {
+            foreach (Type nodeType in TypeCache.GetTypesDerivedFrom<SceneHandle>()) {
                 if (nodeType.IsAbstract) continue;
                 List<ContextFilterableAttribute> filterableAttributes = new List<ContextFilterableAttribute>();
                 foreach (Attribute attribute in Attribute.GetCustomAttributes(nodeType)) {

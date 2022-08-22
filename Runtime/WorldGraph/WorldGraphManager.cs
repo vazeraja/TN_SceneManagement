@@ -21,7 +21,9 @@ namespace ThunderNut.SceneManagement {
         }
 
         private void Start() {
-            SceneManager.LoadScene(WorldGraph.Instance.firstScene.sceneIndex);
+            foreach (var handle in WorldGraph.Instance.sceneHandles) {
+                Debug.Log(handle.HandleName);
+            }
         }
     }
 

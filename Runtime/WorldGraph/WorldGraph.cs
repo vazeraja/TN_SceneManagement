@@ -9,21 +9,7 @@ namespace ThunderNut.SceneManagement {
     [CreateAssetMenu(fileName = "WorldGraph", menuName = "World Graph/World Graph")]
     public class WorldGraph : SingletonScriptableObject<WorldGraph> {
         
-        [SerializeField] private List<SceneHandle> sceneHandles;
-        public List<SceneHandle> SceneHandles {
-            get => sceneHandles;
-            set => sceneHandles = value;
-        }
-
-        public SceneReference firstScene {
-            get {
-                if (sceneHandles.First().scene == null) {
-                    throw new NullReferenceException();
-                }
-
-                return sceneHandles.First().scene;
-            }
-        }
+        public List<SceneHandle> sceneHandles;
 
         public string settingA;
         public string settingB;
@@ -35,7 +21,7 @@ namespace ThunderNut.SceneManagement {
 
         #if UNITY_EDITOR
         public SceneHandle CreateSubAsset(Type type) {
-            SceneHandle newHandle = CreateInstance<SceneHandle>();
+            SceneHandle newHandle = (SceneHandle) CreateInstance(type);
             newHandle.name = type.Name;
             newHandle.guid = GUID.Generate().ToString();
             sceneHandles.Add(newHandle);

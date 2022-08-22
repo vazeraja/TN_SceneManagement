@@ -1,8 +1,14 @@
 ﻿// Public Domain. NO WARRANTIES. License: https://opensource.org/licenses/0BSD
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.Searcher;
+using UnityEditor.ShaderGraph;
+using UnityEngine.UIElements;
 
 namespace ThunderNut.SceneManagement.Editor {
 
@@ -30,13 +36,15 @@ namespace ThunderNut.SceneManagement.Editor {
             var oldGuid = property.stringValue;
 
             var oldPath = AssetDatabase.GUIDToAssetPath(oldGuid);
-            SceneAsset oldObj = AssetDatabase.LoadAssetAtPath<SceneAsset>(oldPath), newObj;
+            var oldObj = AssetDatabase.LoadAssetAtPath<SceneAsset>(oldPath);
+            SceneAsset newObj;
             try {
                 var helperProp = oldObj == null && oldGuid != null && oldGuid.Length > 0 // refers to missing GUID
                     ? helper.FindProperty(nameof(SceneReferencesEditorHelper.missingScene)) // draw missing scene property
                     : helper.FindProperty(nameof(SceneReferencesEditorHelper.nullScene)); // draw null scene property
                 if (oldObj != null) helperProp.objectReferenceValue = oldObj;
                 EditorGUI.ObjectField(position, helperProp, typeof(SceneAsset), label);
+
                 if (helperProp.objectReferenceInstanceIDValue == 0) newObj = null; // set to null if null is selected
                 else {
                     // else set to object if not missing
@@ -48,12 +56,12 @@ namespace ThunderNut.SceneManagement.Editor {
                 helper.Update();
             } // reset helper so it does undo right
 
-            if (newObj == null)
-                property.stringValue = "";
+            if (newObj == null) property.stringValue = "";
             else if (newObj == oldObj) return;
             else if (AssetDatabase.TryGetGUIDAndLocalFileIdentifier(newObj, out string newGuid, out long _))
                 property.stringValue = newGuid;
         }
+        
     }
 
 }

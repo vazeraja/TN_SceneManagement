@@ -24,7 +24,7 @@ namespace ThunderNut.SceneManagement.Editor {
             // ------------------------------- Initialize Properties -------------------------------
             m_SceneHandle = target as SceneHandle;
 
-            sceneProperty = serializedObject.FindProperty("scene");
+            sceneProperty = serializedObject.FindProperty(nameof(SceneHandle.scene));
             passagesProperty = serializedObject.FindProperty(nameof(SceneHandle.passages));
             sceneConnectionsProperty = serializedObject.FindProperty(nameof(SceneHandle.sceneConnections));
 
@@ -33,6 +33,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 displayAdd = true,
                 displayRemove = true,
                 draggable = false,
+                
 
                 drawHeaderCallback = rect => { EditorGUI.LabelField(rect, passagesProperty.displayName); },
                 drawElementCallback = (rect, index, _, _) => {
@@ -196,7 +197,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("guid"));
             }
 
-            EditorGUILayout.PropertyField(sceneProperty);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("scene"));
             EditorGUILayout.Space();
 
             EditorGUI.BeginChangeCheck();

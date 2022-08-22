@@ -13,10 +13,11 @@ namespace ThunderNut.SceneManagement {
 
         [Tooltip("Unique identifier for this handle")]
         public string guid;
-        
+
         #if UNITY_EDITOR
-        public Color FeedbackColor => WGSceneHandleInspectorColors.GameObjectColor;
+        public virtual Color HandleColor => Color.white;
         #endif
+        public virtual string HandleName => "";
 
 
         public SceneReference scene;
