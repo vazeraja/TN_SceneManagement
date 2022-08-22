@@ -67,7 +67,7 @@ namespace ThunderNut.SceneManagement.Editor {
         public void ForceClose() => m_ShouldClose = true;
     }
 
-    // [CustomPropertyDrawer(typeof(SceneHandle), true)]
+    [CustomPropertyDrawer(typeof(SceneHandle), true)]
     public class SceneHandlePropertyDrawer : PropertyDrawer {
         private Rect buttonRect;
 

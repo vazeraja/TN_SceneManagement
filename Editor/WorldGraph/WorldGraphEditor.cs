@@ -44,7 +44,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
             EditorGUILayout.Space();
 
-            EditorGUILayout.HelpBox($"Select SceneHandles from the 'Add new SceneHandle...' button", MessageType.None);
+            EditorGUILayout.HelpBox($"Select SceneHandles using the **Add new SceneHandle** button", MessageType.None);
 
             Rect helpBoxRect = GUILayoutUtility.GetLastRect();
 
@@ -54,15 +54,15 @@ namespace ThunderNut.SceneManagement.Editor {
             if (_settingsMenuDropdown) {
                 EditorGUILayout.Space(10);
                 EditorGUILayout.LabelField("Initialization", EditorStyles.boldLabel);
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("a"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("b"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("c"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("settingA"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("settingB"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("settingC"));
 
 
                 EditorGUILayout.Space(10);
                 EditorGUILayout.LabelField("Other", EditorStyles.boldLabel);
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("d"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("e"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("settingD"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("settingE"));
             }
 
             // -------------------------------------------- Duration --------------------------------------------
@@ -184,6 +184,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
             var wasRemoved = false;
             for (int i = _sceneHandles.arraySize - 1; i >= 0; i--) {
+                // ReSharper disable once InvertIf
                 if (_sceneHandles.GetArrayElementAtIndex(i).objectReferenceValue == null) {
                     wasRemoved = true;
                     _sceneHandles.DeleteArrayElementAtIndex(i);

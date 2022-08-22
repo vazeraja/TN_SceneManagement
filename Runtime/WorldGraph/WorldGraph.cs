@@ -9,11 +9,11 @@ namespace ThunderNut.SceneManagement {
     public class WorldGraph : SingletonScriptableObject<WorldGraph> {
         public List<SceneHandle> sceneHandles;
 
-        public string a;
-        public string b;
-        public string c;
-        public string d;
-        public string e;
+        public string settingA;
+        public string settingB;
+        public string settingC;
+        public string settingD;
+        public string settingE;
 
         protected override void ScriptableObjectAwake() => Debug.Log($"{GetType().Name} created.");
 

@@ -35,11 +35,11 @@ MonoBehaviour:
   sceneHandles:
   - {fileID: -5858572452385887634}
   - {fileID: 1136651228567539702}
-  a: 
-  b: 
-  c: 
-  d: 
-  e: 
+  settingA: 
+  settingB: 
+  settingC: 
+  settingD: 
+  settingE: 
 --- !u!114 &1136651228567539702
 MonoBehaviour:
   m_ObjectHideFlags: 2

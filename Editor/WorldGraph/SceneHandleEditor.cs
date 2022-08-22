@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
+﻿using System.Linq;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
-using UnityEngine.LowLevel;
 
 namespace ThunderNut.SceneManagement.Editor {
 
@@ -38,9 +33,9 @@ namespace ThunderNut.SceneManagement.Editor {
                 displayAdd = true,
                 displayRemove = true,
                 draggable = false,
-                
+
                 drawHeaderCallback = rect => { EditorGUI.LabelField(rect, passagesProperty.displayName); },
-                drawElementCallback = (rect, index, focused, active) => {
+                drawElementCallback = (rect, index, _, _) => {
                     var element = passagesProperty.GetArrayElementAtIndex(index);
                     var availableIDs = m_SceneHandle.passages;
 
@@ -74,7 +69,7 @@ namespace ThunderNut.SceneManagement.Editor {
                     var availableIDs = m_SceneHandle.passages;
 
                     float height = EditorGUI.GetPropertyHeight(element);
-                    
+
                     // Increase height for invalid values
                     if (string.IsNullOrWhiteSpace(element.stringValue) ||
                         availableIDs.Count(item => string.Equals(item, element.stringValue)) > 1) {
@@ -110,7 +105,7 @@ namespace ThunderNut.SceneManagement.Editor {
                     var handleTags = element.FindPropertyRelative(nameof(SceneConnection.sceneHandlePassage));
 
                     return EditorGUI.GetPropertyHeight(sceneTag) + EditorGUI.GetPropertyHeight(handle) +
-                           EditorGUIUtility.singleLineHeight + 10;
+                           EditorGUI.GetPropertyHeight(handleTags) + EditorGUIUtility.singleLineHeight + 10;
                 },
 
                 // Overwrite what shall be done when an element is added via the +
@@ -123,15 +118,13 @@ namespace ThunderNut.SceneManagement.Editor {
                     var newElement =
                         list.serializedProperty.GetArrayElementAtIndex(list.serializedProperty.arraySize - 1);
                     var sceneTag = newElement.FindPropertyRelative(nameof(SceneConnection.passage));
-                    var handle = newElement.FindPropertyRelative(nameof(SceneConnection.sceneHandle));
-                    var text = newElement.FindPropertyRelative(nameof(SceneConnection.sceneHandlePassage));
 
                     sceneTag.intValue = -1;
                 },
 
                 // Draw element callback for how fields should be drawn in a reorderable list
                 // All the important stuff happens here
-                drawElementCallback = (rect, index, focused, active) => {
+                drawElementCallback = (rect, index, _, _) => {
                     //get the current element's SerializedProperty
                     var element = sceneConnectionsProperty.GetArrayElementAtIndex(index);
 
@@ -186,7 +179,7 @@ namespace ThunderNut.SceneManagement.Editor {
                     EditorGUI.EndDisabledGroup();
                 }
             };
-            
+
             // ------------------------------- Initialize Passage Names -------------------------------
             availableOptions = (target as SceneHandle)?.passages.Select(item => new GUIContent(item)).ToArray();
         }
@@ -198,7 +191,7 @@ namespace ThunderNut.SceneManagement.Editor {
             serializedObject.Update();
 
             const bool disabled = true;
-            using (var scope = new EditorGUI.DisabledGroupScope(disabled)) {
+            using (new EditorGUI.DisabledGroupScope(disabled)) {
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("Active"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("guid"));
             }
@@ -222,7 +215,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
             serializedObject.ApplyModifiedProperties();
         }
-        
+
         private void DrawScriptField() {
             EditorGUI.BeginDisabledGroup(true);
             EditorGUILayout.ObjectField("Script", MonoScript.FromScriptableObject((SceneHandle) target),
@@ -233,29 +226,28 @@ namespace ThunderNut.SceneManagement.Editor {
 
         #region Old/Unused Code
 
-        [MenuItem("Assets/Create/World Graph/Scene Handle (From Scene)", false, 400)]
-        private static void CreateFromScene() {
-            var trailingNumbersRegex = new Regex(@"(\d+$)");
-
-            var scene = Selection.activeObject as SceneAsset;
-
-            var asset = CreateInstance<SceneHandle>();
-            string baseName = trailingNumbersRegex.Replace(scene != null ? scene.name : string.Empty, "");
-            asset.name = baseName + "Handle";
-            if (AssetDatabase.TryGetGUIDAndLocalFileIdentifier(scene, out string newGuid, out long _)) {
-                asset.scene = new SceneReference(newGuid);
-            }
-
-            string assetPath = Path.GetDirectoryName(AssetDatabase.GetAssetPath(scene));
-            AssetDatabase.CreateAsset(asset, Path.Combine(assetPath ?? Application.dataPath, asset.name + ".asset"));
-            AssetDatabase.SaveAssets();
-        }
-
-        [MenuItem("Assets/Create/World Graph/Scene Handle (From Scene)", true, 400)]
-        private static bool CreateFromSceneValidation() => Selection.activeObject as SceneAsset;
+        // [MenuItem("Assets/Create/World Graph/Scene Handle (From Scene)", false, 400)]
+        // private static void CreateFromScene() {
+        //     var trailingNumbersRegex = new Regex(@"(\d+$)");
+        //
+        //     var scene = Selection.activeObject as SceneAsset;
+        //
+        //     var asset = CreateInstance<SceneHandle>();
+        //     string baseName = trailingNumbersRegex.Replace(scene != null ? scene.name : string.Empty, "");
+        //     asset.name = baseName + "Handle";
+        //     if (AssetDatabase.TryGetGUIDAndLocalFileIdentifier(scene, out string newGuid, out long _)) {
+        //         asset.scene = new SceneReference(newGuid);
+        //     }
+        //
+        //     string assetPath = Path.GetDirectoryName(AssetDatabase.GetAssetPath(scene));
+        //     AssetDatabase.CreateAsset(asset, Path.Combine(assetPath ?? Application.dataPath, asset.name + ".asset"));
+        //     AssetDatabase.SaveAssets();
+        // }
+        //
+        // [MenuItem("Assets/Create/World Graph/Scene Handle (From Scene)", true, 400)]
+        // private static bool CreateFromSceneValidation() => Selection.activeObject as SceneAsset;
 
         #endregion
-        
     }
 
 }
