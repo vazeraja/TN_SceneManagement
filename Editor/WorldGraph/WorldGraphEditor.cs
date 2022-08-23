@@ -11,7 +11,7 @@ namespace ThunderNut.SceneManagement.Editor {
         private SerializedProperty _sceneHandles;
 
         private Dictionary<SceneHandle, UnityEditor.Editor> _editors;
-        private readonly List<string> typeDisplays = new();
+        private readonly List<string> typeDisplays = new List<string>();
         private bool _settingsMenuDropdown;
         private static bool _debugView = false;
         private GUIStyle _playingStyle;

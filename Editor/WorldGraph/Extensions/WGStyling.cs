@@ -9,7 +9,7 @@ using PropertyAttribute = UnityEngine.PropertyAttribute;
 namespace ThunderNut.SceneManagement.Editor {
 
     public static class WGStyling {
-        public static readonly GUIStyle SmallTickbox = new("ShurikenToggle");
+        public static readonly GUIStyle SmallTickbox = new GUIStyle("ShurikenToggle");
 
         private static readonly Color _splitterDark = new Color(0.12f, 0.12f, 0.12f, 1.333f);
         private static readonly Color _splitterLight = new Color(0.6f, 0.6f, 0.6f, 1.333f);
@@ -218,7 +218,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 return null;
             }
 
-            return attributes is {Length: > 0} ? attributes[0] : null;
+            return attributes != null && attributes.Length > 0 ? attributes[0] : null;
         }
 
         #endregion

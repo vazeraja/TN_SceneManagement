@@ -53,8 +53,8 @@ namespace ThunderNut.SceneManagement.Editor {
             }
         }
 
-        private static readonly ProfilerMarker GraphLoadMarker = new("GraphLoad");
-        private static readonly ProfilerMarker CreateGraphEditorViewMarker = new("CreateGraphEditorView");
+        private static readonly ProfilerMarker GraphLoadMarker = new ProfilerMarker("GraphLoad");
+        private static readonly ProfilerMarker CreateGraphEditorViewMarker = new ProfilerMarker("CreateGraphEditorView");
 
         public static bool ShowWorldGraphEditorWindow(string path) {
             string guid = AssetDatabase.AssetPathToGUID(path);

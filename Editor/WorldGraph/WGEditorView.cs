@@ -59,7 +59,7 @@ namespace ThunderNut.SceneManagement.Editor {
         UserViewSettings m_UserViewSettings;
 
         const string k_FloatingWindowsLayoutKey = "TN.WorldGraph.FloatingWindowsLayout2";
-        FloatingWindowsLayout m_FloatingWindowsLayout = new();
+        FloatingWindowsLayout m_FloatingWindowsLayout = new FloatingWindowsLayout();
 
         public WGGraphView graphView => m_GraphView;
 
