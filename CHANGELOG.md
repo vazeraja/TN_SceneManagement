@@ -1,3 +1,10 @@
+## [1.0.14](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.13...v1.0.14) (2022-08-23)
+
+
+### Bug Fixes
+
+* preprocessor directives ([7fc7e12](https://github.com/vazeraja/TN_SceneManagement/commit/7fc7e12c7665b61e4eedfb6c6e32f7b2c204fd43))
+
 ## [1.0.13](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.12...v1.0.13) (2022-08-23)
 
 
