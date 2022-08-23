@@ -4,10 +4,13 @@ using UnityEditor;
 using System;
 using System.Linq;
 using UnityEngine;
+
+#if UNITY_2022_1_OR_NEWER
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement;
 using UnityEngine.ResourceManagement.Exceptions;
 using UnityEngine.SceneManagement;
+#endif
 
 namespace ThunderNut.SceneManagement {
 
