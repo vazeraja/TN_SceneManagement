@@ -2,9 +2,9 @@
     "name": "Unity.SceneManagement.Editor",
     "rootNamespace": "ThunderNut.SceneManagement.Editor",
     "references": [
-        "Unity.Searcher.Editor",
-        "Unity.ShaderGraph.Editor",
-        "Unity.SceneManagement"
+        "GUID:4988cf9794f41d64c884876ab6574b89",
+        "GUID:be0903cd8e1546f498710afdc59db5eb",
+        "GUID:edf83413a43a2ff45a266371fdac318a"
     ],
     "includePlatforms": [
         "Editor"

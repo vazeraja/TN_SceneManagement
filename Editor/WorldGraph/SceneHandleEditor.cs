@@ -38,7 +38,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
 
                 drawHeaderCallback = rect => { EditorGUI.LabelField(rect, passagesProperty.displayName); },
-                drawElementCallback = (rect, index, _, _) => {
+                drawElementCallback = (rect, index, isActive, isFocused) => {
                     var element = passagesProperty.GetArrayElementAtIndex(index);
                     var availableIDs = m_SceneHandle.passages;
 
@@ -127,7 +127,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
                 // Draw element callback for how fields should be drawn in a reorderable list
                 // All the important stuff happens here
-                drawElementCallback = (rect, index, _, _) => {
+                drawElementCallback = (rect, index, isActive, isFocused) => {
                     //get the current element's SerializedProperty
                     var element = sceneConnectionsProperty.GetArrayElementAtIndex(index);
 
