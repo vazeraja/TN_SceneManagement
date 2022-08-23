@@ -1,3 +1,10 @@
+## [1.0.11](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.10...v1.0.11) (2022-08-23)
+
+
+### Bug Fixes
+
+* world graph styling ([0c19c68](https://github.com/vazeraja/TN_SceneManagement/commit/0c19c68fde8baccd980155e748388c6beb4f8ab4))
+
 ## [1.0.10](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.9...v1.0.10) (2022-08-22)
 
 
