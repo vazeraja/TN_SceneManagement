@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-2568178102570133571
+MonoBehaviour:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03a72a9984864b28a97b386a9620a419, type: 3}
+  m_Name: CutsceneHandle
+  m_EditorClassIdentifier: 
+  Active: 1
+  guid: 9210bdbc4ca3bd446825b74848f1e41d
+  HandleName: 
+  scene:
+    sceneAsset: {fileID: 0}
+    ScenePath: 
+  passages:
+  - default_value1
+  - default_value2
+  sceneConnections: []
+--- !u!114 &-1182726240174178519
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db8d3b437e4741e2996521a15c9a76ef, type: 3}
+  m_Name: BattleHandle
+  m_EditorClassIdentifier: 
+  Active: 1
+  guid: 2daf87e76b3990c47a3deb69e8df6e57
+  HandleName: 
+  scene:
+    sceneAsset: {fileID: 0}
+    ScenePath: 
+  passages:
+  - default_value1
+  - default_value2
+  sceneConnections: []
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b85ad94b6b588c4a9a1e4c57ebe2c01, type: 3}
+  m_Name: WorldGraph
+  m_EditorClassIdentifier: 
+  sceneHandles:
+  - {fileID: -2568178102570133571}
+  - {fileID: -1182726240174178519}
+  settingA: 
+  settingB: 
+  settingC: 
+  settingD: 
+  settingE: 

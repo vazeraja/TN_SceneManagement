@@ -50,7 +50,7 @@ namespace ThunderNut.SceneManagement {
         #endif
 
         public SceneReference scene;
-        public List<string> passages = new() {"default_value1", "default_value2"};
+        public List<string> passages = new List<string>() {"default_value1", "default_value2"};
         public List<SceneConnection> sceneConnections;
     }
 
