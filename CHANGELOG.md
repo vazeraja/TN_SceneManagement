@@ -1,3 +1,10 @@
+## [1.0.13](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.12...v1.0.13) (2022-08-23)
+
+
+### Bug Fixes
+
+* remove addressable assets reference ([d050b15](https://github.com/vazeraja/TN_SceneManagement/commit/d050b15f9cdfd92ebb2857a79e141857df8edd0e))
+
 ## [1.0.12](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.11...v1.0.12) (2022-08-23)
 
 
