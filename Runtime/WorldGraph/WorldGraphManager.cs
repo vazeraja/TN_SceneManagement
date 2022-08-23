@@ -9,14 +9,15 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement;
 using UnityEngine.ResourceManagement.Exceptions;
-using UnityEngine.SceneManagement;
 #endif
+
+using UnityEngine.SceneManagement; 
 
 namespace ThunderNut.SceneManagement {
 
     public class WorldGraphManager : MonoBehaviour {
         private void Awake() {
-            #if UNITY_EDITOR
+            #if UNITY_EDITOR && UNITY_2022_1_OR_NEWER
             ResourceManager.ExceptionHandler = (handle, exception) => {
                 if (exception.GetType() == typeof(InvalidKeyException) || exception.GetType() == typeof(OperationException)) { }
             };
