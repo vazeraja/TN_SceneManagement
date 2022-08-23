@@ -21,9 +21,8 @@ namespace ThunderNut.SceneManagement {
         }
 
         private void Start() {
-            foreach (var handle in WorldGraph.Instance.sceneHandles) {
-                Debug.Log(handle.HandleName);
-            }
+            SceneHandle sceneHandle = WorldGraph.Instance.sceneHandles.Find(handle => handle.HandleName == "Boss Battle 1");
+            SceneManager.LoadScene(sceneHandle.scene.ScenePath);
         }
     }
 

@@ -20,6 +20,8 @@ namespace ThunderNut.SceneManagement.Editor {
 
         private GUIContent[] availableOptions;
 
+        private bool _settingsMenuDropdown;
+
         private void OnEnable() {
             // ------------------------------- Initialize Properties -------------------------------
             m_SceneHandle = target as SceneHandle;
@@ -33,7 +35,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 displayAdd = true,
                 displayRemove = true,
                 draggable = false,
-                
+
 
                 drawHeaderCallback = rect => { EditorGUI.LabelField(rect, passagesProperty.displayName); },
                 drawElementCallback = (rect, index, _, _) => {
@@ -193,9 +195,16 @@ namespace ThunderNut.SceneManagement.Editor {
 
             const bool disabled = true;
             using (new EditorGUI.DisabledGroupScope(disabled)) {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("Active"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("guid"));
+                _settingsMenuDropdown = EditorGUILayout.Foldout(_settingsMenuDropdown, "Internal Settings", true, EditorStyles.foldout);
+                if (_settingsMenuDropdown) {
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("Active"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("guid"));
+                }
             }
+
+            EditorGUILayout.Space(10);
+
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("HandleName"), includeChildren: true);
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("scene"));
             EditorGUILayout.Space();
