@@ -1,3 +1,10 @@
+## [1.0.15](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.14...v1.0.15) (2022-08-23)
+
+
+### Bug Fixes
+
+* remove new c# features ([1c7213f](https://github.com/vazeraja/TN_SceneManagement/commit/1c7213fe596c7e7e00048d7dc8c187a8e3e71d09))
+
 ## [1.0.14](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.13...v1.0.14) (2022-08-23)
 
 
