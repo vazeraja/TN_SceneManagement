@@ -11,11 +11,11 @@ namespace ThunderNut.SceneManagement.Editor
     {
         static AddRequest Request;
 
-        [MenuItem("Tools/Add Package Example")]
+        [MenuItem("Tools/Install ShaderGraph")]
         static void Add()
         {
             // Add a package to the project
-            Request = Client.Add("com.unity.textmeshpro");
+            Request = Client.Add("com.unity.shadergraph");
             EditorApplication.update += Progress;
         }
 
