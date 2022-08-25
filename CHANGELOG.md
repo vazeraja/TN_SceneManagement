@@ -1,3 +1,11 @@
+## [1.0.16](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.15...v1.0.16) (2022-08-25)
+
+
+### Bug Fixes
+
+* add dependency installer ([da4a4d2](https://github.com/vazeraja/TN_SceneManagement/commit/da4a4d2a6ae7bdc7c32a26c6b91bd39207fb04c4))
+* add shader graph dependency installer ([0626db8](https://github.com/vazeraja/TN_SceneManagement/commit/0626db86c64582426299f74adad5bcb867cce979))
+
 ## [1.0.15](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.14...v1.0.15) (2022-08-23)
 
 
