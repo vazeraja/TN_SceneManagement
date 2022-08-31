@@ -11,7 +11,7 @@ namespace ThunderNut.SceneManagement.Editor
     {
         static AddRequest Request;
 
-        [MenuItem("Tools/Install ShaderGraph")]
+        [MenuItem("WorldGraph/Install Dependencies")]
         static void Add()
         {
             // Add a package to the project

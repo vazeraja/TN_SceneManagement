@@ -65,7 +65,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 return true;
             }
 
-            var window = EditorWindow.CreateWindow<WGEditorWindow>(typeof(WGEditorWindow), typeof(SceneView));
+            var window = CreateWindow<WGEditorWindow>(typeof(WGEditorWindow));
             window.minSize = new Vector2(1200, 600);
             window.Initialize(guid);
             window.Focus();
@@ -76,9 +76,9 @@ namespace ThunderNut.SceneManagement.Editor {
         [OnOpenAsset(0)]
         public static bool OnBaseGraphOpened(int instanceID, int line) {
             var asset = EditorUtility.InstanceIDToObject(instanceID) as WorldGraph;
-            var path = AssetDatabase.GetAssetPath(instanceID);
+            string path = AssetDatabase.GetAssetPath(instanceID);
 
-            if (asset == null || !AssetDatabase.GetAssetPath(asset).Contains("WorldGraph"))
+            if (asset == null || !path.Contains("WorldGraph"))
                 return false;
 
             return ShowWorldGraphEditorWindow(path);

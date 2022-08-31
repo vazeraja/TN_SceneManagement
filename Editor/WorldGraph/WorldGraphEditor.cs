@@ -117,50 +117,47 @@ namespace ThunderNut.SceneManagement.Editor {
                         menu.AddDisabledItem(new GUIContent("Play"));
                     menu.AddSeparator(null);
                     menu.AddItem(new GUIContent("Remove"), false, () => RemoveSceneHandle(id));
-                    menu.AddItem(new GUIContent("Reset"), false, () => Debug.Log("Reset"));
                 });
 
                 property.isExpanded = isExpanded;
-                switch (isExpanded) {
-                    case true: {
-                        EditorGUI.BeginDisabledGroup(!handle.Active);
-                        EditorGUILayout.Space();
+                
+                // ReSharper disable once ConvertIfStatementToSwitchStatement
+                if (isExpanded) {
+                    EditorGUI.BeginDisabledGroup(!handle.Active);
+                    EditorGUILayout.Space();
 
-                        if (!_editors.ContainsKey(handle)) AddEditor(handle);
-                        
-                        UnityEditor.Editor editor = _editors[handle];
-                        CreateCachedEditor(handle, handle.GetType(), ref editor);
+                    if (!_editors.ContainsKey(handle)) AddEditor(handle);
 
-                        ((SceneHandleEditor) editor).drawScriptField = false;
-                        editor.OnInspectorGUI();
+                    UnityEditor.Editor editor = _editors[handle];
+                    CreateCachedEditor(handle, handle.GetType(), ref editor);
 
-                        EditorGUI.EndDisabledGroup();
+                    ((SceneHandleEditor) editor).drawScriptField = false;
+                    editor.OnInspectorGUI();
 
-                        EditorGUILayout.Space();
+                    EditorGUI.EndDisabledGroup();
 
-                        EditorGUI.BeginDisabledGroup(!Application.isPlaying);
-                        EditorGUILayout.BeginHorizontal();
-                        {
-                            if (GUILayout.Button("Play", EditorStyles.miniButtonMid)) {
-                                //PlayFeedback(id);
-                                Debug.Log("Play");
-                            }
+                    EditorGUILayout.Space();
 
-                            if (GUILayout.Button("Stop", EditorStyles.miniButtonMid)) {
-                                //StopFeedback(id);
-                                Debug.Log("Stop");
-                            }
+                    EditorGUI.BeginDisabledGroup(!Application.isPlaying);
+                    EditorGUILayout.BeginHorizontal();
+                    {
+                        if (GUILayout.Button("Play", EditorStyles.miniButtonMid)) {
+                            //PlayFeedback(id);
+                            Debug.Log("Play");
                         }
-                        EditorGUILayout.EndHorizontal();
-                        EditorGUI.EndDisabledGroup();
 
-                        EditorGUILayout.Space();
-                        EditorGUILayout.Space();
-                        break;
+                        if (GUILayout.Button("Stop", EditorStyles.miniButtonMid)) {
+                            //StopFeedback(id);
+                            Debug.Log("Stop");
+                        }
                     }
-                    case false:
-                        break;
+                    EditorGUILayout.EndHorizontal();
+                    EditorGUI.EndDisabledGroup();
+
+                    EditorGUILayout.Space();
+                    EditorGUILayout.Space();
                 }
+                else if (isExpanded == false) { }
             }
 
             if (_sceneHandles.arraySize > 0) {
@@ -193,10 +190,8 @@ namespace ThunderNut.SceneManagement.Editor {
             }
 
             if (wasRemoved) {
-                foreach (var handle in _worldGraph.sceneHandles) {
-                    if (handle != null) {
-                        handle.hideFlags = HideFlags.None;
-                    }
+                foreach (var handle in _worldGraph.sceneHandles.Where(handle => handle != null)) {
+                    handle.hideFlags = HideFlags.None;
                 }
             }
 

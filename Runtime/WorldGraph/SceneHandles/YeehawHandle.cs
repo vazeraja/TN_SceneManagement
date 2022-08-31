@@ -2,7 +2,7 @@
 
 namespace ThunderNut.SceneManagement {
 
-    [Path("I/Love/Big/Cox/YeehawHandle", "YeehawNode")]
+    [Path("Random/YeehawHandle", "YeehawNode")]
     public class YeehawHandle : SceneHandle {
         public override Color HandleColor => Color.yellow;
     }

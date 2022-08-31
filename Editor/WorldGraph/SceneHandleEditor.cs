@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -195,7 +196,8 @@ namespace ThunderNut.SceneManagement.Editor {
 
             const bool disabled = true;
             using (new EditorGUI.DisabledGroupScope(disabled)) {
-                _settingsMenuDropdown = EditorGUILayout.Foldout(_settingsMenuDropdown, "Internal Settings", true, EditorStyles.foldout);
+                _settingsMenuDropdown =
+                    EditorGUILayout.Foldout(_settingsMenuDropdown, "Internal Settings", true, EditorStyles.foldout);
                 if (_settingsMenuDropdown) {
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("Active"));
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("guid"));
@@ -204,9 +206,9 @@ namespace ThunderNut.SceneManagement.Editor {
 
             EditorGUILayout.Space(10);
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("HandleName"), includeChildren: true);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("handleName"), includeChildren: true);
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("scene"));
+            EditorGUILayout.PropertyField(sceneProperty);
             EditorGUILayout.Space();
 
             EditorGUI.BeginChangeCheck();

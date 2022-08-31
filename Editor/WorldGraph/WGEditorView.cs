@@ -165,22 +165,23 @@ namespace ThunderNut.SceneManagement.Editor {
             }
 
             m_SearchWindowProvider = ScriptableObject.CreateInstance<WGSearcherProvider>();
-            m_SearchWindowProvider.Initialize(editorWindow, m_GraphView, ItemSelectedCallback);
-            m_GraphView.nodeCreationRequest = GraphViewNodeCreationRequest;
+            m_SearchWindowProvider.Initialize(editorWindow, m_GraphView, SearchWindowItemSelected);
+            m_GraphView.nodeCreationRequest = NodeCreationRequest;
 
             Add(m_TwoPaneSplitView);
         }
 
-        private void ItemSelectedCallback(Type type) {
+        private void SearchWindowItemSelected(Type type) {
             Debug.Log("creating node");
-            var node = new WGNodeView();
-            node.Initialize(graphView);
+            
+            //SceneHandle newHandle = m_Graph.CreateSubAsset(type);
+            var node = new WGNodeView(m_GraphView);
 
-            graphView.AddElement(node);
-            Debug.Log(m_GraphView.nodes.OfType<IWorldGraphNodeView>().Count());
+            m_GraphView.AddElement(node);
+            Debug.Log("Node Count: " + m_GraphView.graphElements.OfType<IWorldGraphNodeView>().Count());
         }
 
-        private void GraphViewNodeCreationRequest(NodeCreationContext c) {
+        private void NodeCreationRequest(NodeCreationContext c) {
             if (EditorWindow.focusedWindow != m_EditorWindow) return;
             var displayPosition = (c.screenMousePosition - m_EditorWindow.position.position);
 
@@ -198,10 +199,15 @@ namespace ThunderNut.SceneManagement.Editor {
                 checkOut = null;
 
                 // Get all nodes and dispose
-                //Debug.Log(m_GraphView.graphElements.OfType<IWorldGraphNodeView>().Count());
-                foreach (var node in m_GraphView.graphElements.OfType<IWorldGraphNodeView>())
+                Debug.Log("Node Count: " + m_GraphView.graphElements.OfType<IWorldGraphNodeView>().Count());
+                foreach (IWorldGraphNodeView node in m_GraphView.graphElements.OfType<IWorldGraphNodeView>()) {
+                    //m_Graph.RemoveSubAsset(node.sceneHandle);
+                    m_GraphView.RemoveElement(node.gvNode);
+                    
                     node.Dispose();
-                //Debug.Log(m_GraphView.graphElements.OfType<IWorldGraphNodeView>().Count());
+                }
+
+                Debug.Log("Node Count: " + m_GraphView.graphElements.OfType<IWorldGraphNodeView>().Count());
 
                 m_GraphView.nodeCreationRequest = null;
                 m_GraphView = null;

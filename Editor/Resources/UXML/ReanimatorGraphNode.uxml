@@ -1,0 +1,27 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/TN_SceneManagement/Editor/Resources/UXML/ReanimatorGraphNode.uss?fileID=7433441132597879392&amp;guid=cd359daa7fa5ee64e95bf35b4a8408e3&amp;type=3#ReanimatorGraphNode" />
+    <ui:VisualElement name="node-border">
+        <ui:VisualElement name="title">
+            <ui:Label name="title-label" text="Label" class="unity-text-element unity-label" />
+            <ui:VisualElement name="title-button-container">
+                <ui:VisualElement name="collapse-button">
+                    <ui:VisualElement name="icon" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="title-divider" class="horizontal" />
+        <ui:VisualElement name="contents" style="background-color: rgb(43, 43, 43);">
+            <ui:VisualElement name="divider" class="horizontal" />
+            <ui:VisualElement name="top">
+                <ui:VisualElement name="input" />
+                <ui:VisualElement name="divider" class="vertical" />
+                <ui:VisualElement name="output" />
+            </ui:VisualElement>
+            <ui:VisualElement name="collapsible-area">
+                <ui:VisualElement name="divider" class="horizontal" />
+                <ui:VisualElement name="extension" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="selection-border" picking-mode="Ignore" />
+</ui:UXML>

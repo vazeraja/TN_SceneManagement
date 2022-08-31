@@ -24,13 +24,11 @@ namespace ThunderNut.SceneManagement {
             SceneHandle newHandle = (SceneHandle) CreateInstance(type);
             newHandle.name = type.Name;
             newHandle.guid = GUID.Generate().ToString();
+            
             sceneHandles.Add(newHandle);
 
             Undo.RecordObject(this, name);
-            if (!Application.isPlaying) {
-                AssetDatabase.AddObjectToAsset(newHandle, this);
-            }
-
+            if (!Application.isPlaying) AssetDatabase.AddObjectToAsset(newHandle, this);
             Undo.RegisterCreatedObjectUndo(newHandle, name);
 
             AssetDatabase.SaveAssets();
