@@ -5,11 +5,11 @@ using UnityEngine;
 
 namespace ThunderNut.SceneManagement {
 
-    public abstract class SceneHandle : MonoBehaviour {
+    public abstract class SceneHandle : ScriptableObject {
         public bool Active = true;
-        public string Label = "";
-        public string Guid;
         
+        public string guid;
+        public string handleName = "";
         public Vector2 position;
         
         #if UNITY_EDITOR

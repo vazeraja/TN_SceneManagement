@@ -3,7 +3,6 @@ using System.Linq;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace ThunderNut.SceneManagement.Editor {
 
@@ -201,14 +200,13 @@ namespace ThunderNut.SceneManagement.Editor {
                     EditorGUILayout.Foldout(_settingsMenuDropdown, "Internal Settings", true, EditorStyles.foldout);
                 if (_settingsMenuDropdown) {
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("Active"));
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("Guid"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("guid"));
                 }
             }
 
-            
             EditorGUILayout.Space(10);
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("Label"), includeChildren: true);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("handleName"), includeChildren: true);
 
             EditorGUILayout.PropertyField(sceneProperty);
             EditorGUILayout.Space();
@@ -230,13 +228,10 @@ namespace ThunderNut.SceneManagement.Editor {
             serializedObject.ApplyModifiedProperties();
         }
 
-        public Object source;
-
         private void DrawScriptField() {
             EditorGUI.BeginDisabledGroup(true);
-            // EditorGUILayout.ObjectField("Script", MonoScript.FromScriptableObject((SceneHandle) target),
-            //     ((SceneHandle) target).GetType(), false);
-            source = EditorGUILayout.ObjectField("Script", source, typeof(SceneHandle), false);
+            EditorGUILayout.ObjectField("Script", MonoScript.FromScriptableObject((SceneHandle) target),
+                ((SceneHandle) target).GetType(), false);
             EditorGUI.EndDisabledGroup();
             EditorGUILayout.Space();
         }

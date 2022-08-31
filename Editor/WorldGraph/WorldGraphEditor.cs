@@ -67,26 +67,23 @@ namespace ThunderNut.SceneManagement.Editor {
 
             // -------------------------------------------- Duration --------------------------------------------
 
-            var durationRectWidth = 70f;
-            Rect durationRect = new Rect(helpBoxRect.xMax - durationRectWidth, helpBoxRect.yMax + 6, durationRectWidth, 17f) {
-                xMin = helpBoxRect.xMax - durationRectWidth,
-                xMax = helpBoxRect.xMax
-            };
+            float durationRectWidth = 70f;
+            Rect durationRect = new Rect(helpBoxRect.xMax - durationRectWidth, helpBoxRect.yMax + 6, durationRectWidth, 17f);
+            durationRect.xMin = helpBoxRect.xMax - durationRectWidth;
+            durationRect.xMax = helpBoxRect.xMax;
 
-            var playingRectWidth = 70f;
+            float playingRectWidth = 70f;
             Rect playingRect = new Rect(helpBoxRect.xMax - playingRectWidth - durationRectWidth, helpBoxRect.yMax + 6,
-                playingRectWidth, 17f) {
-                xMin = helpBoxRect.xMax - durationRectWidth - playingRectWidth, 
-                xMax = helpBoxRect.xMax
-            };
+                playingRectWidth, 17f);
+            playingRect.xMin = helpBoxRect.xMax - durationRectWidth - playingRectWidth;
+            playingRect.xMax = helpBoxRect.xMax;
 
             // -------------------------------------------- Direction --------------------------------------------
 
-            var directionRectWidth = 16f;
-            Rect directionRect = new Rect(helpBoxRect.xMax - directionRectWidth, helpBoxRect.yMax + 5, directionRectWidth, 17f) {
-                xMin = helpBoxRect.xMax - directionRectWidth, 
-                xMax = helpBoxRect.xMax
-            };
+            float directionRectWidth = 16f;
+            Rect directionRect = new Rect(helpBoxRect.xMax - directionRectWidth, helpBoxRect.yMax + 5, directionRectWidth, 17f);
+            directionRect.xMin = helpBoxRect.xMax - directionRectWidth;
+            directionRect.xMax = helpBoxRect.xMax;
 
             if (Application.isPlaying) {
                 GUI.Label(playingRect, "[PLAYING] ", _playingStyle);
@@ -111,7 +108,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
                 int id = i;
                 bool isExpanded = property.isExpanded;
-                string label = handle.Label;
+                string label = handle.name;
 
                 WGStyling.DrawSimpleHeader(ref isExpanded, ref handle.Active, label, handle.HandleColor, menu => {
                     if (Application.isPlaying)
@@ -160,6 +157,7 @@ namespace ThunderNut.SceneManagement.Editor {
                     EditorGUILayout.Space();
                     EditorGUILayout.Space();
                 }
+                else if (isExpanded == false) { }
             }
 
             if (_sceneHandles.arraySize > 0) {
@@ -256,20 +254,8 @@ namespace ThunderNut.SceneManagement.Editor {
         }
 
         private SceneHandle AddSceneHandle(System.Type type) {
-            GameObject gameObject = (target as WorldGraph)?.gameObject;
-
-            SceneHandle newHandle = Undo.AddComponent(gameObject, type) as SceneHandle;
-            
-            System.Diagnostics.Debug.Assert(newHandle != null, nameof(newHandle) + " != null");
-            newHandle.hideFlags = _debugView ? HideFlags.None : HideFlags.HideInInspector;
-            newHandle.Guid = GUID.Generate().ToString();
-            newHandle.Label = type.Name;
-            
+            SceneHandle newHandle = _worldGraph.CreateSubAsset(type);
             AddEditor(newHandle);
-            
-            _sceneHandles.arraySize++;
-            _sceneHandles.GetArrayElementAtIndex(_sceneHandles.arraySize - 1).objectReferenceValue = newHandle;
-            
             return newHandle;
         }
 
@@ -277,11 +263,9 @@ namespace ThunderNut.SceneManagement.Editor {
             SerializedProperty property = _sceneHandles.GetArrayElementAtIndex(id);
             SceneHandle handle = property.objectReferenceValue as SceneHandle;
 
-            (target as WorldGraph)?.sceneHandles.Remove(handle);
-            
-            _editors.Remove(handle!);
-            
-            Undo.DestroyObjectImmediate(handle);
+            (target as WorldGraph)?.RemoveSubAsset(handle);
+
+            if (handle != null) _editors.Remove(handle);
         }
 
 

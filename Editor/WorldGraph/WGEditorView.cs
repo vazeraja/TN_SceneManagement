@@ -176,8 +176,8 @@ namespace ThunderNut.SceneManagement.Editor {
             
             //SceneHandle newHandle = m_Graph.CreateSubAsset(type);
             var node = new WGNodeView(m_GraphView);
+
             m_GraphView.AddElement(node);
-            
             Debug.Log("Node Count: " + m_GraphView.graphElements.OfType<IWorldGraphNodeView>().Count());
         }
 
