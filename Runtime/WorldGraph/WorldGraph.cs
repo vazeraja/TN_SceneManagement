@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
 namespace ThunderNut.SceneManagement {
 
     [CreateAssetMenu(fileName = "WorldGraph", menuName = "World Graph/World Graph")]
-    public class WorldGraph : SingletonScriptableObject<WorldGraph> {
-        
+    public class WorldGraph : ScriptableObject {
         public List<SceneHandle> sceneHandles;
 
         public string settingA;
@@ -17,14 +17,20 @@ namespace ThunderNut.SceneManagement {
         public string settingD;
         public string settingE;
 
-        protected override void ScriptableObjectAwake() => Debug.Log($"{GetType().Name} created.");
+        public SceneHandle currentSceneHandle;
+        
+        public void ChangeScene() {
+            currentSceneHandle.ChangeToScene();
+        }
+
+        #region Editor
 
         #if UNITY_EDITOR
         public SceneHandle CreateSubAsset(Type type) {
             SceneHandle newHandle = (SceneHandle) CreateInstance(type);
             newHandle.name = type.Name;
             newHandle.guid = GUID.Generate().ToString();
-            
+
             sceneHandles.Add(newHandle);
 
             Undo.RecordObject(this, name);
@@ -44,8 +50,9 @@ namespace ThunderNut.SceneManagement {
             Undo.DestroyObjectImmediate(handle);
             AssetDatabase.SaveAssets();
         }
-
         #endif
+
+        #endregion
     }
 
 }

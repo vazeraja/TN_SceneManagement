@@ -45,8 +45,8 @@ namespace ThunderNut.SceneManagement.Editor {
         private SearcherWindow searcherWindow;
 
         // Demo Variables for testing things in right-panel
-        private WorldGraphEditor m_WorldGraphEditor;
-        private Rect buttonRect;
+        private UnityEditor.Editor m_WorldGraphEditor;
+        private Vector2 scrollPos;
 
         public Action saveRequested { get; set; }
         public Action saveAsRequested { get; set; }
@@ -82,7 +82,7 @@ namespace ThunderNut.SceneManagement.Editor {
             var serializedSettings = EditorUserSettings.GetConfigValue(k_UserViewSettings);
             m_UserViewSettings = JsonUtility.FromJson<UserViewSettings>(serializedSettings) ?? new UserViewSettings();
 
-            m_WorldGraphEditor = UnityEditor.Editor.CreateEditor(graph) as WorldGraphEditor;
+            m_WorldGraphEditor = UnityEditor.Editor.CreateEditor(m_Graph);
 
             var toolbar = new IMGUIContainer(() => {
                 GUILayout.BeginHorizontal(EditorStyles.toolbar);
@@ -155,9 +155,15 @@ namespace ThunderNut.SceneManagement.Editor {
                 }
                 m_TwoPaneSplitView.Add(new VisualElement {name = "right-panel"});
                 {
-                    var rightPanelIMGUI = new IMGUIContainer();
-                    rightPanelIMGUI.onGUIHandler += () => {
-                        // m_WorldGraphEditor.OnInspectorGUI();
+                    var rightPanelIMGUI = new IMGUIContainer {
+                        onGUIHandler = () => {
+                            if (GUILayout.Button(EditorGUIUtility.IconContent("d_SearchWindow"))) { }
+
+                            using var scrollViewScope = new GUILayout.ScrollViewScope(scrollPos);
+                            scrollPos = scrollViewScope.scrollPosition;
+
+                            m_WorldGraphEditor.OnInspectorGUI();
+                        }
                     };
 
                     m_TwoPaneSplitView.Q<VisualElement>("right-panel").Add(rightPanelIMGUI);
@@ -173,9 +179,9 @@ namespace ThunderNut.SceneManagement.Editor {
 
         private void SearchWindowItemSelected(Type type) {
             Debug.Log("creating node");
-            
-            //SceneHandle newHandle = m_Graph.CreateSubAsset(type);
-            var node = new WGNodeView(m_GraphView);
+
+            SceneHandle newHandle = m_Graph.CreateSubAsset(type);
+            var node = new WGNodeView(m_GraphView, newHandle);
 
             m_GraphView.AddElement(node);
             Debug.Log("Node Count: " + m_GraphView.graphElements.OfType<IWorldGraphNodeView>().Count());
@@ -201,14 +207,15 @@ namespace ThunderNut.SceneManagement.Editor {
                 // Get all nodes and dispose
                 Debug.Log("Node Count: " + m_GraphView.graphElements.OfType<IWorldGraphNodeView>().Count());
                 foreach (IWorldGraphNodeView node in m_GraphView.graphElements.OfType<IWorldGraphNodeView>()) {
-                    //m_Graph.RemoveSubAsset(node.sceneHandle);
+                    m_Graph.RemoveSubAsset(node.sceneHandle);
                     m_GraphView.RemoveElement(node.gvNode);
-                    
+
                     node.Dispose();
                 }
 
                 Debug.Log("Node Count: " + m_GraphView.graphElements.OfType<IWorldGraphNodeView>().Count());
 
+                m_WorldGraphEditor = null;
                 m_GraphView.nodeCreationRequest = null;
                 m_GraphView = null;
             }

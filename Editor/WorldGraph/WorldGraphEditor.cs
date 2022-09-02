@@ -28,6 +28,7 @@ namespace ThunderNut.SceneManagement.Editor {
             for (var i = 0; i < _sceneHandles.arraySize; i++) {
                 AddEditor(_sceneHandles.GetArrayElementAtIndex(i).objectReferenceValue as SceneHandle);
             }
+            
 
             // ------------------------------- Get Display Options ---------------------------------
 
@@ -131,8 +132,9 @@ namespace ThunderNut.SceneManagement.Editor {
                     UnityEditor.Editor editor = _editors[handle];
                     CreateCachedEditor(handle, handle.GetType(), ref editor);
 
-                    ((SceneHandleEditor) editor).drawScriptField = false;
-                    editor.OnInspectorGUI();
+                    // ((SceneHandleEditor) editor).drawScriptField = false;
+                    ((SceneHandleEditor) editor).OnInspectorGUI();
+                    //editor.OnInspectorGUI();
 
                     EditorGUI.EndDisabledGroup();
 
@@ -157,7 +159,6 @@ namespace ThunderNut.SceneManagement.Editor {
                     EditorGUILayout.Space();
                     EditorGUILayout.Space();
                 }
-                else if (isExpanded == false) { }
             }
 
             if (_sceneHandles.arraySize > 0) {
@@ -264,11 +265,11 @@ namespace ThunderNut.SceneManagement.Editor {
             SceneHandle handle = property.objectReferenceValue as SceneHandle;
 
             (target as WorldGraph)?.RemoveSubAsset(handle);
-
-            if (handle != null) _editors.Remove(handle);
+            
+            _editors.Remove(handle!);
         }
 
-
+        
         private void AddEditor(SceneHandle handle) {
             if (handle == null) return;
             if (_editors.ContainsKey(handle)) return;

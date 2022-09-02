@@ -9,7 +9,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
     public class SceneHandlePopupWindow : PopupWindowContent {
         private SceneHandle m_SceneHandle;
-        private SceneHandleEditor m_SceneHandleEditor;
+        private UnityEditor.Editor m_SceneHandleEditor;
 
         private bool m_ShouldClose;
         private Vector2 scrollPos;
@@ -19,7 +19,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
         public SceneHandlePopupWindow(SceneHandle sceneHandle) {
             m_SceneHandle = sceneHandle;
-            m_SceneHandleEditor = UnityEditor.Editor.CreateEditor(m_SceneHandle) as SceneHandleEditor;
+            m_SceneHandleEditor = UnityEditor.Editor.CreateEditor(m_SceneHandle);
         }
 
         public override void OnGUI(Rect rect) {
@@ -43,7 +43,6 @@ namespace ThunderNut.SceneManagement.Editor {
                 using (var scrollViewScope = new GUILayout.ScrollViewScope(scrollPos)) {
                     scrollPos = scrollViewScope.scrollPosition;
 
-                    m_SceneHandleEditor.drawScriptField = false;
                     m_SceneHandleEditor.OnInspectorGUI();
                 }
             }
@@ -67,7 +66,7 @@ namespace ThunderNut.SceneManagement.Editor {
         public void ForceClose() => m_ShouldClose = true;
     }
 
-    [CustomPropertyDrawer(typeof(SceneHandle), true)]
+    // [CustomPropertyDrawer(typeof(SceneHandle), true)]
     public class SceneHandlePropertyDrawer : PropertyDrawer {
         private Rect buttonRect;
 

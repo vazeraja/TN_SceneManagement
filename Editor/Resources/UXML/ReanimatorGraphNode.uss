@@ -132,6 +132,29 @@
     border-bottom-right-radius: 5px;
 }
 
+.base #collapse-button {
+    align-items: stretch;
+    justify-content: flex-start;
+    border-left-color: rgb(255, 255, 255);
+    border-right-color: rgb(255, 255, 255);
+    border-top-color: rgb(255, 255, 255);
+    border-bottom-color: rgb(255, 255, 255);
+    width: 1px;
+    height: 1px;
+    margin-left: 3px;
+    margin-right: 3px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    padding-left: 3px;
+    padding-right: 3px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
 .battleHandle #collapse-button {
     align-items: stretch;
     justify-content: flex-start;

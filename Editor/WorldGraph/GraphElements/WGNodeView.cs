@@ -9,7 +9,7 @@ using UnityEngine.UIElements;
 
 namespace ThunderNut.SceneManagement.Editor {
 
-    public class WGNodeView : Node, IWorldGraphNodeView {
+    public sealed class WGNodeView : Node, IWorldGraphNodeView {
         public WGGraphView graphView { get; private set; }
         public Node gvNode => this;
 
@@ -18,93 +18,76 @@ namespace ThunderNut.SceneManagement.Editor {
         public Port input;
         public Port output;
 
-        public WGNodeView(WGGraphView graphView, SceneHandle sceneHandle = null) : base(
+        public WGNodeView(WGGraphView graphView, SceneHandle sceneHandle) : base(
             AssetDatabase.GetAssetPath(Resources.Load<VisualTreeAsset>("UXML/ReanimatorGraphNode"))) {
-            UseDefaultStyling();
-            
+            // UseDefaultStyling();
+
             this.graphView = graphView;
             this.sceneHandle = sceneHandle;
 
-            // name = sceneHandle.GetType().Name;
-            // viewDataKey = sceneHandle.guid;
-            // style.left = sceneHandle.position.x;
-            // style.top = sceneHandle.position.y;
-            // 
-            // var serializedHandle = new SerializedObject(sceneHandle);
-            // sceneHandle.handleName = sceneHandle.GetType().Name;
+            name = sceneHandle.GetType().Name;
+            viewDataKey = sceneHandle.guid;
+            style.left = sceneHandle.position.x;
+            style.top = sceneHandle.position.y;
 
-            // CreateInputPorts();
-            // CreateOutputPorts();
-            //
-            // switch (sceneHandle) {
-            //     case YeehawHandle _:
-            //         AddToClassList("base");
-            //         break;
-            //     case DefaultHandle _:
-            //         AddToClassList("defaultHandle");
-            //         break;
-            //     case BattleHandle _:
-            //         AddToClassList("battleHandle");
-            //         break;
-            //     case CutsceneHandle _:
-            //         AddToClassList("cutscene");
-            //         break;
-            // }
+            var serializedHandle = new SerializedObject(sceneHandle);
+            sceneHandle.HandleName = sceneHandle.GetType().Name;
 
-
-            // Label description = this.Q<Label>("title-label");
-            // {
-            //     description.Bind(serializedHandle);
-            //     description.bindingPath = "handleName";
-            //     var textField = new TextField();
-            //     extensionContainer.Add(textField);
-            // }
-        }
-
-        private void CreateInputPorts() {
             switch (sceneHandle) {
+                case BaseHandle _:
+                    AddToClassList("base");
+
+                    output = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single, typeof(BaseHandle));
+
+                    AddPortToContainer();
+                    break;
                 case DefaultHandle _:
-                    input = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single,
-                        typeof(DefaultHandle));
+                    AddToClassList("defaultHandle");
+
+                    input = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(DefaultHandle));
+
+                    AddPortToContainer();
                     break;
                 case BattleHandle _:
-                    input = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single,
-                        typeof(BattleHandle));
+                    AddToClassList("battleHandle");
+
+                    input = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(BattleHandle));
+                    output = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(BattleHandle));
+
+                    AddPortToContainer();
                     break;
                 case CutsceneHandle _:
-                    input = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single,
-                        typeof(CutsceneHandle));
-                    break;
-                case YeehawHandle _:
+                    AddToClassList("cutsceneHandle");
+
+                    input = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(CutsceneHandle));
+                    output = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single, typeof(CutsceneHandle));
+
+                    AddPortToContainer();
                     break;
             }
 
-            if (input == null) return;
-            input.portName = "";
-            inputContainer.Add(input);
+
+            Label description = this.Q<Label>("title-label");
+            {
+                description.Bind(serializedHandle);
+                description.bindingPath = "HandleName";
+                var textField = new TextField();
+                extensionContainer.Add(textField);
+                RefreshExpandedState();
+            }
         }
 
-        private void CreateOutputPorts() {
-            switch (sceneHandle) {
-                case DefaultHandle _:
-                    break;
-                case BattleHandle _:
-                    output = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi,
-                        typeof(BattleHandle));
-                    break;
-                case CutsceneHandle _:
-                    output = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single,
-                        typeof(CutsceneHandle));
-                    break;
-                case YeehawHandle _:
-                    output = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single,
-                        typeof(YeehawHandle));
-                    break;
+        private void AddPortToContainer() {
+            if (input != null) {
+                input.portName = "";
+                inputContainer.Add(input);
             }
 
-            if (output == null) return;
-            output.portName = "";
-            outputContainer.Add(output);
+            // ReSharper disable once InvertIf
+            if (output != null) {
+                output.portName = "";
+                outputContainer.Add(output);
+            }
         }
 
         public override void SetPosition(Rect newPos) {
