@@ -33,7 +33,7 @@ namespace ThunderNut.SceneManagement.Editor {
             // ------------------------------- Get Display Options ---------------------------------
 
             typeDisplays.Add("Add new SceneHandle...");
-            typeDisplays.AddRange(WGNodeTypeCache.knownNodeTypes.Select(type => type.Name));
+            typeDisplays.AddRange(WGAttributeCache.knownNodeTypes.Select(type => type.Name));
 
             _playingStyle = new GUIStyle {normal = {textColor = Color.yellow}};
         }
@@ -173,7 +173,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 if (newItem >= 1) {
                     Debug.Log(typeDisplays[newItem]);
 
-                    var type = WGNodeTypeCache.knownNodeTypes.ToList().Find(x => x.Name == typeDisplays[newItem]);
+                    var type = WGAttributeCache.knownNodeTypes.ToList().Find(x => x.Name == typeDisplays[newItem]);
                     AddSceneHandle(type);
                 }
             }

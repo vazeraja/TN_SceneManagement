@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Reflection;
 using UnityEditor;
+using UnityEngine;
 using UnityEngine.Profiling;
 
 namespace ThunderNut.SceneManagement.Editor {
 
     [InitializeOnLoad]
-    public static class WGNodeTypeCache {
-        static WGNodeTypeCache() {
+    public static class WGAttributeCache {
+        static WGAttributeCache() {
             ReCacheKnownNodeTypes();
+            ReCacheKnownScenePassages();
         }
 
         public static Dictionary<Type, List<ContextFilterableAttribute>> m_KnownNodeTypeLookupTable { get; set; }
@@ -30,6 +34,27 @@ namespace ThunderNut.SceneManagement.Editor {
 
                 m_KnownNodeTypeLookupTable.Add(nodeType, filterableAttributes);
             }
+        }
+
+        public static Dictionary<string, ParameterType> knownParametersLookupTable;
+        public static IEnumerable<string> knownParameters => knownParametersLookupTable.Keys;
+
+        private static void ReCacheKnownScenePassages() {
+            knownParametersLookupTable = new Dictionary<string, ParameterType>();
+            foreach (var f in TypeCache.GetFieldsWithAttribute<ParameterFilterAttribute>()) {
+                if (f == null) continue;
+
+                var parameterName = string.Empty;
+                ParameterType parameterType = new ParameterType();
+
+                foreach (ParameterFilterAttribute attribute in f.GetCustomAttributes(typeof(ParameterFilterAttribute), true)) {
+                    parameterType = attribute.Type;
+                    parameterName = attribute.Name;
+                }
+
+                knownParametersLookupTable.Add(parameterName, parameterType);
+            }
+            
         }
 
         public static List<string> GetSortedNodePathsList() {

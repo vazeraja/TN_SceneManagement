@@ -6,9 +6,9 @@ namespace ThunderNut.SceneManagement {
     [Serializable]
     public class SceneConnection {
         public SceneHandle exitScene;
-        public int exitScenePassage;
+        public string exitScenePassage;
         public SceneHandle entryScene;
-        public int entryScenePassage;
+        public string entryScenePassage;
     }
     
     [Serializable]

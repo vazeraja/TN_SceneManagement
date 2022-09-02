@@ -17,10 +17,10 @@ namespace ThunderNut.SceneManagement {
         public string settingD;
         public string settingE;
 
-        public SceneHandle currentSceneHandle;
+        private SceneHandle activeSceneHandle;
         
         public void ChangeScene() {
-            currentSceneHandle.ChangeToScene();
+            activeSceneHandle.ChangeToScene();
         }
 
         #region Editor

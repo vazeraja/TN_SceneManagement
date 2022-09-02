@@ -205,7 +205,8 @@ namespace ThunderNut.SceneManagement.Editor {
                 checkOut = null;
 
                 // Get all nodes and dispose
-                Debug.Log("Node Count: " + m_GraphView.graphElements.OfType<IWorldGraphNodeView>().Count());
+                // Debug.Log("Node Count: " + m_GraphView.graphElements.OfType<IWorldGraphNodeView>().Count());
+
                 foreach (IWorldGraphNodeView node in m_GraphView.graphElements.OfType<IWorldGraphNodeView>()) {
                     m_Graph.RemoveSubAsset(node.sceneHandle);
                     m_GraphView.RemoveElement(node.gvNode);
@@ -213,7 +214,7 @@ namespace ThunderNut.SceneManagement.Editor {
                     node.Dispose();
                 }
 
-                Debug.Log("Node Count: " + m_GraphView.graphElements.OfType<IWorldGraphNodeView>().Count());
+                // Debug.Log("Node Count: " + m_GraphView.graphElements.OfType<IWorldGraphNodeView>().Count());
 
                 m_WorldGraphEditor = null;
                 m_GraphView.nodeCreationRequest = null;

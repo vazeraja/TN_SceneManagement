@@ -10,6 +10,9 @@ namespace ThunderNut.SceneManagement.Editor {
     public class SceneConnectionsListDrawer : PropertyDrawer {
         private readonly Dictionary<string, ReorderableList> _listsPerProp = new Dictionary<string, ReorderableList>();
 
+        private int index1 = 0;
+        private int index2 = 0;
+
         ReorderableList GetReorderableList(SerializedProperty prop) {
             SerializedProperty listProperty = prop.FindPropertyRelative("list");
 
@@ -66,9 +69,11 @@ namespace ThunderNut.SceneManagement.Editor {
                     : new GUIContent[] { };
 
                 EditorGUI.BeginDisabledGroup(exitSceneHandle == null);
-                exitScenePassageProp.intValue = EditorGUI.Popup(new Rect(rect.x, rect.y + 2, rect.width, popUpHeight),
-                    new GUIContent(exitScenePassageProp.displayName),
-                    exitScenePassageProp.intValue, exitSceneHandlePassageOptions);
+                index1 = EditorGUI.Popup(new Rect(rect.x, rect.y + 2, rect.width, popUpHeight),
+                    new GUIContent(exitScenePassageProp.displayName), index1, exitSceneHandlePassageOptions);
+
+                exitScenePassageProp.stringValue = exitSceneHandle != null ? exitSceneHandle.passages.ToArray()[index1] : "null";
+
                 EditorGUI.EndDisabledGroup();
 
                 GUI.color = color;
@@ -96,8 +101,11 @@ namespace ThunderNut.SceneManagement.Editor {
                     : new GUIContent[] { };
 
                 EditorGUI.BeginDisabledGroup(entrySceneHandle == null);
-                entryScenePassageProp.intValue = EditorGUI.Popup(new Rect(rect.x, rect.y + 2, rect.width, popUpHeight),
-                    new GUIContent("Passage"), entryScenePassageProp.intValue, entrySceneHandlePassageOptions);
+                index2 = EditorGUI.Popup(new Rect(rect.x, rect.y + 2, rect.width, popUpHeight),
+                    new GUIContent("Passage"), index2, entrySceneHandlePassageOptions);
+
+                entryScenePassageProp.stringValue = entrySceneHandle != null ? entrySceneHandle.passages.ToArray()[index2] : "null";
+
                 EditorGUI.EndDisabledGroup();
             };
             return list;
