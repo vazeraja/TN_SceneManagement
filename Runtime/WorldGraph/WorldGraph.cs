@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
@@ -18,9 +19,24 @@ namespace ThunderNut.SceneManagement {
         public string settingE;
 
         private SceneHandle activeSceneHandle;
-        
+
+        private readonly HashSet<string> stringParameters = new HashSet<string>();
+
         public void ChangeScene() {
             activeSceneHandle.ChangeToScene();
+        }
+
+        private void RegisterParameter(string param) {
+            if (!stringParameters.Add(param)) Debug.LogError($"{param} with that name already exists");
+        }
+
+        public void RegisterParameters(object obj) {
+            var fieldsWithAttribute =
+                WGReflectionHelper.GetFieldInfosWithAttribute(obj, typeof(ParameterFilterAttribute));
+            foreach (FieldInfo field in fieldsWithAttribute) {
+                object s = field.GetValue(obj);
+                RegisterParameter(s.ToString());
+            }
         }
 
         #region Editor

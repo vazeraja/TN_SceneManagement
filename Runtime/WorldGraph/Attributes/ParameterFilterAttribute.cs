@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using Object = System.Object;
 
 namespace ThunderNut.SceneManagement {
 
