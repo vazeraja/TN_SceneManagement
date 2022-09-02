@@ -1,3 +1,10 @@
+## [1.0.17](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.16...v1.0.17) (2022-09-02)
+
+
+### Bug Fixes
+
+* fixed serializedobject exception, implement basic graph nodes ([57ab4c6](https://github.com/vazeraja/TN_SceneManagement/commit/57ab4c6f41e4d7ac0a6ce3cd31655b88d33df61f))
+
 ## [1.0.16](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.15...v1.0.16) (2022-08-25)
 
 
