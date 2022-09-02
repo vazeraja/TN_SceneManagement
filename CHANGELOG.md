@@ -1,3 +1,10 @@
+## [1.0.18](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.17...v1.0.18) (2022-09-02)
+
+
+### Bug Fixes
+
+* implement register string parameters ([7c7a0b5](https://github.com/vazeraja/TN_SceneManagement/commit/7c7a0b51f2b7a86aed31001ffb4ba49d0f01cf05))
+
 ## [1.0.17](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.16...v1.0.17) (2022-09-02)
 
 
