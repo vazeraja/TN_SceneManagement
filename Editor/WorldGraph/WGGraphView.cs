@@ -9,11 +9,21 @@ namespace ThunderNut.SceneManagement.Editor {
     public class WGGraphView : GraphView {
         private readonly WorldGraph graph;
 
+        public Blackboard blackboard = new Blackboard();
+
         public WGGraphView() { }
 
         public WGGraphView(WorldGraph graph) : this() {
             this.graph = graph;
-            this.graphViewChanged = null;
+
+            blackboard = new Blackboard(this) {title = "WorldGraph"};
+            blackboard.Add(new BlackboardSection {
+                title = "Exposed Properties"
+            });
+
+            blackboard.addItemRequested += blackboard1 => { Debug.Log("item requested"); };
+
+            Add(blackboard);
         }
 
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)

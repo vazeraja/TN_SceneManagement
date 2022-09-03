@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEditor;
-using UnityEditor.Experimental.GraphView;
-using UnityEngine.Profiling;
 
 namespace ThunderNut.SceneManagement.Editor {
     
@@ -18,7 +16,6 @@ namespace ThunderNut.SceneManagement.Editor {
         public static List<string> nodePathsList => GetNodePathsList();
 
         private static void ReCacheKnownNodeTypes() {
-            Profiler.BeginSample("NodeTypeCache: Re-caching all known node types");
             m_KnownNodeTypeLookupTable = new Dictionary<Type, List<ContextFilterableAttribute>>();
             foreach (Type nodeType in TypeCache.GetTypesDerivedFrom<SceneHandle>()) {
                 if (nodeType.IsAbstract) continue;

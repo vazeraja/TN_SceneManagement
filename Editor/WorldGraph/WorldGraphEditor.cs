@@ -253,10 +253,10 @@ namespace ThunderNut.SceneManagement.Editor {
             }
             EditorGUILayout.EndHorizontal();
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("stringParametersDict"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("floatParametersDict"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("intParametersDict"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("boolParametersDict"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("stringParametersDict"), true);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("floatParametersDict"), true);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("intParametersDict"), true);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("boolParametersDict"), true);
         }
 
         private SceneHandle AddSceneHandle(System.Type type) {

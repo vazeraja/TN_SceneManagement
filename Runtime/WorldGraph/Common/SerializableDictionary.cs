@@ -20,7 +20,8 @@ namespace ThunderNut.SceneManagement {
 
     [Serializable]
     public abstract class SerializableDictionaryBase<TKey, TValue, TValueStorage> : SerializableDictionaryBase,
-        IDictionary<TKey, TValue>, IDictionary, ISerializationCallbackReceiver, IDeserializationCallback, ISerializable {
+        IDictionary<TKey, TValue>, IDictionary, ISerializationCallbackReceiver, IDeserializationCallback, ISerializable 
+    {
         Dictionary<TKey, TValue> m_dict;
         [SerializeField] TKey[] m_keys;
         [SerializeField] TValueStorage[] m_values;

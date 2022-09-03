@@ -12,7 +12,7 @@ namespace ThunderNut.SceneManagement {
     }
 
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class ParameterFilterAttribute : PropertyAttribute {
+    public class ParameterAttribute : PropertyAttribute {
         public ParameterType Type;
         public string Name;
     }

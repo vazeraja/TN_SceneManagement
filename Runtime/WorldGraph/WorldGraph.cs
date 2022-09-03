@@ -17,31 +17,40 @@ namespace ThunderNut.SceneManagement {
         public string settingE;
 
         private SceneHandle activeSceneHandle;
-        
+
+        // --------------------- Key: Represents parameter name | Value: Represents parameter value ---------------------
         public SerializableDictionary<string, string> stringParametersDict = new SerializableDictionary<string, string>();
         public SerializableDictionary<string, float> floatParametersDict = new SerializableDictionary<string, float>();
         public SerializableDictionary<string, int> intParametersDict = new SerializableDictionary<string, int>();
         public SerializableDictionary<string, bool> boolParametersDict = new SerializableDictionary<string, bool>();
 
-
         public void ChangeScene() {
             activeSceneHandle.ChangeToScene();
         }
 
-        public void ClearDictionaries() {
-            stringParametersDict.Clear();
-            floatParametersDict.Clear();
-            intParametersDict.Clear();
-            boolParametersDict.Clear();
+        public void SetString(string name, string value) {
+            stringParametersDict[name] = value;
+        }
+        public void SetFloat(string name, float value) {
+            floatParametersDict[name] = value;
+        }
+
+        public void SetInt(string name, int value) {
+            intParametersDict[name] = value;
+        }
+
+        public void SetBool(string name, bool value) {
+            boolParametersDict[name] = value;
         }
 
         public void RegisterParameters(object obj) {
-            var fieldsWithAttribute = WGReflectionHelper.GetFieldInfosWithAttribute(obj, typeof(ParameterFilterAttribute));
+            var fieldsWithAttribute = WGReflectionHelper.GetFieldInfosWithAttribute(obj, typeof(ParameterAttribute));
+
             foreach (FieldInfo field in fieldsWithAttribute) {
-                var attribute = (ParameterFilterAttribute) field.GetCustomAttribute(typeof(ParameterFilterAttribute), true);
+                var attribute = (ParameterAttribute) field.GetCustomAttribute(typeof(ParameterAttribute), true);
                 object fieldValue = field.GetValue(obj);
 
-                Debug.Log($"Key: {attribute.Name} , Value: {fieldValue}");
+                // Debug.Log($"Key: {attribute.Name} , Value: {fieldValue}");
 
                 switch (attribute.Type) {
                     case ParameterType.StringParam:
@@ -64,7 +73,7 @@ namespace ThunderNut.SceneManagement {
 
         private void RegisterParameter(string key, string value) {
             if (stringParametersDict.ContainsKey(key)) {
-                Debug.LogWarning($"Parameter {key} overriding previous value");
+                Debug.LogWarning($"Key {key} overriding previous value");
                 stringParametersDict[key] = value;
             }
             else {
@@ -74,7 +83,7 @@ namespace ThunderNut.SceneManagement {
 
         private void RegisterParameter(string key, float value) {
             if (floatParametersDict.ContainsKey(key)) {
-                Debug.LogWarning($"Parameter {key} overriding previous value");
+                Debug.LogWarning($"Key {key} overriding previous value");
                 floatParametersDict[key] = value;
             }
             else {
@@ -84,7 +93,7 @@ namespace ThunderNut.SceneManagement {
 
         private void RegisterParameter(string key, int value) {
             if (intParametersDict.ContainsKey(key)) {
-                Debug.LogWarning($"Parameter {key} overriding previous value");
+                Debug.LogWarning($"Key {key} overriding previous value");
                 intParametersDict[key] = value;
             }
             else {
@@ -94,7 +103,7 @@ namespace ThunderNut.SceneManagement {
 
         private void RegisterParameter(string key, bool value) {
             if (boolParametersDict.ContainsKey(key)) {
-                Debug.LogWarning($"Parameter {key} overriding previous value");
+                Debug.LogWarning($"Key {key} overriding previous value");
                 boolParametersDict[key] = value;
             }
             else {

@@ -35,7 +35,6 @@ namespace ThunderNut.SceneManagement.Editor {
         private WorldGraph m_Graph;
         private string m_AssetName;
 
-        private TwoPaneSplitView m_TwoPaneSplitView;
         private int m_FPIndex = 0;
         private float m_FPInitialDimension = 600;
         private TwoPaneSplitViewOrientation splitViewOrientation = TwoPaneSplitViewOrientation.Horizontal;
@@ -43,11 +42,7 @@ namespace ThunderNut.SceneManagement.Editor {
         private BaseEdgeConnectorListener connectorListener;
         private WGSearcherProvider m_SearchWindowProvider;
         private SearcherWindow searcherWindow;
-
-        // Demo Variables for testing things in right-panel
-        private UnityEditor.Editor m_WorldGraphEditor;
-        private Vector2 scrollPos;
-
+        
         public Action saveRequested { get; set; }
         public Action saveAsRequested { get; set; }
         public Action showInProjectRequested { get; set; }
@@ -81,8 +76,6 @@ namespace ThunderNut.SceneManagement.Editor {
 
             var serializedSettings = EditorUserSettings.GetConfigValue(k_UserViewSettings);
             m_UserViewSettings = JsonUtility.FromJson<UserViewSettings>(serializedSettings) ?? new UserViewSettings();
-
-            m_WorldGraphEditor = UnityEditor.Editor.CreateEditor(m_Graph);
 
             var toolbar = new IMGUIContainer(() => {
                 GUILayout.BeginHorizontal(EditorStyles.toolbar);
@@ -130,7 +123,7 @@ namespace ThunderNut.SceneManagement.Editor {
             });
             Add(toolbar);
 
-            m_TwoPaneSplitView = new TwoPaneSplitView(m_FPIndex, m_FPInitialDimension, splitViewOrientation) {
+            var m_TwoPaneSplitView = new TwoPaneSplitView(m_FPIndex, m_FPInitialDimension, splitViewOrientation) {
                 name = "TwoPaneSplitView"
             };
             {
@@ -145,7 +138,7 @@ namespace ThunderNut.SceneManagement.Editor {
                     m_GraphView.AddManipulator(new RectangleSelector());
                     m_GraphView.AddManipulator(new ClickSelector());
                     m_GraphView.SetupZoom(0.05f, 8);
-
+                    
                     string serializedWindowLayout = EditorUserSettings.GetConfigValue(k_FloatingWindowsLayoutKey);
                     if (!string.IsNullOrEmpty(serializedWindowLayout)) {
                         m_FloatingWindowsLayout = JsonUtility.FromJson<FloatingWindowsLayout>(serializedWindowLayout);
@@ -155,16 +148,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 }
                 m_TwoPaneSplitView.Add(new VisualElement {name = "right-panel"});
                 {
-                    var rightPanelIMGUI = new IMGUIContainer {
-                        onGUIHandler = () => {
-                            if (GUILayout.Button(EditorGUIUtility.IconContent("d_SearchWindow"))) { }
-
-                            using var scrollViewScope = new GUILayout.ScrollViewScope(scrollPos);
-                            scrollPos = scrollViewScope.scrollPosition;
-
-                            m_WorldGraphEditor.OnInspectorGUI();
-                        }
-                    };
+                    var rightPanelIMGUI = new IMGUIContainer { };
 
                     m_TwoPaneSplitView.Q<VisualElement>("right-panel").Add(rightPanelIMGUI);
                 }
@@ -216,7 +200,6 @@ namespace ThunderNut.SceneManagement.Editor {
 
                 // Debug.Log("Node Count: " + m_GraphView.graphElements.OfType<IWorldGraphNodeView>().Count());
 
-                m_WorldGraphEditor = null;
                 m_GraphView.nodeCreationRequest = null;
                 m_GraphView = null;
             }
