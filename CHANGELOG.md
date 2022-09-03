@@ -1,3 +1,10 @@
+## [1.0.19](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.18...v1.0.19) (2022-09-03)
+
+
+### Bug Fixes
+
+* implement registering parameters for worldgraph ([d913f1a](https://github.com/vazeraja/TN_SceneManagement/commit/d913f1abeb89f51a0b60969935efa37f488c8f69))
+
 ## [1.0.18](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.17...v1.0.18) (2022-09-02)
 
 
