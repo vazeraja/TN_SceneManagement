@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine.Profiling;
 
 namespace ThunderNut.SceneManagement.Editor {
+    
 
     [InitializeOnLoad]
     public static class WGAttributeCache {

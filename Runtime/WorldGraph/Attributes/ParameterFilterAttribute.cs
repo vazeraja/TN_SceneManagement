@@ -7,6 +7,8 @@ namespace ThunderNut.SceneManagement {
     public enum ParameterType {
         StringParam,
         FloatParam,
+        IntParam,
+        BoolParam
     }
 
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
