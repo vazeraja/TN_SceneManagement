@@ -1,3 +1,11 @@
+## [1.0.20](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.19...v1.0.20) (2022-09-05)
+
+
+### Bug Fixes
+
+* added floating windows to graphview ([05d92a1](https://github.com/vazeraja/TN_SceneManagement/commit/05d92a19b10ad935596514e8667ef87b815e601e))
+* other ([3e6a127](https://github.com/vazeraja/TN_SceneManagement/commit/3e6a12798d0a2d4491979dc10d6645012c51e349))
+
 ## [1.0.19](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.18...v1.0.19) (2022-09-03)
 
 
