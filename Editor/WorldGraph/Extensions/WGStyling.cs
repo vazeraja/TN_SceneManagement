@@ -85,20 +85,21 @@ namespace ThunderNut.SceneManagement.Editor {
             reorderRect.width = 9f;
             reorderRect.height = 9f;
 
-            var labelRect = backgroundRect;
-            labelRect.xMin += 32f;
-            labelRect.xMax -= 20f;
-
             var foldoutRect = backgroundRect;
-            foldoutRect.y += 1f;
+            foldoutRect.x += 10f;
+            foldoutRect.y += 2f;
             foldoutRect.width = 13f;
             foldoutRect.height = 13f;
 
             var toggleRect = backgroundRect;
-            toggleRect.x += 16f;
+            toggleRect.x += 25f;
             toggleRect.y += 2f;
             toggleRect.width = 13f;
             toggleRect.height = 13f;
+            
+            var labelRect = backgroundRect;
+            labelRect.xMin += 45f;
+            labelRect.xMax -= 20f;
 
             var menuIcon = PaneOptionsIcon;
             var menuRect = new Rect(labelRect.xMax + 4f, labelRect.y + 1f, menuIcon.width, menuIcon.height);

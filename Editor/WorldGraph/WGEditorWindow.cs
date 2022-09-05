@@ -65,7 +65,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 return true;
             }
 
-            var window = CreateWindow<WGEditorWindow>(typeof(WGEditorWindow));
+            var window = CreateWindow<WGEditorWindow>(typeof(WGEditorWindow), typeof(SceneView));
             window.minSize = new Vector2(1200, 600);
             window.Initialize(guid);
             window.Focus();
@@ -110,7 +110,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
                     string graphName = Path.GetFileNameWithoutExtension(assetPath);
                     var asset = AssetDatabase.LoadAssetAtPath<WorldGraph>(assetPath);
-                    
+
                     graphEditorView = new WGEditorView(this, asset, graphName) {
                         viewDataKey = selectedGuid,
                     };

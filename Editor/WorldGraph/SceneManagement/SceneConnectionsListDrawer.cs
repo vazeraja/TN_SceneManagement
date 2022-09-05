@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace ThunderNut.SceneManagement.Editor {
 
-    [CustomPropertyDrawer(typeof(SceneConnectionsList))]
+    [CustomPropertyDrawer(typeof(SceneConnectionsList), true)]
     public class SceneConnectionsListDrawer : PropertyDrawer {
         private readonly Dictionary<string, ReorderableList> _listsPerProp = new Dictionary<string, ReorderableList>();
 

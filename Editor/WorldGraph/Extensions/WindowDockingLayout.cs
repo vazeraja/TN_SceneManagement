@@ -2,38 +2,42 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
+// Credit: Borrowed from Unity's ShaderGraph package
+// Github: https://github.com/Unity-Technologies/ShaderGraph/blob/master/com.unity.shadergraph/Editor/Drawing/Inspector/WindowDockingLayout.cs
+
 namespace ThunderNut.SceneManagement.Editor {
+
     [Serializable]
     public class WindowDockingLayout {
-        [SerializeField] bool m_DockingLeft;
+        [SerializeField] private bool m_DockingLeft;
 
         public bool dockingLeft {
             get => m_DockingLeft;
             set => m_DockingLeft = value;
         }
 
-        [SerializeField] bool m_DockingTop;
+        [SerializeField] private bool m_DockingTop;
 
         public bool dockingTop {
             get => m_DockingTop;
             set => m_DockingTop = value;
         }
 
-        [SerializeField] float m_VerticalOffset;
+        [SerializeField] private float m_VerticalOffset;
 
         public float verticalOffset {
             get => m_VerticalOffset;
             set => m_VerticalOffset = value;
         }
 
-        [SerializeField] float m_HorizontalOffset;
+        [SerializeField] private float m_HorizontalOffset;
 
         public float horizontalOffset {
             get => m_HorizontalOffset;
             set => m_HorizontalOffset = value;
         }
 
-        [SerializeField] Vector2 m_Size;
+        [SerializeField] private Vector2 m_Size;
 
         public Vector2 size {
             get => m_Size;
@@ -116,4 +120,5 @@ namespace ThunderNut.SceneManagement.Editor {
             return layout;
         }
     }
+
 }

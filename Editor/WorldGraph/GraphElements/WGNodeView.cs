@@ -19,7 +19,7 @@ namespace ThunderNut.SceneManagement.Editor {
         public Port output;
 
         public WGNodeView(WGGraphView graphView, SceneHandle sceneHandle) : base(
-            AssetDatabase.GetAssetPath(Resources.Load<VisualTreeAsset>("UXML/ReanimatorGraphNode"))) {
+            AssetDatabase.GetAssetPath(Resources.Load<VisualTreeAsset>("UXML/WGGraphNode"))) {
             // UseDefaultStyling();
 
             this.graphView = graphView;

@@ -6,8 +6,9 @@ WGEditorView > #TwoPaneSplitView > #left-panel > #GraphView {
     flex-grow: 1;
 }
 
-/* 
-Originally ShaderGraph USS
+/*
+------- UNUSED ------
+Credit: Originally ShaderGraph USS
 */
 WGEditorView {
     flex-direction: column;
