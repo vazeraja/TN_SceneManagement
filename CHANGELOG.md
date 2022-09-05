@@ -1,3 +1,10 @@
+## [1.0.21](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.20...v1.0.21) (2022-09-05)
+
+
+### Bug Fixes
+
+* clean up directories, saving and loading of graphelements ([55804b8](https://github.com/vazeraja/TN_SceneManagement/commit/55804b8b7fcba6023f141c6d1ca0991eafa88197))
+
 ## [1.0.20](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.19...v1.0.20) (2022-09-05)
 
 
