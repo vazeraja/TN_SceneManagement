@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -7,17 +9,21 @@ namespace ThunderNut.SceneManagement.Editor {
 
     public class MasterPreviewView : VisualElement {
         private readonly WorldGraph m_Graph;
+        private WorldGraphGraphView graphGraphView;
+        private EditorWindow editorWindow;
 
         private readonly Label m_Title;
 
         public VisualElement preview { get; set; }
-        public Image previewTextureView { get; }
+        public Image previewTextureView { get; set; } = new Image();
         private Vector2 m_PreviewScrollPosition;
 
         private ResizeBorderFrame m_PreviewResizeBorderFrame;
         public ResizeBorderFrame previewResizeBorderFrame => m_PreviewResizeBorderFrame;
 
-        public MasterPreviewView(WorldGraph graph) {
+        public MasterPreviewView(WorldGraphGraphView mGraphGraphView, EditorWindow mEditorWindow, WorldGraph graph) {
+            graphGraphView = mGraphGraphView;
+            editorWindow = mEditorWindow;
             m_Graph = graph;
 
             styleSheets.Add(Resources.Load<StyleSheet>("Styles/PreviewView"));
@@ -38,6 +44,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 // previewTextureView = CreatePreview(Texture2D.blackTexture);
                 // m_PreviewScrollPosition = new Vector2(0f, 0f);
                 // preview.Add(previewTextureView);
+                
                 preview.AddManipulator(new Scrollable((x) => { }));
             }
             Add(preview);

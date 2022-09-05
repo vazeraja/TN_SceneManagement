@@ -1,7 +1,7 @@
-WGEditorView > #TwoPaneSplitView {
+WorldGraphEditorView > #TwoPaneSplitView {
     flex: 1;
 }
-WGEditorView > #TwoPaneSplitView > #left-panel > #GraphView {
+WorldGraphEditorView > #TwoPaneSplitView > #left-panel > #GraphView {
     flex: 1;
     flex-grow: 1;
 }
@@ -10,24 +10,24 @@ WGEditorView > #TwoPaneSplitView > #left-panel > #GraphView {
 ------- UNUSED ------
 Credit: Originally ShaderGraph USS
 */
-WGEditorView {
+WorldGraphEditorView {
     flex-direction: column;
     flex: 1;
 }
-WGEditorView #TitleBar {
+WorldGraphEditorView #TitleBar {
 
 }
 
-WGEditorView > #content {
+WorldGraphEditorView > #content {
     flex: 1;
     flex-direction: row;
 }
 
-WGEditorView > #content > #GraphView {
+WorldGraphEditorView > #content > #GraphView {
     flex: 1;
 }
 
-WGEditorView > #content > #inspector {
+WorldGraphEditorView > #content > #inspector {
     width: 400px;
 }
 

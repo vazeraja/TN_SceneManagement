@@ -10,27 +10,27 @@ using Object = UnityEngine.Object;
 
 namespace ThunderNut.SceneManagement.Editor {
 
-    public class WGEditorWindow : EditorWindow {
-        [SerializeField] private string m_Selected;
+    public class WorldGraphEditorWindow : EditorWindow {
         [NonSerialized] bool m_FrameAllAfterLayout;
         [NonSerialized] bool m_HasError;
         [NonSerialized] bool m_ProTheme;
 
-        public string selectedGuid {
+        [SerializeField] private string m_Selected;
+        private string selectedGuid {
             get => m_Selected;
-            private set => m_Selected = value;
+            set => m_Selected = value;
         }
 
-        [SerializeField] protected WorldGraph m_WorldGraph;
-        public WorldGraph worldGraph {
+        private WorldGraph m_WorldGraph;
+        private WorldGraph worldGraph {
             get => m_WorldGraph;
             set => m_WorldGraph = value;
         }
 
-        protected WGEditorView m_GraphEditorView;
-        public WGEditorView graphEditorView {
+        private WorldGraphEditorView m_GraphEditorView;
+        private WorldGraphEditorView graphEditorView {
             get => m_GraphEditorView;
-            private set {
+            set {
                 if (m_GraphEditorView != null) {
                     m_GraphEditorView.RemoveFromHierarchy();
                     m_GraphEditorView.Dispose();
@@ -41,11 +41,11 @@ namespace ThunderNut.SceneManagement.Editor {
                 // ReSharper disable once InvertIf
                 if (m_GraphEditorView != null) {
                     // m_GraphEditorView.saveRequested += () => SaveAsset();
-                    m_GraphEditorView.saveAsRequested += SaveAs;
-                    m_GraphEditorView.showInProjectRequested += PingAsset;
-                    m_GraphEditorView.refreshRequested += Refresh;
-                    // m_GraphEditorView.isCheckedOut += IsGraphAssetCheckedOut;
-                    // m_GraphEditorView.checkOut += CheckoutAsset;
+                    m_GraphEditorView.toolbar.saveAsRequested += SaveAs;
+                    m_GraphEditorView.toolbar.showInProjectRequested += PingAsset;
+                    m_GraphEditorView.toolbar.refreshRequested += Refresh;
+                    // m_GraphEditorView.toolbar.isCheckedOut += IsGraphAssetCheckedOut;
+                    // m_GraphEditorView.toolbar.checkOut += CheckoutAsset;
                     m_GraphEditorView.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
                     m_FrameAllAfterLayout = true;
                     rootVisualElement.Add(graphEditorView);
@@ -59,13 +59,13 @@ namespace ThunderNut.SceneManagement.Editor {
         public static bool ShowWorldGraphEditorWindow(string path) {
             string guid = AssetDatabase.AssetPathToGUID(path);
 
-            foreach (var w in Resources.FindObjectsOfTypeAll<WGEditorWindow>()) {
+            foreach (var w in Resources.FindObjectsOfTypeAll<WorldGraphEditorWindow>()) {
                 if (w.selectedGuid != guid) continue;
                 w.Focus();
                 return true;
             }
 
-            var window = CreateWindow<WGEditorWindow>(typeof(WGEditorWindow), typeof(SceneView));
+            var window = CreateWindow<WorldGraphEditorWindow>(typeof(WorldGraphEditorWindow), typeof(SceneView));
             window.minSize = new Vector2(1200, 600);
             window.Initialize(guid);
             window.Focus();
@@ -89,8 +89,8 @@ namespace ThunderNut.SceneManagement.Editor {
         }
 
         protected void Update() {
-            if (m_HasError)
-                return;
+            if (m_HasError) return;
+
             var updateTitle = false;
 
             try {
@@ -111,7 +111,7 @@ namespace ThunderNut.SceneManagement.Editor {
                     string graphName = Path.GetFileNameWithoutExtension(assetPath);
                     var asset = AssetDatabase.LoadAssetAtPath<WorldGraph>(assetPath);
 
-                    graphEditorView = new WGEditorView(this, asset, graphName) {
+                    graphEditorView = new WorldGraphEditorView(this, asset, graphName) {
                         viewDataKey = selectedGuid,
                     };
 
@@ -131,11 +131,10 @@ namespace ThunderNut.SceneManagement.Editor {
         }
 
         protected void OnDisable() {
-            worldGraph = null;
             graphEditorView = null;
         }
 
-        public void Initialize(WGEditorWindow other) { }
+        public void Initialize(WorldGraphEditorWindow other) { }
 
         public void Initialize(string assetGuid) {
             try {
@@ -154,7 +153,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 }
 
                 using (CreateGraphEditorViewMarker.Auto()) {
-                    graphEditorView = new WGEditorView(this, worldGraph, graphName) {
+                    graphEditorView = new WorldGraphEditorView(this, worldGraph, graphName) {
                         viewDataKey = assetGuid,
                     };
                 }
@@ -179,12 +178,12 @@ namespace ThunderNut.SceneManagement.Editor {
             if (graphEditorView != null)
                 graphEditorView.assetName = graphName;
 
-            string title = graphName;
+            string newTitle = graphName;
             if (worldGraph == null)
-                title += " (nothing loaded)";
+                newTitle += " (nothing loaded)";
             else {
                 if (!AssetFileExists())
-                    title += " (deleted)";
+                    newTitle += " (deleted)";
             }
 
             // TODO: Replace with Custom WG Icon instead of SG icons
@@ -193,14 +192,15 @@ namespace ThunderNut.SceneManagement.Editor {
                 string theme = EditorGUIUtility.isProSkin ? "_dark" : "_light";
                 icon = Resources.Load<Texture2D>("Icons/sg_graph_icon_gray" + theme);
             }
-            titleContent = new GUIContent(title, icon);
+            titleContent = new GUIContent(newTitle, icon);
         }
 
-        public void SaveAs() {
+        private void SaveAs() {
             SaveAsImplementation(true);
         }
 
-        public string SaveAsImplementation(bool openWhenSaved) {
+        // ReSharper disable once UnusedMethodReturnValue.Local
+        private string SaveAsImplementation(bool openWhenSaved) {
             string savedFilePath = "";
             if (openWhenSaved) {
                 Debug.Log("TODO: Implement SaveAsImplementation()");
@@ -211,16 +211,15 @@ namespace ThunderNut.SceneManagement.Editor {
             }
         }
 
-        public void PingAsset() {
-            if (selectedGuid != null) {
-                var path = AssetDatabase.GUIDToAssetPath(selectedGuid);
-                var asset = AssetDatabase.LoadAssetAtPath<Object>(path);
-                EditorGUIUtility.PingObject(asset);
-                Selection.activeObject = asset;
-            }
+        private void PingAsset() {
+            string path = AssetDatabase.GUIDToAssetPath(selectedGuid);
+            if (selectedGuid == null) return;
+            var asset = AssetDatabase.LoadAssetAtPath<Object>(path);
+            EditorGUIUtility.PingObject(asset);
+            Selection.activeObject = asset;
         }
 
-        public void Refresh() {
+        private void Refresh() {
             OnDisable();
             OnEnable();
         }
@@ -235,7 +234,7 @@ namespace ThunderNut.SceneManagement.Editor {
             // we immediately unregister it so it doesn't get called again
             graphEditorView.UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
             if (m_FrameAllAfterLayout) {
-                graphEditorView.graphView.FrameAll();
+                graphEditorView.GraphView.FrameAll();
             }
 
             m_FrameAllAfterLayout = false;

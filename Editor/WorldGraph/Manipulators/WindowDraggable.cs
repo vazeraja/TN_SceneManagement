@@ -1,10 +1,10 @@
-﻿using System;
+﻿// Credit: Found in Unity's ShaderGraph package
+// Github: https://github.com/Unity-Technologies/ShaderGraph/blob/master/com.unity.shadergraph/Editor/Drawing/Manipulators/WindowDraggable.cs
+using System;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-// Credit: Found in Unity's ShaderGraph package
-// Github: https://github.com/Unity-Technologies/ShaderGraph/blob/master/com.unity.shadergraph/Editor/Drawing/Manipulators/WindowDraggable.cs
 
 namespace ThunderNut.SceneManagement.Editor {
 

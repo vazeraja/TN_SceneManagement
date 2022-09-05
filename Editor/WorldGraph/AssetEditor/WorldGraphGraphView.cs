@@ -7,12 +7,12 @@ using UnityEngine.UIElements;
 
 namespace ThunderNut.SceneManagement.Editor {
 
-    public class WGGraphView : GraphView {
+    public class WorldGraphGraphView : GraphView {
         private readonly WorldGraph graph;
         
-        private WGGraphView() { }
+        private WorldGraphGraphView() { }
 
-        public WGGraphView(WorldGraph graph) : this() {
+        public WorldGraphGraphView(WorldGraph graph) : this() {
             this.graph = graph;
         }
 

@@ -10,7 +10,7 @@ using UnityEngine.UIElements;
 namespace ThunderNut.SceneManagement.Editor {
 
     public sealed class WGNodeView : Node, IWorldGraphNodeView {
-        public WGGraphView graphView { get; private set; }
+        public WorldGraphGraphView GraphGraphView { get; private set; }
         public Node gvNode => this;
 
         public SceneHandle sceneHandle { get; private set; }
@@ -18,11 +18,11 @@ namespace ThunderNut.SceneManagement.Editor {
         public Port input;
         public Port output;
 
-        public WGNodeView(WGGraphView graphView, SceneHandle sceneHandle) : base(
+        public WGNodeView(WorldGraphGraphView graphGraphView, SceneHandle sceneHandle) : base(
             AssetDatabase.GetAssetPath(Resources.Load<VisualTreeAsset>("UXML/WGGraphNode"))) {
             // UseDefaultStyling();
 
-            this.graphView = graphView;
+            this.GraphGraphView = graphGraphView;
             this.sceneHandle = sceneHandle;
 
             name = sceneHandle.GetType().Name;
@@ -39,19 +39,23 @@ namespace ThunderNut.SceneManagement.Editor {
 
                     output = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single, typeof(BaseHandle));
 
+                    capabilities &= ~Capabilities.Movable;
+                    capabilities &= ~Capabilities.Deletable;
+
                     AddPortToContainer();
                     break;
                 case DefaultHandle _:
                     AddToClassList("defaultHandle");
-
-                    input = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(DefaultHandle));
+                    
+                    input = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(DefaultHandle));
+                    output = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(DefaultHandle));
 
                     AddPortToContainer();
                     break;
                 case BattleHandle _:
                     AddToClassList("battleHandle");
 
-                    input = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(BattleHandle));
+                    input = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(BattleHandle));
                     output = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(BattleHandle));
 
                     AddPortToContainer();
@@ -59,8 +63,8 @@ namespace ThunderNut.SceneManagement.Editor {
                 case CutsceneHandle _:
                     AddToClassList("cutsceneHandle");
 
-                    input = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(CutsceneHandle));
-                    output = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single, typeof(CutsceneHandle));
+                    input = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(CutsceneHandle));
+                    output = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(CutsceneHandle));
 
                     AddPortToContainer();
                     break;

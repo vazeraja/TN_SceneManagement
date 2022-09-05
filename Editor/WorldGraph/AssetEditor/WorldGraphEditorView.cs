@@ -2,29 +2,20 @@
 using System.Linq;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
-using UnityEditor.IMGUI.Controls;
 using UnityEditor.Searcher;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
-using PopupWindow = UnityEditor.PopupWindow;
 
 namespace ThunderNut.SceneManagement.Editor {
 
-    [Serializable]
-    public class UserViewSettings {
-        public bool isBlackboardVisible = true;
-        public bool isInspectorVisible = true;
-        public bool isPreviewVisible = true;
-    }
+    public class WorldGraphEditorView : VisualElement, IDisposable {
+        private readonly EditorWindow _EditorWindow;
+        private WorldGraphGraphView _GraphView;
 
-    public class WGEditorView : VisualElement, IDisposable {
-        private EditorWindow m_EditorWindow;
-        private WGGraphView m_GraphView;
-
-        private WorldGraph m_Graph;
-        private WorldGraphEditor graphEditor;
-        private string m_AssetName;
+        private readonly WorldGraph _Graph;
+        private readonly WorldGraphEditor _GraphEditor;
+        private string _AssetName;
 
         private Vector2 scrollPos;
 
@@ -37,16 +28,7 @@ namespace ThunderNut.SceneManagement.Editor {
         private WGSearcherProvider m_SearchWindowProvider;
         private SearcherWindow searcherWindow;
 
-        public Action saveRequested { get; set; }
-        public Action saveAsRequested { get; set; }
-        public Action showInProjectRequested { get; set; }
-        public Action refreshRequested { get; set; }
-        public Func<bool> isCheckedOut { get; set; }
-        public Action checkOut { get; set; }
-
-        const string k_UserViewSettings = "TN.WorldGraph.ToggleSettings";
-        private readonly UserViewSettings m_UserViewSettings;
-
+        public WorldGraphEditorToolbar toolbar { get; set; }
 
         const string k_PreviewWindowLayoutKey = "TN.WorldGraph.PreviewWindowLayout";
 
@@ -67,7 +49,7 @@ namespace ThunderNut.SceneManagement.Editor {
             size = new Vector2(20, 30)
         };
 
-        const string k_PropertiesWindowLayoutKey = "TN.WorldGraph.ExposedPropertiesWindowLayout";
+        private const string k_PropertiesWindowLayoutKey = "TN.WorldGraph.ExposedPropertiesWindowLayout";
 
         private WindowDockingLayout exposedPropertiesDockingLayout { get; set; } = new WindowDockingLayout {
             dockingTop = true,
@@ -77,88 +59,42 @@ namespace ThunderNut.SceneManagement.Editor {
             size = new Vector2(20, 30)
         };
 
-        public WGGraphView graphView => m_GraphView;
+        public WorldGraphGraphView GraphView => _GraphView;
 
         public string assetName {
-            get => m_AssetName;
+            get => _AssetName;
             set {
-                m_AssetName = value;
-                // Also update blackboard title
-                // m_BlackboardController.UpdateBlackboardTitle(m_AssetName);
+                _AssetName = value;
+                inspectorBlackboard.title = _AssetName + " Inspector";
             }
         }
 
-        public WGEditorView(EditorWindow editorWindow, WorldGraph graph, string graphName) {
-            m_EditorWindow = editorWindow;
-            m_Graph = graph;
-            m_AssetName = graphName;
+        public WorldGraphEditorView(EditorWindow editorWindow, WorldGraph graph, string graphName) {
+            _EditorWindow = editorWindow;
+            _Graph = graph;
+            _AssetName = graphName;
 
             styleSheets.Add(Resources.Load<StyleSheet>("Styles/WGEditorView"));
 
-            graphEditor = UnityEditor.Editor.CreateEditor(graph) as WorldGraphEditor;
+            _GraphEditor = UnityEditor.Editor.CreateEditor(graph) as WorldGraphEditor;
 
-            string serializedSettings = EditorUserSettings.GetConfigValue(k_UserViewSettings);
-            m_UserViewSettings = JsonUtility.FromJson<UserViewSettings>(serializedSettings) ?? new UserViewSettings();
-
-            var toolbar = new IMGUIContainer(() => {
-                GUILayout.BeginHorizontal(EditorStyles.toolbar);
-                {
-                    if (GUILayout.Button("Save Asset", EditorStyles.toolbarButton)) {
-                        //saveRequested?.Invoke();
-                    }
-
-                    GUILayout.Space(6);
-                    if (GUILayout.Button("Save As...", EditorStyles.toolbarButton)) {
-                        saveAsRequested();
-                    }
-
-                    GUILayout.Space(6);
-                    if (GUILayout.Button("Show In Project", EditorStyles.toolbarButton)) {
-                        showInProjectRequested?.Invoke();
-                    }
-
-                    GUILayout.Space(6);
-                    if (GUILayout.Button("Refresh", EditorStyles.toolbarButton)) {
-                        refreshRequested?.Invoke();
-                    }
-
-                    GUILayout.FlexibleSpace();
-
-                    EditorGUI.BeginChangeCheck();
-                    m_UserViewSettings.isBlackboardVisible =
-                        GUILayout.Toggle(m_UserViewSettings.isBlackboardVisible, "Blackboard", EditorStyles.toolbarButton);
-
-                    GUILayout.Space(6);
-
-                    m_UserViewSettings.isInspectorVisible =
-                        GUILayout.Toggle(m_UserViewSettings.isInspectorVisible, "Graph Inspector", EditorStyles.toolbarButton);
-
-                    GUILayout.Space(6);
-
-                    m_UserViewSettings.isPreviewVisible =
-                        GUILayout.Toggle(m_UserViewSettings.isPreviewVisible, "Main Preview", EditorStyles.toolbarButton);
-
-                    if (EditorGUI.EndChangeCheck()) {
-                        UserViewSettingsChangeCheck();
-                    }
-                }
-                GUILayout.EndHorizontal();
-            });
-            Add(toolbar);
+            toolbar = new WorldGraphEditorToolbar {changeCheck = UpdateSubWindowsVisibility};
+            var toolbarGUI = new IMGUIContainer(() => { toolbar.OnGUI(); });
+            Add(toolbarGUI);
 
             var content = new VisualElement {name = "content"};
             {
-                m_GraphView = new WGGraphView(graph) {
+                _GraphView = new WorldGraphGraphView(graph) {
                     name = "GraphView", viewDataKey = "MaterialGraphView"
                 };
-                m_GraphView.styleSheets.Add(Resources.Load<StyleSheet>("Styles/WGGraphView"));
-                m_GraphView.AddManipulator(new ContentDragger());
-                m_GraphView.AddManipulator(new SelectionDragger());
-                m_GraphView.AddManipulator(new RectangleSelector());
-                m_GraphView.AddManipulator(new ClickSelector());
-                m_GraphView.SetupZoom(0.05f, 8);
+                _GraphView.styleSheets.Add(Resources.Load<StyleSheet>("Styles/WGGraphView"));
+                _GraphView.AddManipulator(new ContentDragger());
+                _GraphView.AddManipulator(new SelectionDragger());
+                _GraphView.AddManipulator(new RectangleSelector());
+                _GraphView.AddManipulator(new ClickSelector());
+                _GraphView.SetupZoom(0.05f, 8);
 
-                content.Add(m_GraphView);
+                content.Add(_GraphView);
 
                 string serializedPreview = EditorUserSettings.GetConfigValue(k_PreviewWindowLayoutKey);
                 if (!string.IsNullOrEmpty(serializedPreview)) {
@@ -182,30 +118,81 @@ namespace ThunderNut.SceneManagement.Editor {
                 CreateExposedPropertiesBlackboard();
 
                 UpdateSubWindowsVisibility();
+                
+                _GraphView.graphViewChanged = GraphViewChanged;
 
                 RegisterCallback<GeometryChangedEvent>(ApplySerializedWindowLayouts);
             }
 
             m_SearchWindowProvider = ScriptableObject.CreateInstance<WGSearcherProvider>();
-            m_SearchWindowProvider.Initialize(editorWindow, m_GraphView, SearchWindowItemSelected);
-            m_GraphView.nodeCreationRequest = c => {
-                if (EditorWindow.focusedWindow != m_EditorWindow) return;
-                var displayPosition = (c.screenMousePosition - m_EditorWindow.position.position);
+            m_SearchWindowProvider.Initialize(editorWindow, _GraphView, SearchWindowItemSelected);
+            _GraphView.nodeCreationRequest = c => {
+                if (EditorWindow.focusedWindow != _EditorWindow) return;
+                var displayPosition = (c.screenMousePosition - _EditorWindow.position.position);
 
                 m_SearchWindowProvider.target = c.target;
-                SearcherWindow.Show(m_EditorWindow, m_SearchWindowProvider.LoadSearchWindow(),
+                SearcherWindow.Show(_EditorWindow, m_SearchWindowProvider.LoadSearchWindow(),
                     item => m_SearchWindowProvider.OnSearcherSelectEntry(item, displayPosition), displayPosition, null);
             };
 
+            AddNodes();
+
             Add(content);
         }
-        
+
+        private void AddNodes() {
+            if (_Graph.sceneHandles.Count == 0) {
+                _Graph.CreateSubAsset(typeof(BaseHandle));
+                EditorUtility.SetDirty(_Graph);
+                AssetDatabase.SaveAssets();
+            }
+            
+            _Graph.sceneHandles.ForEach((sceneHandle) => {
+                var node = new WGNodeView(_GraphView, sceneHandle);
+                _GraphView.AddElement(node);
+            });
+        }
+        private void SearchWindowItemSelected(Type type) {
+            SceneHandle sceneHandle = _Graph.CreateSubAsset(type);
+            var node = new WGNodeView(_GraphView, sceneHandle);
+
+            _GraphView.AddElement(node);
+            Debug.Log("Node Count: " + _GraphView.graphElements.OfType<IWorldGraphNodeView>().Count());
+        }
+
+        private GraphViewChange GraphViewChanged(GraphViewChange graphViewChange) {
+            graphViewChange.elementsToRemove?.ForEach(elem => {
+                switch (elem) {
+                    case IWorldGraphNodeView nodeDisplay:
+                        _Graph.RemoveSubAsset(nodeDisplay.sceneHandle);
+                        break;
+                    // case Edge edge: 
+                    //     ReanimatorGraphNode parent = edge.output.node as ReanimatorGraphNode;
+                    //     ReanimatorGraphNode child = edge.input.node as ReanimatorGraphNode;
+                    //     graph.RemoveChild(parent?.node, child?.node);
+                    //     break;
+                    // case ReanimatorGroup group:
+                    //     SaveToGraphSaveData();
+                    //     break;
+                }
+            });
+            graphViewChange.edgesToCreate?.ForEach(edge => {
+                // ReanimatorGraphNode parent = edge.output.node as ReanimatorGraphNode;
+                // ReanimatorGraphNode child = edge.input.node as ReanimatorGraphNode;
+                //
+                // graph.AddChild(parent?.node, child?.node);
+                // SaveToGraphSaveData();
+            });
+
+            return graphViewChange;
+        }
+
         private void CreateMasterPreview() {
-            masterPreviewView = new MasterPreviewView(m_Graph) {name = "MasterPreview"};
+            masterPreviewView = new MasterPreviewView(_GraphView, _EditorWindow, _Graph) {name = "MasterPreview"};
 
             var masterPreviewViewDraggable = new WindowDraggable(null, this);
             masterPreviewView.AddManipulator(masterPreviewViewDraggable);
-            m_GraphView.Add(masterPreviewView);
+            _GraphView.Add(masterPreviewView);
 
             masterPreviewViewDraggable.OnDragFinished += () => {
                 ApplySerializedLayout(masterPreviewView, previewDockingLayout, k_PreviewWindowLayoutKey);
@@ -216,21 +203,21 @@ namespace ThunderNut.SceneManagement.Editor {
         }
 
         private void CreateInspectorBlackboard() {
-            inspectorBlackboard = new Blackboard(m_GraphView) {title = "Inspector", subTitle = "WorldGraph"};
+            inspectorBlackboard = new Blackboard(_GraphView) {title = "Inspector", subTitle = "WorldGraph"};
             {
                 inspectorBlackboard.Add(new IMGUIContainer(() => {
                     // ReSharper disable once ConvertToUsingDeclaration
                     using (var scrollViewScope = new EditorGUILayout.ScrollViewScope(scrollPos)) {
                         scrollPos = scrollViewScope.scrollPosition;
-                        //graphEditor!.OnInspectorGUI();
+                        _GraphEditor!.OnInspectorGUI();
                     }
                 }));
             }
-            m_GraphView.Add(inspectorBlackboard);
+            _GraphView.Add(inspectorBlackboard);
         }
 
         private void CreateExposedPropertiesBlackboard() {
-            exposedPropertiesBlackboard = new Blackboard(m_GraphView) {title = "Exposed Properties", subTitle = "WorldGraph"};
+            exposedPropertiesBlackboard = new Blackboard(_GraphView) {title = "Exposed Properties", subTitle = "WorldGraph"};
             {
                 exposedPropertiesItemMenu = new GenericMenu();
                 exposedPropertiesItemMenu.AddItem(new GUIContent("String"), false, () => Debug.Log("String"));
@@ -242,9 +229,9 @@ namespace ThunderNut.SceneManagement.Editor {
                 exposedPropertiesBlackboard.addItemRequested += b => exposedPropertiesItemMenu.ShowAsContext();
             }
 
-            m_GraphView.Add(exposedPropertiesBlackboard);
+            _GraphView.Add(exposedPropertiesBlackboard);
         }
-        
+
         private void ApplySerializedWindowLayouts(GeometryChangedEvent evt) {
             UnregisterCallback<GeometryChangedEvent>(ApplySerializedWindowLayouts);
 
@@ -252,13 +239,13 @@ namespace ThunderNut.SceneManagement.Editor {
             ApplySerializedLayout(exposedPropertiesBlackboard, exposedPropertiesDockingLayout, k_PropertiesWindowLayoutKey);
             ApplySerializedLayout(masterPreviewView, previewDockingLayout, k_PreviewWindowLayoutKey);
         }
-        
+
         private void ApplySerializedLayout(VisualElement target, WindowDockingLayout layout, string layoutKey) {
             layout.ApplySize(target);
             layout.ApplyPosition(target);
 
             target.RegisterCallback<GeometryChangedEvent>((evt) => {
-                layout.CalculateDockingCornerAndOffset(target.layout, m_GraphView.layout);
+                layout.CalculateDockingCornerAndOffset(target.layout, _GraphView.layout);
                 layout.ClampToParentWindow();
 
                 string serializedWindowLayout = JsonUtility.ToJson(layout);
@@ -266,53 +253,33 @@ namespace ThunderNut.SceneManagement.Editor {
             });
         }
 
-        private void SearchWindowItemSelected(Type type) {
-            SceneHandle newHandle = m_Graph.CreateSubAsset(type);
-            var node = new WGNodeView(m_GraphView, newHandle);
-
-            m_GraphView.AddElement(node);
-            Debug.Log("Node Count: " + m_GraphView.graphElements.OfType<IWorldGraphNodeView>().Count());
-        }
-
-        private void UserViewSettingsChangeCheck() {
-            string serializedUserViewSettings = JsonUtility.ToJson(m_UserViewSettings);
-            EditorUserSettings.SetConfigValue(k_UserViewSettings, serializedUserViewSettings);
-
-            UpdateSubWindowsVisibility();
-        }
-
         private void UpdateSubWindowsVisibility() {
-            exposedPropertiesBlackboard.visible = m_UserViewSettings.isBlackboardVisible;
-            inspectorBlackboard.visible = m_UserViewSettings.isInspectorVisible;
-            masterPreviewView.visible = m_UserViewSettings.isPreviewVisible;
+            exposedPropertiesBlackboard.visible = toolbar.m_UserViewSettings.isBlackboardVisible;
+            inspectorBlackboard.visible = toolbar.m_UserViewSettings.isInspectorVisible;
+            masterPreviewView.visible = toolbar.m_UserViewSettings.isPreviewVisible;
         }
 
         public void Dispose() {
-            if (m_GraphView != null) {
-                saveRequested = null;
-                saveAsRequested = null;
-                showInProjectRequested = null;
-                isCheckedOut = null;
-                checkOut = null;
+            if (_GraphView != null) {
+                toolbar.Dispose();
 
                 // Get all nodes and dispose
                 // Debug.Log("Node Count: " + m_GraphView.graphElements.OfType<IWorldGraphNodeView>().Count());
-                foreach (IWorldGraphNodeView node in m_GraphView.graphElements.OfType<IWorldGraphNodeView>()) {
-                    m_Graph.RemoveSubAsset(node.sceneHandle);
-                    m_GraphView.RemoveElement(node.gvNode);
+                foreach (IWorldGraphNodeView node in _GraphView.graphElements.OfType<IWorldGraphNodeView>()) {
+                    // _Graph.RemoveSubAsset(node.sceneHandle);
+                    _GraphView.RemoveElement(node.gvNode);
 
                     node.Dispose();
                 }
                 // Debug.Log("Node Count: " + m_GraphView.graphElements.OfType<IWorldGraphNodeView>().Count());
 
-                m_GraphView.nodeCreationRequest = null;
-                m_GraphView = null;
+                _GraphView.nodeCreationRequest = null;
+                _GraphView = null;
             }
 
-            if (m_SearchWindowProvider != null) {
-                Object.DestroyImmediate(m_SearchWindowProvider);
-                m_SearchWindowProvider = null;
-            }
+            if (m_SearchWindowProvider == null) return;
+            Object.DestroyImmediate(m_SearchWindowProvider);
+            m_SearchWindowProvider = null;
         }
     }
 
