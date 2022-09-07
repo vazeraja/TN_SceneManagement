@@ -1,3 +1,10 @@
+## [1.0.22](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.21...v1.0.22) (2022-09-07)
+
+
+### Bug Fixes
+
+* exposed properties / edge drop outside port ([27e06c7](https://github.com/vazeraja/TN_SceneManagement/commit/27e06c742830d2b0641b19fa93db7321c29adf23))
+
 ## [1.0.21](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.20...v1.0.21) (2022-09-05)
 
 
