@@ -1,5 +1,25 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-2876734979102268180
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db8d3b437e4741e2996521a15c9a76ef, type: 3}
+  m_Name: BattleHandle
+  m_EditorClassIdentifier: 
+  guid: f342c5debe65e024c8d9de23644bfb1e
+  position: {x: 0, y: 0}
+  Active: 1
+  HandleName: 
+  scene:
+    sceneAsset: {fileID: 0}
+    ScenePath: 
+  children: []
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14,6 +34,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sceneHandles:
   - {fileID: 7715859213092420471}
+  - {fileID: -2876734979102268180}
   settingA: 
   settingB: 
   settingC: 

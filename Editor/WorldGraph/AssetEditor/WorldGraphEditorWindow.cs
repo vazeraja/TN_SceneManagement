@@ -222,6 +222,7 @@ namespace ThunderNut.SceneManagement.Editor {
         private void Refresh() {
             OnDisable();
             OnEnable();
+            // worldGraph.ClearAllParameters();
         }
 
         private bool AssetFileExists() => File.Exists(AssetDatabase.GUIDToAssetPath(selectedGuid));
@@ -234,7 +235,7 @@ namespace ThunderNut.SceneManagement.Editor {
             // we immediately unregister it so it doesn't get called again
             graphEditorView.UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
             if (m_FrameAllAfterLayout) {
-                graphEditorView.GraphView.FrameAll();
+                graphEditorView.graphView.FrameAll();
             }
 
             m_FrameAllAfterLayout = false;

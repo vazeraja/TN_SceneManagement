@@ -7,6 +7,103 @@ using UnityEngine;
 
 namespace ThunderNut.SceneManagement {
 
+    [Serializable]
+    public abstract class ExposedParameter {
+        [SerializeField] private string m_Name = "ExposedProperty";
+        public string Name {
+            get => m_Name;
+            set => m_Name = value;
+        }
+
+        [SerializeField] private string m_Reference = "_ExposedProperty";
+        public string Reference {
+            get => m_Reference;
+            set => m_Reference = value;
+        }
+        [SerializeField] private bool m_Exposed = true;
+        public bool Exposed {
+            get => m_Exposed;
+            set => m_Exposed = value;
+        }
+    }
+
+    [Serializable]
+    public abstract class ParameterField<TValueType> : ExposedParameter {
+        [SerializeField] private TValueType m_Value;
+        public TValueType Value {
+            get => m_Value;
+            set => m_Value = value;
+        }
+    }
+
+    [Serializable]
+    public class StringParameterField : ParameterField<string> {
+        public StringParameterField() {
+            Name = "StringParameter";
+            Reference = "_StringParameter";
+        }
+
+        public StringParameterField(string name) : this() {
+            Name = name;
+        }
+
+        public StringParameterField(string name, string value) : this() {
+            Name = name;
+            Value = value;
+        }
+    }
+
+    [Serializable]
+    public class FloatParameterField : ParameterField<float> {
+        public FloatParameterField() {
+            Name = "FloatParameter";
+            Reference = "_FloatParameter";
+        }
+
+        public FloatParameterField(string name) : this() {
+            Name = name;
+        }
+
+        public FloatParameterField(string name, float value) : this() {
+            Name = name;
+            Value = value;
+        }
+    }
+
+    [Serializable]
+    public class IntParameterField : ParameterField<int> {
+        public IntParameterField() {
+            Name = "IntParameter";
+            Reference = "_IntParameter";
+        }
+
+        public IntParameterField(string name) : this() {
+            Name = name;
+        }
+
+        public IntParameterField(string name, int value) : this() {
+            Name = name;
+            Value = value;
+        }
+    }
+
+    [Serializable]
+    public class BoolParameterField : ParameterField<bool> {
+        public BoolParameterField() {
+            Name = "BoolParameter";
+            Reference = "_BoolParameter";
+        }
+
+        public BoolParameterField(string name) : this() {
+            Name = name;
+        }
+
+        public BoolParameterField(string name, bool value) : this() {
+            Name = name;
+            Value = value;
+        }
+    }
+
     [CreateAssetMenu(fileName = "WorldGraph", menuName = "World Graph/World Graph")]
     public class WorldGraph : ScriptableObject {
         public List<SceneHandle> sceneHandles;
@@ -18,6 +115,11 @@ namespace ThunderNut.SceneManagement {
         public string settingE;
 
         private SceneHandle activeSceneHandle;
+
+        public List<StringParameterField> stringParameters = new List<StringParameterField>();
+        public List<FloatParameterField> floatParameters = new List<FloatParameterField>();
+        public List<IntParameterField> intParameters = new List<IntParameterField>();
+        public List<BoolParameterField> boolParameters = new List<BoolParameterField>();
 
         // --------------------- Key: Represents parameter name | Value: Represents parameter value ---------------------
         public SerializableDictionary<string, string> stringParametersDict = new SerializableDictionary<string, string>();
@@ -113,11 +215,42 @@ namespace ThunderNut.SceneManagement {
             }
         }
 
+        public void ClearAllParameters() {
+            stringParameters.Clear();
+            floatParameters.Clear();
+            intParameters.Clear();
+            boolParameters.Clear();
+        }
+
+        public StringParameterField CreateStringParameter() {
+            var param = new StringParameterField();
+            stringParameters.Add(param);
+            return param;
+        }
+
+        public FloatParameterField CreateFloatParameter() {
+            var param = new FloatParameterField();
+            floatParameters.Add(param);
+            return param;
+        }
+
+        public IntParameterField CreateIntParameter() {
+            var param = new IntParameterField();
+            intParameters.Add(param);
+            return param;
+        }
+
+        public BoolParameterField CreateBoolParameter() {
+            var param = new BoolParameterField();
+            boolParameters.Add(param);
+            return param;
+        }
+
         public SceneHandle CreateSceneHandle(Type type) {
             SceneHandle newHandle = (SceneHandle) CreateInstance(type);
             newHandle.name = type.Name;
             newHandle.guid = GUID.Generate().ToString();
-            
+
             AddSceneHandle(newHandle);
             return newHandle;
         }
@@ -144,7 +277,7 @@ namespace ThunderNut.SceneManagement {
         public SceneHandle CreateSubAsset(Type type) {
             var newHandle = CreateSceneHandle(type);
 
-            if (!Application.isPlaying) 
+            if (!Application.isPlaying)
                 AssetDatabase.AddObjectToAsset(newHandle, this);
 
             AssetDatabase.SaveAssets();
