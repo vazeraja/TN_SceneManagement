@@ -9,23 +9,18 @@ using Object = UnityEngine.Object;
 namespace ThunderNut.SceneManagement {
 
     public abstract class SceneHandle : ScriptableObject {
-        public bool Active = true;
-        public string HandleName = "";
-
         public string guid;
         public Vector2 position;
 
-        #if UNITY_EDITOR
-        public virtual Color HandleColor => Color.white;
-        #endif
+        public bool Active = true;
+        public string HandleName = "";
+        protected virtual Color HandleColor => Color.white;
+        public Color color => HandleColor;
 
         public SceneReference scene;
+        public List<SceneHandle> children = new List<SceneHandle>();
+        
         public List<string> passages = new List<string> {"default_value1", "default_value2"};
-        public SceneConnectionsList sceneConnections;
-
-        protected static void LoadSceneFromConnection(SceneConnection connection) {
-            SceneManager.LoadScene(connection.exitScene.scene.ScenePath);
-        }
 
         public abstract void ChangeToScene();
     }
@@ -39,12 +34,12 @@ namespace ThunderNut.SceneManagement {
         public override void OnInspectorGUI() {
             serializedObject.Update();
 
-            const bool disabled = true;
-            using (new EditorGUI.DisabledGroupScope(disabled)) {
+            using (new EditorGUI.DisabledGroupScope(true)) {
                 _settingsDropdown = EditorGUILayout.Foldout(_settingsDropdown, "Internal Settings", true, EditorStyles.foldout);
                 if (_settingsDropdown) {
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("Active"));
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("guid"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("position"));
                 }
             }
 
@@ -53,8 +48,9 @@ namespace ThunderNut.SceneManagement {
             EditorGUILayout.PropertyField(serializedObject.FindProperty("HandleName"));
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("scene"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("passages"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("sceneConnections"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("children"));
+            // EditorGUILayout.PropertyField(serializedObject.FindProperty("passages"));
+            // EditorGUILayout.PropertyField(serializedObject.FindProperty("sceneConnections"));
 
             serializedObject.ApplyModifiedProperties();
         }

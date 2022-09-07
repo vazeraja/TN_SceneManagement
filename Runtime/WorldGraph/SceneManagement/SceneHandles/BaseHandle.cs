@@ -4,7 +4,7 @@ namespace ThunderNut.SceneManagement {
 
     [Path("Core/BaseHandle", "BaseNode")]
     public class BaseHandle : SceneHandle {
-        public override Color HandleColor => Color.yellow;
+        protected override Color HandleColor => Color.white;
         
         public override void ChangeToScene() {
             

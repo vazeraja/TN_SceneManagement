@@ -1,0 +1,75 @@
+/* THIS FILE IS FROM GRAPHVIEW BUT CONTAINS MODIFICATIONS */
+
+WorldGraphPort {
+    height: 24px;
+    align-items: center;
+    padding-left: 4px;
+    padding-right: 4px;
+    --port-color: rgb(200, 200, 200);
+    --disabled-port-color: rgb(70, 70, 70);
+}
+
+WorldGraphPort.input {
+    flex-direction: row;
+}
+
+WorldGraphPort.output {
+    flex-direction: row-reverse;
+}
+
+WorldGraphPort > #connector {
+    border-color: rgb(70, 70, 70);
+    background-color: #212121;
+    width: 8px;
+    height: 8px;
+    border-radius: 8px;
+    align-items: center;
+    justify-content: center;
+
+    margin-left: 4px;
+    margin-right: 4px;
+    border-left-width: 1px;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+}
+
+WorldGraphPort > #connector:hover {
+    border-color: #f0f0f0
+}
+
+WorldGraphPort > #connector > #cap
+{
+    background-color: #212121;
+    width: 4px;
+    height: 4px;
+    border-radius: 4px;
+}
+
+WorldGraphPort > #connector > #cap:hover
+{
+    background-color: #f0f0f0;
+}
+
+WorldGraphPort > #connector.portHighlight {
+    border-color: #f0f0f0;
+}
+
+WorldGraphPort > #type {
+    color: #c1c1c1;
+    font-size: 11px;
+    height: 16px;
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: 4px;
+    margin-right: 4px;
+    margin-top: 4px;
+}
+
+WorldGraphPort.input > #type {
+    -unity-text-align: middle-left;
+}
+
+WorldGraphPort.output > #type {
+    -unity-text-align:middle-right;
+}

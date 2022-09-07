@@ -22,13 +22,13 @@ namespace ThunderNut.SceneManagement.Editor {
         }
     }
 
-    public class WGSearcherProvider : ScriptableObject {
-        public EditorWindow editorWindow;
-        protected GraphView graphView;
-        protected Action<Type> itemSelectedCallback;
+    public class WorldGraphSearcherProvider : ScriptableObject {
+        private EditorWindow editorWindow;
+        private GraphView graphView;
+        private Action<Type, Vector2> itemSelectedCallback;
         public VisualElement target;
 
-        public void Initialize(EditorWindow editorWindow, GraphView graphView = null, Action<Type> itemSelectedCallback = null) {
+        public void Initialize(EditorWindow editorWindow, GraphView graphView = null, Action<Type, Vector2> itemSelectedCallback = null) {
             this.editorWindow = editorWindow;
             this.graphView = graphView;
             this.itemSelectedCallback = itemSelectedCallback;
@@ -94,7 +94,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
             // ReSharper disable once InvertIf
             if (selectedEntryType != null && selectedEntryType.IsSubclassOf(typeof(SceneHandle))) {
-                itemSelectedCallback?.Invoke(((SearchNodeItem) entry).type);
+                itemSelectedCallback?.Invoke(((SearchNodeItem) entry).type, graphMousePosition);
                 return true;
             }
 

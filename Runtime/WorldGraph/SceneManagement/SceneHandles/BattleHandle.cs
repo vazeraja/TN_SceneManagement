@@ -7,11 +7,9 @@ namespace ThunderNut.SceneManagement {
 
     [Path("Special/BattleHandle", "Battle")]
     public class BattleHandle : SceneHandle {
-        public override Color HandleColor => Color.red;
+        protected override Color HandleColor => Color.yellow;
 
         public override void ChangeToScene() {
-            SceneConnection firstConnection = sceneConnections.list.First();
-            LoadSceneFromConnection(firstConnection);
         }
     }
 

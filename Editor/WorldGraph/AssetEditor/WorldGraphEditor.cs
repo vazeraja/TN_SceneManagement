@@ -92,10 +92,10 @@ namespace ThunderNut.SceneManagement.Editor {
 
             // -------------------------------------------- Draw list --------------------------------------------
 
-            WGStyling.DrawSection("Scene Handles");
+            WGEditorGUI.DrawSection("Scene Handles");
 
             for (int i = 0; i < _sceneHandles.arraySize; i++) {
-                WGStyling.DrawSplitter();
+                WGEditorGUI.DrawSplitter();
 
                 SerializedProperty property = _sceneHandles.GetArrayElementAtIndex(i);
 
@@ -105,13 +105,11 @@ namespace ThunderNut.SceneManagement.Editor {
                 System.Diagnostics.Debug.Assert(handle != null, nameof(handle) + " != null");
                 handle.hideFlags = _debugView ? HideFlags.None : HideFlags.HideInInspector;
 
-                Undo.RecordObject(handle, "Modified Feedback");
-
                 int id = i;
                 bool isExpanded = property.isExpanded;
                 string label = handle.name;
 
-                WGStyling.DrawSimpleHeader(ref isExpanded, ref handle.Active, label, handle.HandleColor, menu => {
+                WGEditorGUI.DrawSimpleHeader(ref isExpanded, ref handle.Active, ref handle.HandleName, handle.color, menu => {
                     if (Application.isPlaying)
                         menu.AddItem(new GUIContent("Play"), false, () => Debug.Log("Play"));
                     else
@@ -162,7 +160,7 @@ namespace ThunderNut.SceneManagement.Editor {
             }
 
             if (_sceneHandles.arraySize > 0) {
-                WGStyling.DrawSplitter();
+                WGEditorGUI.DrawSplitter();
             }
 
             EditorGUILayout.Space();
@@ -202,7 +200,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
             // -------------------------------------------- Debug Area --------------------------------------------
 
-            WGStyling.DrawSection("All Scenes Debug");
+            WGEditorGUI.DrawSection("All Scenes Debug");
 
             EditorGUI.BeginDisabledGroup(!Application.isPlaying);
             EditorGUILayout.BeginHorizontal();

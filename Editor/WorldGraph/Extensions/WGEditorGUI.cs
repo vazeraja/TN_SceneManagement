@@ -4,11 +4,12 @@ using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 using PropertyAttribute = UnityEngine.PropertyAttribute;
 
 namespace ThunderNut.SceneManagement.Editor {
 
-    public static class WGStyling {
+    public static class WGEditorGUI {
         public static readonly GUIStyle SmallTickbox = new GUIStyle("ShurikenToggle");
 
         private static readonly Color _splitterDark = new Color(0.12f, 0.12f, 0.12f, 1.333f);
@@ -30,7 +31,7 @@ namespace ThunderNut.SceneManagement.Editor {
         private static readonly Texture2D _paneOptionsIconLight;
         public static Texture2D PaneOptionsIcon => EditorGUIUtility.isProSkin ? _paneOptionsIconDark : _paneOptionsIconLight;
 
-        static WGStyling() {
+        static WGEditorGUI() {
             _paneOptionsIconDark = (Texture2D) EditorGUIUtility.Load("Builtin Skins/DarkSkin/Images/pane options.png");
             _paneOptionsIconLight = (Texture2D) EditorGUIUtility.Load("Builtin Skins/LightSkin/Images/pane options.png");
         }
@@ -71,7 +72,7 @@ namespace ThunderNut.SceneManagement.Editor {
         /// <summary>
         /// Draw a header similar to the one used for the post-process stack
         /// </summary>
-        public static Rect DrawSimpleHeader(ref bool expanded, ref bool activeField, string title, Color feedbackColor,
+        public static Rect DrawSimpleHeader(ref bool expanded, ref bool activeField, ref string title, Color feedbackColor,
             Action<GenericMenu> fillGenericMenu) {
             var e = Event.current;
 
@@ -154,8 +155,15 @@ namespace ThunderNut.SceneManagement.Editor {
 
             return backgroundRect;
         }
+        
+        public static VisualElement GetFirstAncestorWhere(VisualElement target, Predicate<VisualElement> predicate) {
+            for (VisualElement parent = target.hierarchy.parent; parent != null; parent = parent.hierarchy.parent) {
+                if (predicate(parent))
+                    return parent;
+            }
 
-        #region Other
+            return null;
+        }
 
         public static EditorWindow GetEditorWindowByName(string name) {
             return Resources.FindObjectsOfTypeAll<EditorWindow>().ToList()
@@ -176,11 +184,7 @@ namespace ThunderNut.SceneManagement.Editor {
             return guids.Select(AssetDatabase.GUIDToAssetPath).Select(AssetDatabase.LoadAssetAtPath<T>)
                 .Where(asset => asset != null).ToList();
         }
-
-        #endregion
-
-        #region Serialized Property Extensions
-
+        
         public static T GetPropertyAttribute<T>(this SerializedProperty prop, bool inherit) where T : PropertyAttribute {
             if (prop == null) {
                 return null;
@@ -222,7 +226,6 @@ namespace ThunderNut.SceneManagement.Editor {
             return attributes != null && attributes.Length > 0 ? attributes[0] : null;
         }
 
-        #endregion
     }
 
 }

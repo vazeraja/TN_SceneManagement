@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
@@ -31,6 +32,7 @@ namespace ThunderNut.SceneManagement {
         public void SetString(string name, string value) {
             stringParametersDict[name] = value;
         }
+
         public void SetFloat(string name, float value) {
             floatParametersDict[name] = value;
         }
@@ -111,19 +113,39 @@ namespace ThunderNut.SceneManagement {
             }
         }
 
+        public SceneHandle CreateSceneHandle(Type type) {
+            SceneHandle newHandle = (SceneHandle) CreateInstance(type);
+            newHandle.name = type.Name;
+            newHandle.guid = GUID.Generate().ToString();
+            
+            AddSceneHandle(newHandle);
+            return newHandle;
+        }
+
+        public void AddSceneHandle(SceneHandle handle) {
+            sceneHandles.Add(handle);
+        }
+
+        public void RemoveSceneHandle(SceneHandle handle) {
+            sceneHandles.Remove(handle);
+        }
+
+        public void AddChild(SceneHandle parent, SceneHandle child) {
+            parent.children.Add(child);
+        }
+
+        public void RemoveChild(SceneHandle parent, SceneHandle child) {
+            parent.children.Remove(child);
+        }
+
         #region Editor
 
         #if UNITY_EDITOR
         public SceneHandle CreateSubAsset(Type type) {
-            SceneHandle newHandle = (SceneHandle) CreateInstance(type);
-            newHandle.name = type.Name;
-            newHandle.guid = GUID.Generate().ToString();
+            var newHandle = CreateSceneHandle(type);
 
-            sceneHandles.Add(newHandle);
-
-            Undo.RecordObject(this, name);
-            if (!Application.isPlaying) AssetDatabase.AddObjectToAsset(newHandle, this);
-            Undo.RegisterCreatedObjectUndo(newHandle, name);
+            if (!Application.isPlaying) 
+                AssetDatabase.AddObjectToAsset(newHandle, this);
 
             AssetDatabase.SaveAssets();
 
@@ -131,13 +153,15 @@ namespace ThunderNut.SceneManagement {
         }
 
         public void RemoveSubAsset(SceneHandle handle) {
-            Undo.RecordObject(this, "Resolution Tree");
-
-            sceneHandles.Remove(handle);
-
-            Undo.DestroyObjectImmediate(handle);
+            RemoveSceneHandle(handle);
+            AssetDatabase.RemoveObjectFromAsset(handle);
             AssetDatabase.SaveAssets();
         }
+
+        public static IEnumerable<SceneHandle> GetChildren(SceneHandle parent) {
+            return parent.children.Count != 0 ? parent.children : Enumerable.Empty<SceneHandle>();
+        }
+
         #endif
 
         #endregion
