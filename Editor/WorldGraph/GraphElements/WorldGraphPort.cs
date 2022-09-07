@@ -7,12 +7,10 @@ namespace ThunderNut.SceneManagement.Editor {
     public class WorldGraphPort : Port {
         private IEdgeConnectorListener connectorListener;
 
-        public WorldGraphPort(
-            Orientation portOrientation,
-            Direction portDirection,
+        public WorldGraphPort(Direction portDirection,
             Capacity portCapacity,
             Type type,
-            IEdgeConnectorListener connectorListener) :
+            IEdgeConnectorListener connectorListener, Orientation portOrientation = Orientation.Horizontal) :
             base(portOrientation, portDirection, portCapacity, type) {
             this.connectorListener = connectorListener;
             m_EdgeConnector = new EdgeConnector<WorldGraphEdge>(connectorListener);

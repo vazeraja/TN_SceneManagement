@@ -20,8 +20,6 @@ namespace ThunderNut.SceneManagement {
         public SceneReference scene;
         public List<SceneHandle> children = new List<SceneHandle>();
         
-        public List<string> passages = new List<string> {"default_value1", "default_value2"};
-
         public abstract void ChangeToScene();
     }
 

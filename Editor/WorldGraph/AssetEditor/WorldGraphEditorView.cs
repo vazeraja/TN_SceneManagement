@@ -192,9 +192,8 @@ namespace ThunderNut.SceneManagement.Editor {
                         var ancestor = WGEditorGUI.GetFirstAncestorWhere(blackboardField, i => i.name == "b_field");
                         exposedPropertiesBlackboard.Remove(ancestor);
                         break;
-                    // case ReanimatorGroup group:
-                    //     SaveToGraphSaveData();
-                    //     break;
+                    case Group group:
+                        break;
                 }
             });
             graphViewChange.edgesToCreate?.ForEach(edge => {
@@ -226,11 +225,9 @@ namespace ThunderNut.SceneManagement.Editor {
             inspectorBlackboard = new Blackboard(GraphView) {title = "Inspector", subTitle = "WorldGraph"};
             {
                 inspectorBlackboard.Add(new IMGUIContainer(() => {
-                    // ReSharper disable once ConvertToUsingDeclaration
-                    using (var scrollViewScope = new EditorGUILayout.ScrollViewScope(scrollPos)) {
-                        scrollPos = scrollViewScope.scrollPosition;
-                        _GraphEditor!.OnInspectorGUI();
-                    }
+                    using var scrollViewScope = new EditorGUILayout.ScrollViewScope(scrollPos);
+                    scrollPos = scrollViewScope.scrollPosition;
+                    _GraphEditor!.OnInspectorGUI();
                 }));
             }
             GraphView.Add(inspectorBlackboard);

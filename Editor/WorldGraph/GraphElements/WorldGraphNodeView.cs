@@ -33,21 +33,6 @@ namespace ThunderNut.SceneManagement.Editor {
             var serializedHandle = new SerializedObject(sceneHandle);
             sceneHandle.HandleName = sceneHandle.GetType().Name;
 
-            switch (sceneHandle) {
-                case BaseHandle _:
-                    AddToClassList("base");
-                    break;
-                case DefaultHandle _:
-                    AddToClassList("defaultHandle");
-                    break;
-                case BattleHandle _:
-                    AddToClassList("battleHandle");
-                    break;
-                case CutsceneHandle _:
-                    AddToClassList("cutsceneHandle");
-                    break;
-            }
-
             CreatePorts();
             AddPortsToContainer();
 
@@ -66,8 +51,9 @@ namespace ThunderNut.SceneManagement.Editor {
                 case BaseHandle _:
                     AddToClassList("base");
 
-                    output = new WorldGraphPort(Orientation.Horizontal, Direction.Output,
-                        Port.Capacity.Multi, typeof(bool), connectorListener);
+                    output = new WorldGraphPort(Direction.Output, Port.Capacity.Multi, typeof(bool), connectorListener) {
+                        portColor = Color.white
+                    };
 
                     capabilities &= ~Capabilities.Movable;
                     capabilities &= ~Capabilities.Deletable;
@@ -76,28 +62,34 @@ namespace ThunderNut.SceneManagement.Editor {
                 case DefaultHandle _:
                     AddToClassList("defaultHandle");
 
-                    input = new WorldGraphPort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi,
-                        typeof(bool), connectorListener);
-                    output = new WorldGraphPort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi,
-                        typeof(bool), connectorListener);
+                    input = new WorldGraphPort(Direction.Input, Port.Capacity.Multi, typeof(bool), connectorListener) {
+                        portColor = new Color(0.12f, 0.44f, 0.81f)
+                    };
+                    output = new WorldGraphPort(Direction.Output, Port.Capacity.Multi, typeof(bool), connectorListener) {
+                        portColor = new Color(0.12f, 0.44f, 0.81f)
+                    };
 
                     break;
                 case BattleHandle _:
                     AddToClassList("battleHandle");
 
-                    input = new WorldGraphPort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi,
-                        typeof(bool), connectorListener);
-                    output = new WorldGraphPort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi,
-                        typeof(bool), connectorListener);
+                    input = new WorldGraphPort(Direction.Input, Port.Capacity.Multi,typeof(bool), connectorListener){
+                        portColor = new Color(0.94f, 0.7f, 0.31f)
+                    };
+                    output = new WorldGraphPort(Direction.Output, Port.Capacity.Multi,typeof(bool), connectorListener){
+                        portColor = new Color(0.94f, 0.7f, 0.31f)
+                    };
 
                     break;
                 case CutsceneHandle _:
                     AddToClassList("cutsceneHandle");
 
-                    input = new WorldGraphPort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi,
-                        typeof(bool), connectorListener);
-                    output = new WorldGraphPort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi,
-                        typeof(bool), connectorListener);
+                    input = new WorldGraphPort(Direction.Input, Port.Capacity.Multi, typeof(bool), connectorListener){
+                        portColor = new Color(0.81f, 0.29f, 0.28f)
+                    };
+                    output = new WorldGraphPort(Direction.Output, Port.Capacity.Multi, typeof(bool), connectorListener){
+                        portColor = new Color(0.81f, 0.29f, 0.28f)
+                    };
 
                     break;
             }
