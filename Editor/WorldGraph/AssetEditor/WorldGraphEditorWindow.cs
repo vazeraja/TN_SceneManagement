@@ -22,7 +22,7 @@ namespace ThunderNut.SceneManagement.Editor {
         }
 
         private WorldGraph m_WorldGraph;
-        private WorldGraph worldGraph {
+        public WorldGraph worldGraph {
             get => m_WorldGraph;
             set => m_WorldGraph = value;
         }
@@ -219,7 +219,7 @@ namespace ThunderNut.SceneManagement.Editor {
             Selection.activeObject = asset;
         }
 
-        private void Refresh() {
+        public void Refresh() {
             OnDisable();
             OnEnable();
         }

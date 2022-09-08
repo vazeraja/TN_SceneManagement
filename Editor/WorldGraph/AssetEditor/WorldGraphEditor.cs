@@ -64,6 +64,15 @@ namespace ThunderNut.SceneManagement.Editor {
                 EditorGUILayout.LabelField("Other", EditorStyles.boldLabel);
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("settingD"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("settingE"));
+
+                using (new EditorGUI.DisabledGroupScope(true)) {
+                    EditorGUILayout.Space(10);
+                    EditorGUILayout.LabelField("Properties", EditorStyles.boldLabel);
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("stringParameters"), true);
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("floatParameters"), true);
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("intParameters"), true);
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("boolParameters"), true);
+                }
             }
 
             // -------------------------------------------- Duration --------------------------------------------
@@ -94,7 +103,9 @@ namespace ThunderNut.SceneManagement.Editor {
 
             WGEditorGUI.DrawSection("Scene Handles");
 
-            for (int i = 0; i < _sceneHandles.arraySize; i++) {
+            for (int i = 0;
+                i < _sceneHandles.arraySize;
+                i++) {
                 WGEditorGUI.DrawSplitter();
 
                 SerializedProperty property = _sceneHandles.GetArrayElementAtIndex(i);
@@ -164,7 +175,6 @@ namespace ThunderNut.SceneManagement.Editor {
             }
 
             EditorGUILayout.Space();
-
             EditorGUILayout.BeginHorizontal();
             {
                 int newItem = EditorGUILayout.Popup(0, typeDisplays.ToArray());
@@ -178,7 +188,6 @@ namespace ThunderNut.SceneManagement.Editor {
             EditorGUILayout.EndHorizontal();
 
             // -------------------------------------------- Clean up --------------------------------------------
-
             var wasRemoved = false;
             for (int i = _sceneHandles.arraySize - 1; i >= 0; i--) {
                 // ReSharper disable once InvertIf
@@ -194,14 +203,11 @@ namespace ThunderNut.SceneManagement.Editor {
                 }
             }
 
-            // -------------------------------------------- Apply Changes --------------------------------------------
-
+// -------------------------------------------- Apply Changes --------------------------------------------
             serializedObject.ApplyModifiedProperties();
 
-            // -------------------------------------------- Debug Area --------------------------------------------
-
+// -------------------------------------------- Debug Area --------------------------------------------
             WGEditorGUI.DrawSection("All Scenes Debug");
-
             EditorGUI.BeginDisabledGroup(!Application.isPlaying);
             EditorGUILayout.BeginHorizontal();
             {
@@ -250,11 +256,6 @@ namespace ThunderNut.SceneManagement.Editor {
                 }
             }
             EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("stringParameters"), true);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("floatParameters"), true);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("intParameters"), true);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("boolParameters"), true);
         }
 
         private SceneHandle AddSceneHandle(System.Type type) {
@@ -271,7 +272,6 @@ namespace ThunderNut.SceneManagement.Editor {
 
             _editors.Remove(handle!);
         }
-
 
         private void AddEditor(SceneHandle handle) {
             if (handle == null) return;

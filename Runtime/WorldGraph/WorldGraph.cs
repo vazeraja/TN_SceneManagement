@@ -7,87 +7,6 @@ using UnityEngine;
 
 namespace ThunderNut.SceneManagement {
 
-    [Serializable]
-    public class ExposedParameter {
-        [SerializeField] private string m_Name;
-        public string Name {
-            get => m_Name;
-            set => m_Name = value;
-        }
-
-        [SerializeField] private string m_Reference;
-        public string Reference {
-            get => m_Reference;
-            set => m_Reference = value;
-        }
-        
-        [SerializeField] private bool m_Exposed;
-        public bool Exposed {
-            get => m_Exposed;
-            set => m_Exposed = value;
-        }
-
-        [SerializeField] private ParameterType m_ParameterType;
-        public ParameterType ParameterType {
-            get => m_ParameterType;
-            protected set => m_ParameterType = value;
-        }
-    }
-
-    [Serializable]
-    public class ParameterField<TValueType> : ExposedParameter  {
-        [SerializeField] private TValueType m_Value;
-        public TValueType Value {
-            get => m_Value;
-            set => m_Value = value;
-        }
-    }
-
-    [Serializable]
-    public class StringParameterField : ParameterField<string> {
-
-        public StringParameterField() {
-            Name = "StringParameter";
-            Reference = "_StringParameter";
-            Exposed = true;
-            ParameterType = ParameterType.String;
-            Value = "_StringParameter";
-        }
-    }
-
-    [Serializable]
-    public class FloatParameterField : ParameterField<float> {
-        public FloatParameterField() {
-            Name = "FloatParameter";
-            Reference = "_FloatParameter";
-            Exposed = true;
-            ParameterType = ParameterType.Float;
-            Value = 69f;
-        }
-    }
-
-    [Serializable]
-    public class IntParameterField : ParameterField<int> {
-        public IntParameterField() {
-            Name = "IntParameter";
-            Reference = "_IntParameter";
-            Exposed = true;
-            ParameterType = ParameterType.Int;
-            Value = 69;
-        }
-    }
-
-    [Serializable]
-    public class BoolParameterField : ParameterField<bool> {
-        public BoolParameterField() {
-            Name = "BoolParameter";
-            Reference = "_BoolParameter";
-            Exposed = true;
-            ParameterType = ParameterType.Bool;
-            Value = true;
-        }
-    }
-
     [CreateAssetMenu(fileName = "WorldGraph", menuName = "World Graph/World Graph")]
     public class WorldGraph : ScriptableObject {
         public List<SceneHandle> sceneHandles;
@@ -134,10 +53,10 @@ namespace ThunderNut.SceneManagement {
         }
 
         public void RegisterParameters(object obj) {
-            var fieldsWithAttribute = WGReflectionHelper.GetFieldInfosWithAttribute(obj, typeof(ParameterAttribute));
+            var fieldsWithAttribute = WGReflectionHelper.GetFieldInfosWithAttribute(obj, typeof(ExposedParameterAttribute));
 
             foreach (FieldInfo field in fieldsWithAttribute) {
-                var attribute = (ParameterAttribute) field.GetCustomAttribute(typeof(ParameterAttribute), true);
+                var attribute = (ExposedParameterAttribute) field.GetCustomAttribute(typeof(ExposedParameterAttribute), true);
                 object fieldValue = field.GetValue(obj);
 
                 // Debug.Log($"Key: {attribute.Name} , Value: {fieldValue}");
@@ -232,8 +151,38 @@ namespace ThunderNut.SceneManagement {
                     return null;
             }
         }
+        public ExposedParameter CreateParameter(ParameterType type, string attrName) {
+            switch (type) {
+                case ParameterType.String:
+                    var stringParameter = new StringParameterField();
+                    stringParameter.Name = attrName;
+                    stringParameter.Reference = attrName;
+                    stringParameters.Add(stringParameter);
+                    return stringParameter;
+                case ParameterType.Float:
+                    var floatParameter = new FloatParameterField();
+                    floatParameter.Name = attrName;
+                    floatParameter.Reference = attrName;
+                    floatParameters.Add(floatParameter);
+                    return floatParameter;
+                case ParameterType.Int:
+                    var intParameter = new IntParameterField();
+                    intParameter.Name = attrName;
+                    intParameter.Reference = attrName;
+                    intParameters.Add(intParameter);
+                    return intParameter;
+                case ParameterType.Bool:
+                    var boolParameter = new BoolParameterField();
+                    boolParameter.Name = attrName;
+                    boolParameter.Reference = attrName;
+                    boolParameters.Add(boolParameter);
+                    return boolParameter;
+                default:
+                    return null;
+            }
+        }
 
-        public SceneHandle CreateSceneHandle(Type type) {
+        private SceneHandle CreateSceneHandle(Type type) {
             SceneHandle newHandle = (SceneHandle) CreateInstance(type);
             newHandle.name = type.Name;
             newHandle.guid = GUID.Generate().ToString();
@@ -242,11 +191,11 @@ namespace ThunderNut.SceneManagement {
             return newHandle;
         }
 
-        public void AddSceneHandle(SceneHandle handle) {
+        private void AddSceneHandle(SceneHandle handle) {
             sceneHandles.Add(handle);
         }
 
-        public void RemoveSceneHandle(SceneHandle handle) {
+        private void RemoveSceneHandle(SceneHandle handle) {
             sceneHandles.Remove(handle);
         }
 

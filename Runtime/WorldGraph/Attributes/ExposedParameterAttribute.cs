@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using Object = System.Object;
 
 namespace ThunderNut.SceneManagement {
 
@@ -11,8 +10,8 @@ namespace ThunderNut.SceneManagement {
         Bool
     }
 
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class ParameterAttribute : PropertyAttribute {
+    [AttributeUsage(AttributeTargets.Field)]
+    public class ExposedParameterAttribute : PropertyAttribute {
         public ParameterType Type;
         public string Name;
     }
