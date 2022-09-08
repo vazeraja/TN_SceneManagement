@@ -8,27 +8,34 @@ using UnityEngine;
 namespace ThunderNut.SceneManagement {
 
     [Serializable]
-    public abstract class ExposedParameter {
-        [SerializeField] private string m_Name = "ExposedProperty";
+    public class ExposedParameter {
+        [SerializeField] private string m_Name;
         public string Name {
             get => m_Name;
             set => m_Name = value;
         }
 
-        [SerializeField] private string m_Reference = "_ExposedProperty";
+        [SerializeField] private string m_Reference;
         public string Reference {
             get => m_Reference;
             set => m_Reference = value;
         }
-        [SerializeField] private bool m_Exposed = true;
+        
+        [SerializeField] private bool m_Exposed;
         public bool Exposed {
             get => m_Exposed;
             set => m_Exposed = value;
         }
+
+        [SerializeField] private ParameterType m_ParameterType;
+        public ParameterType ParameterType {
+            get => m_ParameterType;
+            protected set => m_ParameterType = value;
+        }
     }
 
     [Serializable]
-    public abstract class ParameterField<TValueType> : ExposedParameter {
+    public class ParameterField<TValueType> : ExposedParameter  {
         [SerializeField] private TValueType m_Value;
         public TValueType Value {
             get => m_Value;
@@ -38,18 +45,13 @@ namespace ThunderNut.SceneManagement {
 
     [Serializable]
     public class StringParameterField : ParameterField<string> {
+
         public StringParameterField() {
             Name = "StringParameter";
             Reference = "_StringParameter";
-        }
-
-        public StringParameterField(string name) : this() {
-            Name = name;
-        }
-
-        public StringParameterField(string name, string value) : this() {
-            Name = name;
-            Value = value;
+            Exposed = true;
+            ParameterType = ParameterType.String;
+            Value = "_StringParameter";
         }
     }
 
@@ -58,15 +60,9 @@ namespace ThunderNut.SceneManagement {
         public FloatParameterField() {
             Name = "FloatParameter";
             Reference = "_FloatParameter";
-        }
-
-        public FloatParameterField(string name) : this() {
-            Name = name;
-        }
-
-        public FloatParameterField(string name, float value) : this() {
-            Name = name;
-            Value = value;
+            Exposed = true;
+            ParameterType = ParameterType.Float;
+            Value = 69f;
         }
     }
 
@@ -75,15 +71,9 @@ namespace ThunderNut.SceneManagement {
         public IntParameterField() {
             Name = "IntParameter";
             Reference = "_IntParameter";
-        }
-
-        public IntParameterField(string name) : this() {
-            Name = name;
-        }
-
-        public IntParameterField(string name, int value) : this() {
-            Name = name;
-            Value = value;
+            Exposed = true;
+            ParameterType = ParameterType.Int;
+            Value = 69;
         }
     }
 
@@ -92,15 +82,9 @@ namespace ThunderNut.SceneManagement {
         public BoolParameterField() {
             Name = "BoolParameter";
             Reference = "_BoolParameter";
-        }
-
-        public BoolParameterField(string name) : this() {
-            Name = name;
-        }
-
-        public BoolParameterField(string name, bool value) : this() {
-            Name = name;
-            Value = value;
+            Exposed = true;
+            ParameterType = ParameterType.Bool;
+            Value = true;
         }
     }
 
@@ -131,6 +115,8 @@ namespace ThunderNut.SceneManagement {
             activeSceneHandle.ChangeToScene();
         }
 
+        #region Parameters Dict Code (Might Discard)
+
         public void SetString(string name, string value) {
             stringParametersDict[name] = value;
         }
@@ -157,16 +143,16 @@ namespace ThunderNut.SceneManagement {
                 // Debug.Log($"Key: {attribute.Name} , Value: {fieldValue}");
 
                 switch (attribute.Type) {
-                    case ParameterType.StringParam:
+                    case ParameterType.String:
                         RegisterParameter(attribute.Name, (string) fieldValue);
                         break;
-                    case ParameterType.FloatParam:
+                    case ParameterType.Float:
                         RegisterParameter(attribute.Name, (float) fieldValue);
                         break;
-                    case ParameterType.IntParam:
+                    case ParameterType.Int:
                         RegisterParameter(attribute.Name, (int) fieldValue);
                         break;
-                    case ParameterType.BoolParam:
+                    case ParameterType.Bool:
                         RegisterParameter(attribute.Name, (bool) fieldValue);
                         break;
                     default:
@@ -215,6 +201,8 @@ namespace ThunderNut.SceneManagement {
             }
         }
 
+        #endregion
+
         public void ClearAllParameters() {
             stringParameters.Clear();
             floatParameters.Clear();
@@ -222,28 +210,27 @@ namespace ThunderNut.SceneManagement {
             boolParameters.Clear();
         }
 
-        public StringParameterField CreateStringParameter() {
-            var param = new StringParameterField();
-            stringParameters.Add(param);
-            return param;
-        }
-
-        public FloatParameterField CreateFloatParameter() {
-            var param = new FloatParameterField();
-            floatParameters.Add(param);
-            return param;
-        }
-
-        public IntParameterField CreateIntParameter() {
-            var param = new IntParameterField();
-            intParameters.Add(param);
-            return param;
-        }
-
-        public BoolParameterField CreateBoolParameter() {
-            var param = new BoolParameterField();
-            boolParameters.Add(param);
-            return param;
+        public ExposedParameter CreateParameter(ParameterType type) {
+            switch (type) {
+                case ParameterType.String:
+                    var stringParameter = new StringParameterField();
+                    stringParameters.Add(stringParameter);
+                    return stringParameter;
+                case ParameterType.Float:
+                    var floatParameter = new FloatParameterField();
+                    floatParameters.Add(floatParameter);
+                    return floatParameter;
+                case ParameterType.Int:
+                    var intParameter = new IntParameterField();
+                    intParameters.Add(intParameter);
+                    return intParameter;
+                case ParameterType.Bool:
+                    var boolParameter = new BoolParameterField();
+                    boolParameters.Add(boolParameter);
+                    return boolParameter;
+                default:
+                    return null;
+            }
         }
 
         public SceneHandle CreateSceneHandle(Type type) {

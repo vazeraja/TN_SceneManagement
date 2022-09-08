@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.Searcher;
@@ -26,11 +25,11 @@ namespace ThunderNut.SceneManagement.Editor {
         private MasterPreviewView masterPreviewView;
         private GenericMenu exposedPropertiesItemMenu;
 
+        public WorldGraphEditorToolbar toolbar { get; }
         private WorldGraphSearcherProvider m_SearchWindowProvider;
 
         private EdgeConnectorListener edgeConnectorListener;
 
-        public WorldGraphEditorToolbar toolbar { get; }
 
         private List<IWorldGraphNodeView> nodeViews => graphView.graphElements.OfType<IWorldGraphNodeView>().ToList();
 
@@ -162,6 +161,22 @@ namespace ThunderNut.SceneManagement.Editor {
                 select parentView?.output.ConnectTo(childView?.input)) {
                 graphView.AddElement(edge);
             }
+
+            foreach (var exposedParam in graph.stringParameters) {
+                AddProperty(ParameterType.String, exposedParam);
+            }
+
+            foreach (var exposedParam in graph.floatParameters) {
+                AddProperty(ParameterType.Float, exposedParam);
+            }
+
+            foreach (var exposedParam in graph.intParameters) {
+                AddProperty(ParameterType.Int, exposedParam);
+            }
+
+            foreach (var exposedParam in graph.boolParameters) {
+                AddProperty(ParameterType.Bool, exposedParam);
+            }
         }
 
         private SceneHandle CreateNode(Type type, Vector2 position) {
@@ -191,17 +206,17 @@ namespace ThunderNut.SceneManagement.Editor {
                     case BlackboardField blackboardField:
                         ExposedParameter fieldData = blackboardField.userData as ExposedParameter;
                         switch (fieldData) {
-                            case StringParameterField data:
-                                graph.stringParameters.Remove(data);
+                            case StringParameterField stringParameterField:
+                                graph.stringParameters.Remove(stringParameterField);
                                 break;
-                            case FloatParameterField data:
-                                graph.floatParameters.Remove(data);
+                            case FloatParameterField floatParameterField:
+                                graph.floatParameters.Remove(floatParameterField);
                                 break;
-                            case IntParameterField data:
-                                graph.intParameters.Remove(data);
+                            case IntParameterField intParameterField:
+                                graph.intParameters.Remove(intParameterField);
                                 break;
-                            case BoolParameterField data:
-                                graph.boolParameters.Remove(data);
+                            case BoolParameterField boolParameterField:
+                                graph.boolParameters.Remove(boolParameterField);
                                 break;
                         }
 
@@ -256,15 +271,32 @@ namespace ThunderNut.SceneManagement.Editor {
                     title = "Exposed Variables"
                 });
                 exposedPropertiesBlackboard.editTextRequested = (_blackboard, element, newValue) => {
-                    string oldPropertyName = ((BlackboardField) element).text;
+                    var param = (ExposedParameter) ((BlackboardField) element).userData;
+                    switch (((ExposedParameter) ((BlackboardField) element).userData).ParameterType) {
+                        case ParameterType.String:
+                            graph.stringParameters.Find(x => x == param).Name = newValue;
+                            break;
+                        case ParameterType.Float:
+                            graph.floatParameters.Find(x => x == param).Name = newValue;
+                            break;
+                        case ParameterType.Int:
+                            graph.intParameters.Find(x => x == param).Name = newValue;
+                            break;
+                        case ParameterType.Bool:
+                            graph.boolParameters.Find(x => x == param).Name = newValue;
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+
                     ((BlackboardField) element).text = newValue;
                 };
 
                 exposedPropertiesItemMenu = new GenericMenu();
-                exposedPropertiesItemMenu.AddItem(new GUIContent("String"), false, () => { AddProperty(typeof(string)); });
-                exposedPropertiesItemMenu.AddItem(new GUIContent("Float"), false, () => { AddProperty(typeof(float)); });
-                exposedPropertiesItemMenu.AddItem(new GUIContent("Int"), false, () => { AddProperty(typeof(int)); });
-                exposedPropertiesItemMenu.AddItem(new GUIContent("Bool"), false, () => { AddProperty(typeof(bool)); });
+                exposedPropertiesItemMenu.AddItem(new GUIContent("String"), false, () => { AddProperty(ParameterType.String); });
+                exposedPropertiesItemMenu.AddItem(new GUIContent("Float"), false, () => { AddProperty(ParameterType.Float); });
+                exposedPropertiesItemMenu.AddItem(new GUIContent("Int"), false, () => { AddProperty(ParameterType.Int); });
+                exposedPropertiesItemMenu.AddItem(new GUIContent("Bool"), false, () => { AddProperty(ParameterType.Bool); });
                 exposedPropertiesItemMenu.AddSeparator($"/");
 
                 exposedPropertiesBlackboard.addItemRequested += b => exposedPropertiesItemMenu.ShowAsContext();
@@ -273,61 +305,117 @@ namespace ThunderNut.SceneManagement.Editor {
             graphView.Add(exposedPropertiesBlackboard);
         }
 
-        private void AddProperty(Type type) {
-            ExposedParameter parameter = null;
-            string typeName = null;
-            
-            VisualElement valueField = null;
+        private void AddProperty(ParameterType type, ExposedParameter parameter = null) {
+            ExposedParameter parameterToCreate = null;
+            VisualElement valueField;
 
-            if (type == typeof(string)) {
-                parameter = graph.CreateStringParameter();
-                typeName = "String";
-                
-                valueField = new TextField("Value:") {value = "localPropertyValue"};
-                ((TextField) valueField).RegisterValueChangedCallback(evt => { Debug.Log("changed"); });
+            switch (type) {
+                case ParameterType.String:
+                    if (parameter == null) {
+                        parameterToCreate = graph.CreateParameter(ParameterType.String);
+                        valueField = new TextField("Value:") {value = "localPropertyValue"};
+                    }
+                    else {
+                        valueField = new TextField("Value:") {value = ((StringParameterField) parameter).Value};
+                    }
+
+                    ((TextField) valueField).RegisterValueChangedCallback(evt => {
+                        if (parameter == null) {
+                            graph.stringParameters.Find(x => x == parameterToCreate).Value = evt.newValue;
+                        }
+                        else {
+                            graph.stringParameters.Find(x => x == parameter).Value = evt.newValue;
+                        }
+                    });
+                    break;
+                case ParameterType.Float:
+                    if (parameter == null) {
+                        parameterToCreate = graph.CreateParameter(ParameterType.Float);
+                        valueField = new FloatField("Value:") {value = 5f};
+                    }
+                    else {
+                        valueField = new FloatField("Value:") {value = ((FloatParameterField) parameter).Value};
+                    }
+
+                    ((FloatField) valueField).RegisterValueChangedCallback(evt => {
+                        if (parameter == null) {
+                            graph.floatParameters.Find(x => x == parameterToCreate).Value = evt.newValue;
+                        }
+                        else {
+                            graph.floatParameters.Find(x => x == parameter).Value = evt.newValue;
+                        }
+                    });
+                    break;
+                case ParameterType.Int:
+                    if (parameter == null) {
+                        parameterToCreate = graph.CreateParameter(ParameterType.Int);
+                        valueField = new IntegerField("Value:") {value = 5};
+                    }
+                    else {
+                        valueField = new IntegerField("Value:") {value = ((IntParameterField) parameter).Value};
+                    }
+
+                    ((IntegerField) valueField).RegisterValueChangedCallback(evt => {
+                        if (parameter == null) {
+                            graph.intParameters.Find(x => x == parameterToCreate).Value = evt.newValue;
+                        }
+                        else {
+                            graph.intParameters.Find(x => x == parameter).Value = evt.newValue;
+                        }
+                    });
+                    break;
+                case ParameterType.Bool:
+                    if (parameter == null) {
+                        parameterToCreate = graph.CreateParameter(ParameterType.Bool);
+                        valueField = new Toggle("Value:") {value = true};
+                    }
+                    else {
+                        valueField = new Toggle("Value:") {value = ((BoolParameterField) parameter).Value};
+                    }
+
+                    ((Toggle) valueField).RegisterValueChangedCallback(evt => {
+                        if (parameter == null) {
+                            graph.boolParameters.Find(x => x == parameterToCreate).Value = evt.newValue;
+                        }
+                        else {
+                            graph.boolParameters.Find(x => x == parameter).Value = evt.newValue;
+                        }
+                    });
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
 
-            if (type == typeof(float)) {
-                parameter = graph.CreateFloatParameter();
-                typeName = "Float";
-                
-                valueField = new FloatField("Value:") {value = 5f};
-                ((FloatField) valueField).RegisterValueChangedCallback(evt => { Debug.Log("changed"); });
-            }
-
-            if (type == typeof(int)) {
-                parameter = graph.CreateIntParameter();
-                typeName = "Int";
-                
-                valueField = new IntegerField("Value:") {value = 5};
-                ((IntegerField) valueField).RegisterValueChangedCallback(evt => { Debug.Log("changed"); });
-            }
-
-            if (type == typeof(bool)) {
-                parameter = graph.CreateBoolParameter();
-                typeName = "Bool";
-                
-                valueField = new Toggle("Value:") {value = true};
-                ((Toggle) valueField).RegisterValueChangedCallback(evt => { Debug.Log("changed"); });
-            }
-            
             var container = new VisualElement {name = "b_field"};
             BlackboardField field = null;
 
-            field = new BlackboardField {
-                text = $"New {typeName}",
-                typeText = typeName,
-                userData = parameter,
-                icon = parameter is {Exposed: true} ? Resources.Load<Texture2D>("GraphView/Nodes/BlackboardFieldExposed") : null
-            };
-            container.Add(field);
+            if (parameter == null) {
+                field = new BlackboardField {
+                    userData = parameterToCreate,
+                    text = $"{parameterToCreate.Name}",
+                    typeText = parameterToCreate.ParameterType.ToString(),
+                    icon = parameterToCreate.Exposed ? Resources.Load<Texture2D>("GraphView/Nodes/BlackboardFieldExposed") : null
+                };
+                container.Add(field);
+            }
+            else {
+                field = new BlackboardField {
+                    userData = parameter,
+                    text = $"{parameter.Name}",
+                    typeText = parameter.ParameterType.ToString(),
+                    icon = parameter.Exposed ? Resources.Load<Texture2D>("GraphView/Nodes/BlackboardFieldExposed") : null
+                };
+                container.Add(field);
+            }
+
 
             var row = new BlackboardRow(field, valueField);
             container.Add(row);
 
             exposedPropertiesBlackboard.Add(container);
         }
-
+        
+        #region Serialize Window Layouts
 
         private void ApplySerializedWindowLayouts(GeometryChangedEvent evt) {
             UnregisterCallback<GeometryChangedEvent>(ApplySerializedWindowLayouts);
@@ -355,6 +443,8 @@ namespace ThunderNut.SceneManagement.Editor {
             inspectorBlackboard.visible = toolbar.m_UserViewSettings.isInspectorVisible;
             masterPreviewView.visible = toolbar.m_UserViewSettings.isPreviewVisible;
         }
+
+        #endregion
 
         public void Dispose() {
             if (graphView != null) {

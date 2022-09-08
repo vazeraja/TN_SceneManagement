@@ -222,7 +222,6 @@ namespace ThunderNut.SceneManagement.Editor {
         private void Refresh() {
             OnDisable();
             OnEnable();
-            // worldGraph.ClearAllParameters();
         }
 
         private bool AssetFileExists() => File.Exists(AssetDatabase.GUIDToAssetPath(selectedGuid));

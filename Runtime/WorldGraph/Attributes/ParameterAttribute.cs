@@ -5,10 +5,10 @@ using Object = System.Object;
 namespace ThunderNut.SceneManagement {
 
     public enum ParameterType {
-        StringParam,
-        FloatParam,
-        IntParam,
-        BoolParam
+        String,
+        Float,
+        Int,
+        Bool
     }
 
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]

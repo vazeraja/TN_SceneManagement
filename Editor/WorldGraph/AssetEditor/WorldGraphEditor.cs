@@ -28,7 +28,7 @@ namespace ThunderNut.SceneManagement.Editor {
             for (var i = 0; i < _sceneHandles.arraySize; i++) {
                 AddEditor(_sceneHandles.GetArrayElementAtIndex(i).objectReferenceValue as SceneHandle);
             }
-            
+
 
             // ------------------------------- Get Display Options ---------------------------------
 
@@ -119,7 +119,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 });
 
                 property.isExpanded = isExpanded;
-                
+
                 // ReSharper disable once ConvertIfStatementToSwitchStatement
                 if (isExpanded) {
                     EditorGUI.BeginDisabledGroup(!handle.Active);
@@ -251,10 +251,10 @@ namespace ThunderNut.SceneManagement.Editor {
             }
             EditorGUILayout.EndHorizontal();
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("stringParameters"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("floatParameters"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("intParameters"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("boolParameters"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("stringParameters"), true);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("floatParameters"), true);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("intParameters"), true);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("boolParameters"), true);
         }
 
         private SceneHandle AddSceneHandle(System.Type type) {
@@ -268,11 +268,11 @@ namespace ThunderNut.SceneManagement.Editor {
             SceneHandle handle = property.objectReferenceValue as SceneHandle;
 
             (target as WorldGraph)?.RemoveSubAsset(handle);
-            
+
             _editors.Remove(handle!);
         }
 
-        
+
         private void AddEditor(SceneHandle handle) {
             if (handle == null) return;
             if (_editors.ContainsKey(handle)) return;
