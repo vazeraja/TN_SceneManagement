@@ -1,3 +1,10 @@
+## [1.0.23](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.22...v1.0.23) (2022-09-08)
+
+
+### Bug Fixes
+
+* save and load parameters ([3e17547](https://github.com/vazeraja/TN_SceneManagement/commit/3e1754709a7b785825cbf4bee6d149875bad06e9))
+
 ## [1.0.22](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.21...v1.0.22) (2022-09-07)
 
 
