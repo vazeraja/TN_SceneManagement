@@ -6,10 +6,21 @@ using UnityEditor;
 using UnityEngine;
 
 namespace ThunderNut.SceneManagement {
-
+    
+    [Serializable]
+    public class EdgeData {
+        public SceneHandle BaseSceneHandle;
+        public string BaseNodeGUID;
+        public SceneHandle TargetSceneHandle;
+        public string TargetNodeGUID;
+    }
+    
     [CreateAssetMenu(fileName = "WorldGraph", menuName = "World Graph/World Graph")]
     public class WorldGraph : ScriptableObject {
+        public List<EdgeData> edges = new List<EdgeData>();
+        
         public List<SceneHandle> sceneHandles;
+        private SceneHandle activeSceneHandle;
 
         public string settingA;
         public string settingB;
@@ -17,110 +28,14 @@ namespace ThunderNut.SceneManagement {
         public string settingD;
         public string settingE;
 
-        private SceneHandle activeSceneHandle;
-
         public List<StringParameterField> stringParameters = new List<StringParameterField>();
         public List<FloatParameterField> floatParameters = new List<FloatParameterField>();
         public List<IntParameterField> intParameters = new List<IntParameterField>();
         public List<BoolParameterField> boolParameters = new List<BoolParameterField>();
-
-        // --------------------- Key: Represents parameter name | Value: Represents parameter value ---------------------
-        public SerializableDictionary<string, string> stringParametersDict = new SerializableDictionary<string, string>();
-        public SerializableDictionary<string, float> floatParametersDict = new SerializableDictionary<string, float>();
-        public SerializableDictionary<string, int> intParametersDict = new SerializableDictionary<string, int>();
-        public SerializableDictionary<string, bool> boolParametersDict = new SerializableDictionary<string, bool>();
-
+        
         public void ChangeScene() {
             activeSceneHandle.ChangeToScene();
         }
-
-        #region Parameters Dict Code (Might Discard)
-
-        public void SetString(string name, string value) {
-            stringParametersDict[name] = value;
-        }
-
-        public void SetFloat(string name, float value) {
-            floatParametersDict[name] = value;
-        }
-
-        public void SetInt(string name, int value) {
-            intParametersDict[name] = value;
-        }
-
-        public void SetBool(string name, bool value) {
-            boolParametersDict[name] = value;
-        }
-
-        public void RegisterParameters(object obj) {
-            var fieldsWithAttribute = WGReflectionHelper.GetFieldInfosWithAttribute(obj, typeof(ExposedParameterAttribute));
-
-            foreach (FieldInfo field in fieldsWithAttribute) {
-                var attribute = (ExposedParameterAttribute) field.GetCustomAttribute(typeof(ExposedParameterAttribute), true);
-                object fieldValue = field.GetValue(obj);
-
-                // Debug.Log($"Key: {attribute.Name} , Value: {fieldValue}");
-
-                switch (attribute.Type) {
-                    case ParameterType.String:
-                        RegisterParameter(attribute.Name, (string) fieldValue);
-                        break;
-                    case ParameterType.Float:
-                        RegisterParameter(attribute.Name, (float) fieldValue);
-                        break;
-                    case ParameterType.Int:
-                        RegisterParameter(attribute.Name, (int) fieldValue);
-                        break;
-                    case ParameterType.Bool:
-                        RegisterParameter(attribute.Name, (bool) fieldValue);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-        }
-
-        private void RegisterParameter(string key, string value) {
-            if (stringParametersDict.ContainsKey(key)) {
-                Debug.LogWarning($"Key {key} overriding previous value");
-                stringParametersDict[key] = value;
-            }
-            else {
-                stringParametersDict.Add(key, value);
-            }
-        }
-
-        private void RegisterParameter(string key, float value) {
-            if (floatParametersDict.ContainsKey(key)) {
-                Debug.LogWarning($"Key {key} overriding previous value");
-                floatParametersDict[key] = value;
-            }
-            else {
-                floatParametersDict.Add(key, value);
-            }
-        }
-
-        private void RegisterParameter(string key, int value) {
-            if (intParametersDict.ContainsKey(key)) {
-                Debug.LogWarning($"Key {key} overriding previous value");
-                intParametersDict[key] = value;
-            }
-            else {
-                intParametersDict.Add(key, value);
-            }
-        }
-
-        private void RegisterParameter(string key, bool value) {
-            if (boolParametersDict.ContainsKey(key)) {
-                Debug.LogWarning($"Key {key} overriding previous value");
-                boolParametersDict[key] = value;
-            }
-            else {
-                boolParametersDict.Add(key, value);
-            }
-        }
-
-        #endregion
 
         public void ClearAllParameters() {
             stringParameters.Clear();
@@ -201,10 +116,12 @@ namespace ThunderNut.SceneManagement {
 
         public void AddChild(SceneHandle parent, SceneHandle child) {
             parent.children.Add(child);
+            EditorUtility.SetDirty(this);
         }
 
         public void RemoveChild(SceneHandle parent, SceneHandle child) {
             parent.children.Remove(child);
+            EditorUtility.SetDirty(this);
         }
 
         #region Editor

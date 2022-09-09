@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using System;
 using System.IO;
+using System.Linq;
 using Unity.Profiling;
 using UnityEditor.Callbacks;
 using UnityEditor.UIElements;
@@ -40,8 +41,10 @@ namespace ThunderNut.SceneManagement.Editor {
 
                 // ReSharper disable once InvertIf
                 if (m_GraphEditorView != null) {
-                    // m_GraphEditorView.saveRequested += () => SaveAsset();
-                    m_GraphEditorView.toolbar.saveAsRequested += SaveAs;
+                    m_GraphEditorView.toolbar.saveRequested += () => { };
+                    m_GraphEditorView.toolbar.saveAsRequested += () => {
+                        worldGraph.edges.Clear();
+                    };
                     m_GraphEditorView.toolbar.showInProjectRequested += PingAsset;
                     m_GraphEditorView.toolbar.refreshRequested += Refresh;
                     // m_GraphEditorView.toolbar.isCheckedOut += IsGraphAssetCheckedOut;
@@ -186,11 +189,9 @@ namespace ThunderNut.SceneManagement.Editor {
                     newTitle += " (deleted)";
             }
 
-            // TODO: Replace with Custom WG Icon instead of SG icons
             Texture2D icon;
             {
-                string theme = EditorGUIUtility.isProSkin ? "_dark" : "_light";
-                icon = Resources.Load<Texture2D>("Icons/sg_graph_icon_gray" + theme);
+                icon = Resources.Load<Texture2D>("Sprite-0002");
             }
             titleContent = new GUIContent(newTitle, icon);
         }

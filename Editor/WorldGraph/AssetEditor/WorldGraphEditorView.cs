@@ -30,9 +30,6 @@ namespace ThunderNut.SceneManagement.Editor {
 
         private EdgeConnectorListener edgeConnectorListener;
 
-
-        private List<IWorldGraphNodeView> nodeViews => graphView.graphElements.OfType<IWorldGraphNodeView>().ToList();
-
         const string k_PreviewWindowLayoutKey = "TN.WorldGraph.PreviewWindowLayout";
 
         private WindowDockingLayout previewDockingLayout { get; set; } = new WindowDockingLayout {
@@ -120,13 +117,14 @@ namespace ThunderNut.SceneManagement.Editor {
 
                 UpdateSubWindowsVisibility();
 
+                toolbar.saveRequested += () => { SaveAsset(); };
                 graphView.graphViewChanged = GraphViewChanged;
 
                 RegisterCallback<GeometryChangedEvent>(ApplySerializedWindowLayouts);
             }
 
             m_SearchWindowProvider = ScriptableObject.CreateInstance<WorldGraphSearcherProvider>();
-            m_SearchWindowProvider.Initialize(editorWindow, graphView, (type, position) => { CreateNode(type, position); });
+            m_SearchWindowProvider.Initialize(editorWindow, graphView, CreateNode);
             graphView.nodeCreationRequest = c => {
                 if (EditorWindow.focusedWindow != this.editorWindow) return;
                 var displayPosition = (c.screenMousePosition - this.editorWindow.position.position);
@@ -138,12 +136,12 @@ namespace ThunderNut.SceneManagement.Editor {
 
             edgeConnectorListener = new EdgeConnectorListener(this.editorWindow, m_SearchWindowProvider);
 
-            AddNodes();
+            LoadGraph();
 
             Add(content);
         }
 
-        private void AddNodes() {
+        private void LoadGraph() {
             if (graph.sceneHandles.Count == 0) {
                 graph.CreateSubAsset(typeof(BaseHandle));
             }
@@ -152,13 +150,10 @@ namespace ThunderNut.SceneManagement.Editor {
                 CreateGraphNode(sceneHandle);
             }
 
-            foreach (var edge in from p in graph.sceneHandles
-                let children = WorldGraph.GetChildren(p)
-                from c in children
-                let parentView = graphView.GetNodeByGuid(p.guid) as WorldGraphNodeView
-                let childView = graphView.GetNodeByGuid(c.guid) as WorldGraphNodeView
-                where parentView?.sceneHandle is not BaseHandle || childView?.sceneHandle != null
-                select parentView?.output.ConnectTo(childView?.input)) {
+            foreach (var nodeLink in graph.edges) {
+                WorldGraphNodeView baseView = graphView.GetNodeByGuid(nodeLink.BaseNodeGUID) as WorldGraphNodeView;
+                WorldGraphNodeView targetView = graphView.GetNodeByGuid(nodeLink.TargetNodeGUID) as WorldGraphNodeView;
+                var edge = baseView?.output.ConnectTo(targetView?.input);
                 graphView.AddElement(edge);
             }
 
@@ -179,11 +174,35 @@ namespace ThunderNut.SceneManagement.Editor {
             }
         }
 
-        private SceneHandle CreateNode(Type type, Vector2 position) {
+        private bool SaveAsset() {
+            graph.edges.Clear();
+
+            var Edges = graphView.edges.ToList();
+            var connectedSockets = Edges.Where(x => x.input.node != null).ToList();
+
+            foreach (var edge in connectedSockets) {
+                var outputNode = edge.output.node as WorldGraphNodeView;
+                var inputNode = edge.input.node as WorldGraphNodeView;
+
+                graph.edges.Add(new EdgeData {
+                    BaseSceneHandle = outputNode?.sceneHandle,
+                    BaseNodeGUID = outputNode?.viewDataKey,
+                    TargetSceneHandle = inputNode?.sceneHandle,
+                    TargetNodeGUID = inputNode?.viewDataKey
+                });
+            }
+
+            EditorUtility.SetDirty(graph);
+            return true;
+        }
+
+        private void CreateNode(Type type, Vector2 position) {
             SceneHandle node = graph.CreateSubAsset(type);
             node.position = position;
-            CreateGraphNode(node);
-            return node;
+
+            var graphNode = new WorldGraphNodeView(graphView, node, edgeConnectorListener);
+            graphNode.OnSelected();
+            graphView.AddElement(graphNode);
         }
 
         private void CreateGraphNode(SceneHandle node) {
@@ -197,11 +216,6 @@ namespace ThunderNut.SceneManagement.Editor {
                 switch (elem) {
                     case IWorldGraphNodeView nodeView:
                         graph.RemoveSubAsset(nodeView.sceneHandle);
-                        break;
-                    case WorldGraphEdge edge:
-                        var parentView = edge.output.node as IWorldGraphNodeView;
-                        var childView = edge.input.node as IWorldGraphNodeView;
-                        graph.RemoveChild(parentView?.sceneHandle, childView?.sceneHandle);
                         break;
                     case BlackboardField blackboardField:
                         ExposedParameter fieldData = blackboardField.userData as ExposedParameter;
@@ -223,17 +237,12 @@ namespace ThunderNut.SceneManagement.Editor {
                         var ancestor = WGEditorGUI.GetFirstAncestorWhere(blackboardField, i => i.name == "b_field");
                         exposedPropertiesBlackboard.Remove(ancestor);
                         break;
-                    case Group group:
-                        break;
                 }
             });
+
             graphViewChange.edgesToCreate?.ForEach(edge => {
-                var parentView = edge.output.node as IWorldGraphNodeView;
-                var childView = edge.input.node as IWorldGraphNodeView;
-
-                graph.AddChild(parentView?.sceneHandle, childView?.sceneHandle);
+                
             });
-
             return graphViewChange;
         }
 
@@ -256,9 +265,9 @@ namespace ThunderNut.SceneManagement.Editor {
             inspectorBlackboard = new Blackboard(graphView) {title = "Inspector", subTitle = "WorldGraph"};
             {
                 inspectorBlackboard.Add(new IMGUIContainer(() => {
-                    using var scrollViewScope = new EditorGUILayout.ScrollViewScope(scrollPos);
-                    scrollPos = scrollViewScope.scrollPosition;
-                    _GraphEditor!.OnInspectorGUI();
+                    // using var scrollViewScope = new EditorGUILayout.ScrollViewScope(scrollPos);
+                    // scrollPos = scrollViewScope.scrollPosition;
+                    // _GraphEditor!.OnInspectorGUI();
                 }));
             }
             graphView.Add(inspectorBlackboard);
@@ -387,7 +396,7 @@ namespace ThunderNut.SceneManagement.Editor {
             }
 
             var container = new VisualElement {name = "b_field"};
-            BlackboardField field = null;
+            BlackboardField field;
 
             if (parameter == null) {
                 field = new BlackboardField {
@@ -414,7 +423,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
             exposedPropertiesBlackboard.Add(container);
         }
-        
+
         #region Serialize Window Layouts
 
         private void ApplySerializedWindowLayouts(GeometryChangedEvent evt) {
@@ -449,7 +458,7 @@ namespace ThunderNut.SceneManagement.Editor {
         public void Dispose() {
             if (graphView != null) {
                 toolbar.Dispose();
-                nodeViews.ForEach(node => node.Dispose());
+                graphView.graphElements.OfType<IWorldGraphNodeView>().ToList().ForEach(node => node.Dispose());
                 graphView.nodeCreationRequest = null;
                 graphView = null;
             }

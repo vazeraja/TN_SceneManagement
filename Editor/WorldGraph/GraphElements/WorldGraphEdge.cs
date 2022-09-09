@@ -7,5 +7,11 @@ namespace ThunderNut.SceneManagement.Editor {
         public WorldGraphEdge() {
             styleSheets.Add(Resources.Load<StyleSheet>("Styles/WGEdge"));
         }
+
+        public override void OnSelected() {
+            base.OnSelected();
+            // Debug.Log((output.node as WorldGraphNodeView)?.sceneHandle.HandleName);
+            // Debug.Log((input.node as WorldGraphNodeView)?.sceneHandle.HandleName);
+        }
     }
 }

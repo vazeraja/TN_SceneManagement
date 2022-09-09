@@ -50,15 +50,25 @@ namespace ThunderNut.SceneManagement.Editor {
                         m_EdgesToDelete.Add(edgeToDelete);
                 }
 
+            // Delete duplicate edges (two edges stacked on top of each other)
+            foreach (var edgeToDelete in from existingEdge in graphView.edges
+                let edgeToDelete = existingEdge
+                where existingEdge.output.node == edge.output.node && existingEdge.input.node == edge.input.node
+                select edgeToDelete) {
+                m_EdgesToDelete.Add(edgeToDelete);
+                Debug.Log("Duplicate Port being deleted ...");
+            }
+            
             if (m_EdgesToDelete.Count > 0)
                 graphView.DeleteElements(m_EdgesToDelete);
-
+            
             var edgesToCreate = m_EdgesToCreate;
+            
             if (graphView.graphViewChanged != null) {
                 edgesToCreate = graphView.graphViewChanged(m_GraphViewChange).edgesToCreate;
             }
 
-            foreach (var e in edgesToCreate.Cast<Edge>()) {
+            foreach (var e in edgesToCreate) {
                 graphView.AddElement(e);
                 edge.input.Connect(e);
                 edge.output.Connect(e);

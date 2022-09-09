@@ -103,6 +103,18 @@
     border-bottom-width: 0;
 }
 
+#button-container {
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-direction: row;
+}
+
+#top {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
 :hover > #selection-border {
     border-left-width: 1px;
     border-right-width: 1px;
@@ -224,11 +236,38 @@
     padding-bottom: 3px;
 }
 
-.node {
-    min-width: 150px;
-    margin-left: 0;
-    margin-right: 0;
-    margin-top: 0;
-    margin-bottom: 0;
-    min-height: auto;
+.base #left-button {
+    border-left-color: rgb(255, 255, 255);
+    border-right-color: rgb(255, 255, 255);
+    border-top-color: rgb(255, 255, 255);
+    border-bottom-color: rgb(255, 255, 255);
+    background-color: rgb(32, 32, 32);
+    -unity-background-image-tint-color: rgb(210, 210, 210);
+}
+
+.defaultHandle #left-button {
+    border-left-color: rgb(31, 112, 207);
+    border-right-color: rgb(31, 112, 207);
+    border-top-color: rgb(31, 112, 207);
+    border-bottom-color: rgb(31, 112, 207);
+    background-color: rgb(32, 32, 32);
+    -unity-background-image-tint-color: rgb(210, 210, 210);
+}
+
+.cutsceneHandle #left-button {
+    border-left-color: rgb(207, 73, 72);
+    border-right-color: rgb(207, 73, 72);
+    border-top-color: rgb(207, 73, 72);
+    border-bottom-color: rgb(207, 73, 72);
+    background-color: rgb(32, 32, 32);
+    -unity-background-image-tint-color: rgb(210, 210, 210);
+}
+
+.battleHandle #left-button {
+    border-left-color: rgb(239, 178, 79);
+    border-right-color: rgb(239, 178, 79);
+    border-top-color: rgb(239, 178, 79);
+    border-bottom-color: rgb(239, 178, 79);
+    background-color: rgb(32, 32, 32);
+    -unity-background-image-tint-color: rgb(210, 210, 210);
 }

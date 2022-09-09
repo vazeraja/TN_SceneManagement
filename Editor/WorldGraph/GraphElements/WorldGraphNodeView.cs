@@ -1,4 +1,7 @@
-﻿using UnityEditor;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -12,17 +15,18 @@ namespace ThunderNut.SceneManagement.Editor {
 
         public WorldGraphPort input;
         public WorldGraphPort output;
+        public Color portColor;
 
         private readonly IEdgeConnectorListener connectorListener;
-        private WorldGraphGraphView graphView;
+        public WorldGraphGraphView graphView;
+
+        private Button addParameterButton;
 
         public WorldGraphNodeView(WorldGraphGraphView graphView, SceneHandle sceneHandle, IEdgeConnectorListener connectorListener) :
             base(AssetDatabase.GetAssetPath(Resources.Load<VisualTreeAsset>("UXML/WGGraphNode"))) {
-            // UseDefaultStyling();
-
+            this.connectorListener = connectorListener;
             this.sceneHandle = sceneHandle;
             this.graphView = graphView;
-            this.connectorListener = connectorListener;
 
             userData = sceneHandle;
             name = sceneHandle.GetType().Name;
@@ -33,78 +37,95 @@ namespace ThunderNut.SceneManagement.Editor {
             var serializedHandle = new SerializedObject(sceneHandle);
             sceneHandle.HandleName = sceneHandle.GetType().Name;
 
-            CreatePorts();
-            AddPortsToContainer();
+            addParameterButton = this.Q<Button>("left-button");
+            addParameterButton.style.backgroundImage = Resources.Load<Texture2D>("Sprite-0001");
 
             Label description = this.Q<Label>("title-label");
-            {
-                description.Bind(serializedHandle);
-                description.bindingPath = "HandleName";
-                // var textField = new TextField();
-                // extensionContainer.Add(textField);
-                // RefreshExpandedState();
-            }
+            description.Bind(serializedHandle);
+            description.bindingPath = "HandleName";
+            
+            CreateDefaultPorts(sceneHandle.ports);
+            LoadParameterPorts(sceneHandle.ports);
         }
 
-        private void CreatePorts() {
+        private void CreateDefaultPorts(IEnumerable<PortData> portData) {
+            PortData outputPortData = null;
+            PortData inputPortData = null;
+
+            var portDatas = portData.ToList();
+            var loadedOutputPort = portDatas.ToList().Find(x => x.PortType == PortType.Default && x.PortDirection == "Output");
+            var loadedInputPort = portDatas.ToList().Find(x => x.PortType == PortType.Default && x.PortDirection == "Input");
+
+            addParameterButton.clicked += () => { AddParameterPort(portColor); };
+
             switch (sceneHandle) {
                 case BaseHandle _:
                     AddToClassList("base");
+                    portColor = Color.white;
+                    
+                    if (loadedOutputPort == null) outputPortData = sceneHandle.CreatePort(isOutput: true, false, portColor);
+                    output = new WorldGraphPort(this, loadedOutputPort ?? outputPortData, connectorListener);
+                    outputContainer.Add(output);
 
-                    output = new WorldGraphPort(Direction.Output, Port.Capacity.Multi, typeof(bool), connectorListener) {
-                        portColor = Color.white
-                    };
-
-                    capabilities &= ~Capabilities.Movable;
                     capabilities &= ~Capabilities.Deletable;
+                    addParameterButton.visible = false;
 
                     break;
                 case DefaultHandle _:
                     AddToClassList("defaultHandle");
+                    portColor = new Color(0.12f, 0.44f, 0.81f);
+                    
+                    if (loadedOutputPort == null) outputPortData = sceneHandle.CreatePort(isOutput: true, false, portColor);
+                    output = new WorldGraphPort(this, loadedOutputPort ?? outputPortData, connectorListener);
+                    outputContainer.Add(output);
 
-                    input = new WorldGraphPort(Direction.Input, Port.Capacity.Multi, typeof(bool), connectorListener) {
-                        portColor = new Color(0.12f, 0.44f, 0.81f)
-                    };
-                    output = new WorldGraphPort(Direction.Output, Port.Capacity.Multi, typeof(bool), connectorListener) {
-                        portColor = new Color(0.12f, 0.44f, 0.81f)
-                    };
+                    if (loadedInputPort == null) inputPortData = sceneHandle.CreatePort(isOutput: false, false, portColor);
+                    input = new WorldGraphPort(this, loadedInputPort ?? inputPortData, connectorListener);
+                    inputContainer.Add(input);
 
                     break;
                 case BattleHandle _:
                     AddToClassList("battleHandle");
+                    portColor = new Color(0.94f, 0.7f, 0.31f);
 
-                    input = new WorldGraphPort(Direction.Input, Port.Capacity.Multi,typeof(bool), connectorListener){
-                        portColor = new Color(0.94f, 0.7f, 0.31f)
-                    };
-                    output = new WorldGraphPort(Direction.Output, Port.Capacity.Multi,typeof(bool), connectorListener){
-                        portColor = new Color(0.94f, 0.7f, 0.31f)
-                    };
+                    if (loadedOutputPort == null) outputPortData = sceneHandle.CreatePort(isOutput: true, false, portColor);
+                    output = new WorldGraphPort(this, loadedOutputPort ?? outputPortData, connectorListener);
+                    outputContainer.Add(output);
+
+                    if (loadedInputPort == null) inputPortData = sceneHandle.CreatePort(isOutput: false, false, portColor);
+                    input = new WorldGraphPort(this, loadedInputPort ?? inputPortData, connectorListener);
+                    inputContainer.Add(input);
 
                     break;
                 case CutsceneHandle _:
                     AddToClassList("cutsceneHandle");
+                    portColor = new Color(0.81f, 0.29f, 0.28f);
 
-                    input = new WorldGraphPort(Direction.Input, Port.Capacity.Multi, typeof(bool), connectorListener){
-                        portColor = new Color(0.81f, 0.29f, 0.28f)
-                    };
-                    output = new WorldGraphPort(Direction.Output, Port.Capacity.Multi, typeof(bool), connectorListener){
-                        portColor = new Color(0.81f, 0.29f, 0.28f)
-                    };
+                    if (loadedOutputPort == null) outputPortData = sceneHandle.CreatePort(isOutput: true, false, portColor);
+                    output = new WorldGraphPort(this, loadedOutputPort ?? outputPortData, connectorListener);
+                    outputContainer.Add(output);
+
+                    if (loadedInputPort == null) inputPortData = sceneHandle.CreatePort(isOutput: false, false, portColor);
+                    input = new WorldGraphPort(this, loadedInputPort ?? inputPortData, connectorListener);
+                    inputContainer.Add(input);
 
                     break;
             }
         }
 
-        private void AddPortsToContainer() {
-            if (input != null) {
-                input.portName = "";
-                inputContainer.Add(input);
-            }
+        private void AddParameterPort(Color color) {
+            var portData = sceneHandle.CreatePort(false, true, color);
+            var parameterPort = new WorldGraphPort(this, portData, connectorListener);
 
-            // ReSharper disable once InvertIf
-            if (output != null) {
-                output.portName = "";
-                outputContainer.Add(output);
+            inputContainer.Add(parameterPort);
+        }
+
+        private void LoadParameterPorts(IEnumerable<PortData> portData) {
+            foreach (var data in portData) {
+                if (data.PortType == PortType.Parameter) {
+                    var parameterPort = new WorldGraphPort(this, data, connectorListener);
+                    inputContainer.Add(parameterPort);
+                }
             }
         }
 
@@ -117,7 +138,8 @@ namespace ThunderNut.SceneManagement.Editor {
 
 
         public void Dispose() {
-            Debug.Log($"Disposing: {name}");
+            // Debug.Log($"Disposing: {name}");
+            addParameterButton = null;
         }
     }
 

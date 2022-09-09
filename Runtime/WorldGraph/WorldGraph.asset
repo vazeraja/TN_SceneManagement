@@ -1,5 +1,26 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-474839152628605055
+MonoBehaviour:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad03071f12ab4005b61556313031bdaf, type: 3}
+  m_Name: DefaultHandle
+  m_EditorClassIdentifier: 
+  guid: 65d48a272b5b2af4299ce414b402499c
+  position: {x: 280, y: -90}
+  ports: []
+  Active: 1
+  HandleName: DefaultHandle
+  scene:
+    sceneAsset: {fileID: 0}
+    ScenePath: 
+  children: []
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12,29 +33,63 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b85ad94b6b588c4a9a1e4c57ebe2c01, type: 3}
   m_Name: WorldGraph
   m_EditorClassIdentifier: 
+  edges:
+  - BaseSceneHandle: {fileID: 3605775009967667421}
+    BaseNodeGUID: fafed189fd50e384ea9d0aef81bfbb95
+    TargetSceneHandle: {fileID: -474839152628605055}
+    TargetNodeGUID: 65d48a272b5b2af4299ce414b402499c
+  - BaseSceneHandle: {fileID: 3605775009967667421}
+    BaseNodeGUID: fafed189fd50e384ea9d0aef81bfbb95
+    TargetSceneHandle: {fileID: 6214747587689969737}
+    TargetNodeGUID: 6ed99a21573790544a15b0de49ebc86d
   sceneHandles:
   - {fileID: 3605775009967667421}
+  - {fileID: -474839152628605055}
+  - {fileID: 6214747587689969737}
+  - {fileID: 219359900687776611}
   settingA: 
   settingB: 
   settingC: 
   settingD: 
   settingE: 
-  exposedParameters: []
-  stringParametersDict:
-    m_keys: []
-    m_values: []
-  floatParametersDict:
-    m_keys: []
-    m_values: []
-  intParametersDict:
-    m_keys: []
-    m_values: 
-  boolParametersDict:
-    m_keys: []
-    m_values: 
+  stringParameters:
+  - m_Name: StringLabel
+    m_Reference: StringLabel
+    m_Exposed: 1
+    m_ParameterType: 0
+    m_Value: Default_Value
+  floatParameters:
+  - m_Name: FloatLabel
+    m_Reference: FloatLabel
+    m_Exposed: 1
+    m_ParameterType: 1
+    m_Value: 69
+  intParameters: []
+  boolParameters: []
+--- !u!114 &219359900687776611
+MonoBehaviour:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03a72a9984864b28a97b386a9620a419, type: 3}
+  m_Name: CutsceneHandle
+  m_EditorClassIdentifier: 
+  guid: d4f01feba423ac44e97ee6c2b45270d1
+  position: {x: -18, y: 160.99998}
+  ports: []
+  Active: 1
+  HandleName: CutsceneHandle
+  scene:
+    sceneAsset: {fileID: 0}
+    ScenePath: 
+  children: []
 --- !u!114 &3605775009967667421
 MonoBehaviour:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -46,8 +101,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   guid: fafed189fd50e384ea9d0aef81bfbb95
   position: {x: 0, y: 0}
+  ports: []
   Active: 1
-  HandleName: 
+  HandleName: BaseHandle
+  scene:
+    sceneAsset: {fileID: 0}
+    ScenePath: 
+  children: []
+--- !u!114 &6214747587689969737
+MonoBehaviour:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db8d3b437e4741e2996521a15c9a76ef, type: 3}
+  m_Name: BattleHandle
+  m_EditorClassIdentifier: 
+  guid: 6ed99a21573790544a15b0de49ebc86d
+  position: {x: 279, y: 67}
+  ports:
+  - IsOutputPort: 0
+    IsParameterPort: 1
+    PortColor: {r: 0.94, g: 0.7, b: 0.31, a: 1}
+  Active: 1
+  HandleName: BattleHandle
   scene:
     sceneAsset: {fileID: 0}
     ScenePath: 
