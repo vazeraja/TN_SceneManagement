@@ -117,7 +117,6 @@ namespace ThunderNut.SceneManagement.Editor {
 
                 UpdateSubWindowsVisibility();
 
-                toolbar.saveRequested += () => { SaveAsset(); };
                 graphView.graphViewChanged = GraphViewChanged;
 
                 RegisterCallback<GeometryChangedEvent>(ApplySerializedWindowLayouts);
@@ -159,14 +158,7 @@ namespace ThunderNut.SceneManagement.Editor {
                     graphView.AddElement(edge);
                 }
             }
-
-            // foreach (var nodeLink in graph.edges) {
-            //     WorldGraphNodeView baseView = graphView.GetNodeByGuid(nodeLink.BaseNodeGUID) as WorldGraphNodeView;
-            //     WorldGraphNodeView targetView = graphView.GetNodeByGuid(nodeLink.TargetNodeGUID) as WorldGraphNodeView;
-            //     var edge = baseView?.output.ConnectTo(targetView?.input);
-            //     graphView.AddElement(edge);
-            // }
-
+            
             foreach (var exposedParam in graph.stringParameters) {
                 AddProperty(ParameterType.String, exposedParam);
             }
@@ -182,28 +174,6 @@ namespace ThunderNut.SceneManagement.Editor {
             foreach (var exposedParam in graph.boolParameters) {
                 AddProperty(ParameterType.Bool, exposedParam);
             }
-        }
-
-        private bool SaveAsset() {
-            graph.edges.Clear();
-
-            var Edges = graphView.edges.ToList();
-            var connectedSockets = Edges.Where(x => x.input.node != null).ToList();
-
-            foreach (var edge in connectedSockets) {
-                var outputNode = edge.output.node as WorldGraphNodeView;
-                var inputNode = edge.input.node as WorldGraphNodeView;
-
-                graph.edges.Add(new EdgeData {
-                    BaseSceneHandle = outputNode?.sceneHandle,
-                    BaseNodeGUID = outputNode?.viewDataKey,
-                    TargetSceneHandle = inputNode?.sceneHandle,
-                    TargetNodeGUID = inputNode?.viewDataKey
-                });
-            }
-
-            EditorUtility.SetDirty(graph);
-            return true;
         }
 
         private void CreateNode(Type type, Vector2 position) {

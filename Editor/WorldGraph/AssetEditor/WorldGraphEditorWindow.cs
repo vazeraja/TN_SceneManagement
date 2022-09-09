@@ -42,9 +42,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 // ReSharper disable once InvertIf
                 if (m_GraphEditorView != null) {
                     m_GraphEditorView.toolbar.saveRequested += () => { };
-                    m_GraphEditorView.toolbar.saveAsRequested += () => {
-                        worldGraph.edges.Clear();
-                    };
+                    m_GraphEditorView.toolbar.saveAsRequested += () => { };
                     m_GraphEditorView.toolbar.showInProjectRequested += PingAsset;
                     m_GraphEditorView.toolbar.refreshRequested += Refresh;
                     // m_GraphEditorView.toolbar.isCheckedOut += IsGraphAssetCheckedOut;

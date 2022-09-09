@@ -56,7 +56,7 @@ namespace ThunderNut.SceneManagement.Editor {
             var loadedOutputPort = portDatas.ToList().Find(x => x.PortType == PortType.Default && x.PortDirection == "Output");
             var loadedInputPort = portDatas.ToList().Find(x => x.PortType == PortType.Default && x.PortDirection == "Input");
 
-            addParameterButton.clicked += () => { AddParameterPort(portColor); };
+            addParameterButton.clicked += AddParameterPort;
 
             switch (sceneHandle) {
                 case BaseHandle _:
@@ -113,8 +113,8 @@ namespace ThunderNut.SceneManagement.Editor {
             }
         }
 
-        private void AddParameterPort(Color color) {
-            var portData = sceneHandle.CreatePort(false, true, color);
+        private void AddParameterPort() {
+            var portData = sceneHandle.CreatePort(false, true, portColor);
             var parameterPort = new WorldGraphPort(this, portData, connectorListener);
 
             inputContainer.Add(parameterPort);

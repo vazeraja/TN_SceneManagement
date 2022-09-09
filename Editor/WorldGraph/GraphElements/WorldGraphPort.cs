@@ -11,12 +11,12 @@ namespace ThunderNut.SceneManagement.Editor {
         public readonly WorldGraphNodeView Node;
 
         public readonly Button deleteParameterButton;
-
+        
         public WorldGraphPort(WorldGraphNodeView node, PortData portData, IEdgeConnectorListener connectorListener)
             : base(Orientation.Horizontal, portData.IsOutputPort ? Direction.Output : Direction.Input, Capacity.Multi, typeof(bool)) {
             m_EdgeConnector = new EdgeConnector<WorldGraphEdge>(connectorListener);
             this.AddManipulator(m_EdgeConnector);
-
+            
             ConnectorListener = connectorListener;
             PortData = portData;
             Node = node;

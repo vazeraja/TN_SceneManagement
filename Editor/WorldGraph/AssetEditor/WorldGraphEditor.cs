@@ -58,14 +58,12 @@ namespace ThunderNut.SceneManagement.Editor {
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("settingA"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("settingB"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("settingC"));
-
-
+                
                 EditorGUILayout.Space(10);
                 EditorGUILayout.LabelField("Other", EditorStyles.boldLabel);
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("settingD"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("settingE"));
-
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("edges"));
+                
                 using (new EditorGUI.DisabledGroupScope(true)) {
                     EditorGUILayout.Space(10);
                     EditorGUILayout.LabelField("Graph Data", EditorStyles.boldLabel);

@@ -17,8 +17,6 @@ namespace ThunderNut.SceneManagement {
     
     [CreateAssetMenu(fileName = "WorldGraph", menuName = "World Graph/World Graph")]
     public class WorldGraph : ScriptableObject {
-        public List<EdgeData> edges = new List<EdgeData>();
-        
         public List<SceneHandle> sceneHandles;
         private SceneHandle activeSceneHandle;
 
