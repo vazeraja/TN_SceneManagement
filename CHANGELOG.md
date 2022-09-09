@@ -1,3 +1,10 @@
+## [1.0.24](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.23...v1.0.24) (2022-09-08)
+
+
+### Bug Fixes
+
+* register parameters through code ([109d66a](https://github.com/vazeraja/TN_SceneManagement/commit/109d66aac91848249fa73a870d1cf060a40a5a4a))
+
 ## [1.0.23](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.22...v1.0.23) (2022-09-08)
 
 
