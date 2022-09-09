@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace ThunderNut.SceneManagement.Editor {
@@ -27,7 +28,8 @@ namespace ThunderNut.SceneManagement.Editor {
             if (portData.PortType == PortType.Parameter) {
                 portName = "Parameter";
 
-                deleteParameterButton = new Button(() => { RemoveParameterPort(this); }) {text = "X"};
+                deleteParameterButton = new Button(() => { RemoveParameterPort(this); });
+                deleteParameterButton.style.backgroundImage = Resources.Load<Texture2D>("Sprite-0003");
                 deleteParameterButton.style.width = 15;
                 deleteParameterButton.style.height = 15;
                 deleteParameterButton.style.marginLeft = 3;

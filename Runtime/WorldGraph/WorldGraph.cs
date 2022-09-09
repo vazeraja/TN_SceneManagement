@@ -30,6 +30,8 @@ namespace ThunderNut.SceneManagement {
         public List<FloatParameterField> floatParameters = new List<FloatParameterField>();
         public List<IntParameterField> intParameters = new List<IntParameterField>();
         public List<BoolParameterField> boolParameters = new List<BoolParameterField>();
+
+        public bool IsEmpty => sceneHandles.Count == 0;
         
         public void ChangeScene() {
             activeSceneHandle.ChangeToScene();
@@ -106,10 +108,12 @@ namespace ThunderNut.SceneManagement {
 
         private void AddSceneHandle(SceneHandle handle) {
             sceneHandles.Add(handle);
+            EditorUtility.SetDirty(this);
         }
 
         private void RemoveSceneHandle(SceneHandle handle) {
             sceneHandles.Remove(handle);
+            EditorUtility.SetDirty(this);
         }
 
         public void AddChild(SceneHandle parent, SceneHandle child) {
@@ -143,7 +147,11 @@ namespace ThunderNut.SceneManagement {
         }
 
         public static IEnumerable<SceneHandle> GetChildren(SceneHandle parent) {
-            return parent.children.Count != 0 ? parent.children : Enumerable.Empty<SceneHandle>();
+            if (parent.children.Any()) {
+                return parent.children;
+            }
+            
+            return Enumerable.Empty<SceneHandle>();
         }
 
         #endif

@@ -11,6 +11,7 @@ namespace ThunderNut.SceneManagement {
 
     [Serializable]
     public class PortData {
+        public string OwnerNodeGUID;
         public bool IsOutputPort;
         public string PortDirection;
         public PortType PortType;
@@ -36,8 +37,9 @@ namespace ThunderNut.SceneManagement {
 
         public abstract void ChangeToScene();
 
-        public PortData CreatePort(bool isOutput, bool isParameter, Color portColor) {
+        public PortData CreatePort(string ownerGUID, bool isOutput, bool isParameter, Color portColor) {
             var portData = new PortData {
+                OwnerNodeGUID = ownerGUID,
                 IsOutputPort = isOutput,
                 PortDirection = isOutput ? "Output" : "Input",
                 PortType = isParameter ? PortType.Parameter : PortType.Default,

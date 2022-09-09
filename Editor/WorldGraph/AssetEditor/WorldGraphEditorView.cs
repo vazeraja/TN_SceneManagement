@@ -141,7 +141,7 @@ namespace ThunderNut.SceneManagement.Editor {
         }
 
         private void LoadGraph() {
-            if (graph.sceneHandles.Count == 0) {
+            if (graph.IsEmpty) {
                 graph.CreateSubAsset(typeof(BaseHandle));
             }
 
@@ -149,16 +149,15 @@ namespace ThunderNut.SceneManagement.Editor {
                 CreateGraphNode(sceneHandle);
             }
 
-            foreach (var parent in graph.sceneHandles) {
-                var children = WorldGraph.GetChildren(parent);
-                foreach (var child in children) {
-                    WorldGraphNodeView baseView = graphView.GetNodeByGuid(parent.guid) as WorldGraphNodeView;
-                    WorldGraphNodeView targetView = graphView.GetNodeByGuid(child.guid) as WorldGraphNodeView;
-                    var edge = baseView?.output.ConnectTo(targetView?.input);
-                    graphView.AddElement(edge);
-                }
+            foreach (var edge in from parent in graph.sceneHandles
+                let children = WorldGraph.GetChildren(parent)
+                from child in children
+                let baseView = graphView.GetNodeByGuid(parent.guid) as WorldGraphNodeView
+                let targetView = graphView.GetNodeByGuid(child.guid) as WorldGraphNodeView
+                select baseView?.output.ConnectTo(targetView?.input)) {
+                graphView.AddElement(edge);
             }
-            
+
             foreach (var exposedParam in graph.stringParameters) {
                 AddProperty(ParameterType.String, exposedParam);
             }
@@ -180,9 +179,7 @@ namespace ThunderNut.SceneManagement.Editor {
             SceneHandle node = graph.CreateSubAsset(type);
             node.position = position;
 
-            var graphNode = new WorldGraphNodeView(graphView, node, edgeConnectorListener);
-            graphNode.OnSelected();
-            graphView.AddElement(graphNode);
+            CreateGraphNode(node);
         }
 
         private void CreateGraphNode(SceneHandle node) {
@@ -197,7 +194,7 @@ namespace ThunderNut.SceneManagement.Editor {
                     case WorldGraphNodeView nodeView:
                         graph.RemoveSubAsset(nodeView.sceneHandle);
                         break;
-                    case WorldGraphEdge edgeView:
+                    case Edge edgeView:
                         var output = edgeView.output.node as WorldGraphNodeView;
                         var input = edgeView.input.node as WorldGraphNodeView;
                         graph.RemoveChild(output?.sceneHandle, input?.sceneHandle);
