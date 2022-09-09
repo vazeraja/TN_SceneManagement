@@ -1,3 +1,10 @@
+## [1.0.26](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.25...v1.0.26) (2022-09-09)
+
+
+### Bug Fixes
+
+* styling ([a0d132b](https://github.com/vazeraja/TN_SceneManagement/commit/a0d132b3a01331a0808edc94d256ffda4f504aff))
+
 ## [1.0.25](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.24...v1.0.25) (2022-09-09)
 
 
