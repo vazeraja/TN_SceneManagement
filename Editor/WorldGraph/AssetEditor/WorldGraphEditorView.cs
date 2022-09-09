@@ -150,12 +150,22 @@ namespace ThunderNut.SceneManagement.Editor {
                 CreateGraphNode(sceneHandle);
             }
 
-            foreach (var nodeLink in graph.edges) {
-                WorldGraphNodeView baseView = graphView.GetNodeByGuid(nodeLink.BaseNodeGUID) as WorldGraphNodeView;
-                WorldGraphNodeView targetView = graphView.GetNodeByGuid(nodeLink.TargetNodeGUID) as WorldGraphNodeView;
-                var edge = baseView?.output.ConnectTo(targetView?.input);
-                graphView.AddElement(edge);
+            foreach (var parent in graph.sceneHandles) {
+                var children = WorldGraph.GetChildren(parent);
+                foreach (var child in children) {
+                    WorldGraphNodeView baseView = graphView.GetNodeByGuid(parent.guid) as WorldGraphNodeView;
+                    WorldGraphNodeView targetView = graphView.GetNodeByGuid(child.guid) as WorldGraphNodeView;
+                    var edge = baseView?.output.ConnectTo(targetView?.input);
+                    graphView.AddElement(edge);
+                }
             }
+
+            // foreach (var nodeLink in graph.edges) {
+            //     WorldGraphNodeView baseView = graphView.GetNodeByGuid(nodeLink.BaseNodeGUID) as WorldGraphNodeView;
+            //     WorldGraphNodeView targetView = graphView.GetNodeByGuid(nodeLink.TargetNodeGUID) as WorldGraphNodeView;
+            //     var edge = baseView?.output.ConnectTo(targetView?.input);
+            //     graphView.AddElement(edge);
+            // }
 
             foreach (var exposedParam in graph.stringParameters) {
                 AddProperty(ParameterType.String, exposedParam);
@@ -214,8 +224,13 @@ namespace ThunderNut.SceneManagement.Editor {
         private GraphViewChange GraphViewChanged(GraphViewChange graphViewChange) {
             graphViewChange.elementsToRemove?.ForEach(elem => {
                 switch (elem) {
-                    case IWorldGraphNodeView nodeView:
+                    case WorldGraphNodeView nodeView:
                         graph.RemoveSubAsset(nodeView.sceneHandle);
+                        break;
+                    case WorldGraphEdge edgeView:
+                        var output = edgeView.output.node as WorldGraphNodeView;
+                        var input = edgeView.input.node as WorldGraphNodeView;
+                        graph.RemoveChild(output?.sceneHandle, input?.sceneHandle);
                         break;
                     case BlackboardField blackboardField:
                         ExposedParameter fieldData = blackboardField.userData as ExposedParameter;
@@ -240,8 +255,10 @@ namespace ThunderNut.SceneManagement.Editor {
                 }
             });
 
-            graphViewChange.edgesToCreate?.ForEach(edge => {
-                
+            graphViewChange.edgesToCreate?.ForEach(edgeView => {
+                var output = edgeView.output.node as WorldGraphNodeView;
+                var input = edgeView.input.node as WorldGraphNodeView;
+                graph.AddChild(output?.sceneHandle, input?.sceneHandle);
             });
             return graphViewChange;
         }
