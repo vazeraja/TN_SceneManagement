@@ -1,3 +1,11 @@
+## [1.0.25](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.24...v1.0.25) (2022-09-09)
+
+
+### Bug Fixes
+
+* autosave edges ([d54f0a2](https://github.com/vazeraja/TN_SceneManagement/commit/d54f0a2f2503125fcbadcccef2a62521ceafb34a))
+* save and load parameter specific ports ([b746fc2](https://github.com/vazeraja/TN_SceneManagement/commit/b746fc24558f1e76a8f9a0b5d2a38f1d495fb9c3))
+
 ## [1.0.24](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.23...v1.0.24) (2022-09-08)
 
 
