@@ -1,36 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-7992984004803731891
-MonoBehaviour:
-  m_ObjectHideFlags: 2
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: db8d3b437e4741e2996521a15c9a76ef, type: 3}
-  m_Name: BattleHandle
-  m_EditorClassIdentifier: 
-  guid: 5c61a388473978941ba8d941b11cda32
-  position: {x: 260.99994, y: 26.999992}
-  Active: 1
-  HandleName: BattleHandle
-  scene:
-    sceneAsset: {fileID: 0}
-    ScenePath: 
-  children: []
-  ports:
-  - OwnerNodeGUID: 5c61a388473978941ba8d941b11cda32
-    IsOutputPort: 1
-    PortDirection: Output
-    PortType: 0
-    PortColor: {r: 0.94, g: 0.7, b: 0.31, a: 1}
-  - OwnerNodeGUID: 5c61a388473978941ba8d941b11cda32
-    IsOutputPort: 0
-    PortDirection: Input
-    PortType: 0
-    PortColor: {r: 0.94, g: 0.7, b: 0.31, a: 1}
 --- !u!114 &-94233046595546844
 MonoBehaviour:
   m_ObjectHideFlags: 2
@@ -71,8 +40,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sceneHandles:
   - {fileID: -94233046595546844}
-  - {fileID: 580822018275226188}
-  - {fileID: -7992984004803731891}
   - {fileID: 922939305413851944}
   settingA: 
   settingB: 
@@ -93,40 +60,9 @@ MonoBehaviour:
     m_Exposed: 1
     m_ParameterType: 3
     m_Value: 1
---- !u!114 &580822018275226188
-MonoBehaviour:
-  m_ObjectHideFlags: 2
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 03a72a9984864b28a97b386a9620a419, type: 3}
-  m_Name: CutsceneHandle
-  m_EditorClassIdentifier: 
-  guid: da9a22e72dad3cf4ea373bb708ee7779
-  position: {x: 253.17389, y: -127.565216}
-  Active: 1
-  HandleName: CutsceneHandle
-  scene:
-    sceneAsset: {fileID: 0}
-    ScenePath: 
-  children: []
-  ports:
-  - OwnerNodeGUID: da9a22e72dad3cf4ea373bb708ee7779
-    IsOutputPort: 1
-    PortDirection: Output
-    PortType: 0
-    PortColor: {r: 0.81, g: 0.29, b: 0.28, a: 1}
-  - OwnerNodeGUID: da9a22e72dad3cf4ea373bb708ee7779
-    IsOutputPort: 0
-    PortDirection: Input
-    PortType: 0
-    PortColor: {r: 0.81, g: 0.29, b: 0.28, a: 1}
 --- !u!114 &922939305413851944
 MonoBehaviour:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -137,11 +73,21 @@ MonoBehaviour:
   m_Name: DefaultHandle
   m_EditorClassIdentifier: 
   guid: 31eda769439686649a5009efea0b3d41
-  position: {x: 0, y: 0}
+  position: {x: 280, y: 119}
   Active: 1
-  HandleName: 
+  HandleName: DefaultHandle
   scene:
     sceneAsset: {fileID: 0}
     ScenePath: 
   children: []
-  ports: []
+  ports:
+  - OwnerNodeGUID: 31eda769439686649a5009efea0b3d41
+    IsOutputPort: 1
+    PortDirection: Output
+    PortType: 0
+    PortColor: {r: 0.12, g: 0.44, b: 0.81, a: 1}
+  - OwnerNodeGUID: 31eda769439686649a5009efea0b3d41
+    IsOutputPort: 0
+    PortDirection: Input
+    PortType: 0
+    PortColor: {r: 0.12, g: 0.44, b: 0.81, a: 1}
