@@ -82,7 +82,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
             var content = new VisualElement {name = "content"};
             {
-                graphView = new WorldGraphGraphView(graph) {
+                graphView = new WorldGraphGraphView() {
                     name = "GraphView", viewDataKey = "MaterialGraphView"
                 };
                 graphView.styleSheets.Add(Resources.Load<StyleSheet>("Styles/WGGraphView"));
@@ -201,6 +201,7 @@ namespace ThunderNut.SceneManagement.Editor {
                         break;
                     case BlackboardField blackboardField:
                         ExposedParameter fieldData = blackboardField.userData as ExposedParameter;
+                        
                         switch (fieldData) {
                             case StringParameterField stringParameterField:
                                 graph.stringParameters.Remove(stringParameterField);
@@ -215,7 +216,8 @@ namespace ThunderNut.SceneManagement.Editor {
                                 graph.boolParameters.Remove(boolParameterField);
                                 break;
                         }
-
+                        
+                        // Get Visual Element container that holds the blackboard field
                         var ancestor = WGEditorGUI.GetFirstAncestorWhere(blackboardField, i => i.name == "b_field");
                         exposedPropertiesBlackboard.Remove(ancestor);
                         break;
@@ -381,7 +383,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
             var container = new VisualElement {name = "b_field"};
             BlackboardField field;
-
+            
             if (parameter == null) {
                 field = new BlackboardField {
                     userData = parameterToCreate,

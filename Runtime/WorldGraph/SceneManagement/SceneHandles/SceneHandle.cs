@@ -25,7 +25,6 @@ namespace ThunderNut.SceneManagement {
     public abstract class SceneHandle : ScriptableObject {
         public string guid;
         public Vector2 position;
-        public List<PortData> ports = new List<PortData>();
 
         public bool Active = true;
         public string HandleName = "";
@@ -34,6 +33,7 @@ namespace ThunderNut.SceneManagement {
 
         public SceneReference scene;
         public List<SceneHandle> children = new List<SceneHandle>();
+        public List<PortData> ports = new List<PortData>();
 
         public abstract void ChangeToScene();
 

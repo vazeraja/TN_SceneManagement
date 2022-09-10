@@ -58,21 +58,19 @@ namespace ThunderNut.SceneManagement.Editor {
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("settingA"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("settingB"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("settingC"));
-                
+
                 EditorGUILayout.Space(10);
                 EditorGUILayout.LabelField("Other", EditorStyles.boldLabel);
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("settingD"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("settingE"));
-                
-                using (new EditorGUI.DisabledGroupScope(true)) {
-                    EditorGUILayout.Space(10);
-                    EditorGUILayout.LabelField("Graph Data", EditorStyles.boldLabel);
 
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("stringParameters"), true);
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("floatParameters"), true);
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("intParameters"), true);
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("boolParameters"), true);
-                }
+                EditorGUILayout.Space(10);
+                EditorGUILayout.LabelField("Graph Data", EditorStyles.boldLabel);
+
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("stringParameters"), true);
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("floatParameters"), true);
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("intParameters"), true);
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("boolParameters"), true);
             }
 
             // -------------------------------------------- Duration --------------------------------------------

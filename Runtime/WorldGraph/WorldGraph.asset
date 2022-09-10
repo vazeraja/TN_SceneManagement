@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-474839152628605055
+--- !u!114 &-7992984004803731891
 MonoBehaviour:
   m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9,18 +9,54 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ad03071f12ab4005b61556313031bdaf, type: 3}
-  m_Name: DefaultHandle
+  m_Script: {fileID: 11500000, guid: db8d3b437e4741e2996521a15c9a76ef, type: 3}
+  m_Name: BattleHandle
   m_EditorClassIdentifier: 
-  guid: 65d48a272b5b2af4299ce414b402499c
-  position: {x: 280, y: -90}
-  ports: []
+  guid: 5c61a388473978941ba8d941b11cda32
+  position: {x: 260.99994, y: 26.999992}
   Active: 1
-  HandleName: DefaultHandle
+  HandleName: BattleHandle
   scene:
     sceneAsset: {fileID: 0}
     ScenePath: 
   children: []
+  ports:
+  - OwnerNodeGUID: 5c61a388473978941ba8d941b11cda32
+    IsOutputPort: 1
+    PortDirection: Output
+    PortType: 0
+    PortColor: {r: 0.94, g: 0.7, b: 0.31, a: 1}
+  - OwnerNodeGUID: 5c61a388473978941ba8d941b11cda32
+    IsOutputPort: 0
+    PortDirection: Input
+    PortType: 0
+    PortColor: {r: 0.94, g: 0.7, b: 0.31, a: 1}
+--- !u!114 &-94233046595546844
+MonoBehaviour:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18d79ccd3f254ac29f26006f4b3a23b9, type: 3}
+  m_Name: BaseHandle
+  m_EditorClassIdentifier: 
+  guid: a5bd4b998459cf044bc2aad478b4b9e6
+  position: {x: 0, y: 0}
+  Active: 1
+  HandleName: BaseHandle
+  scene:
+    sceneAsset: {fileID: 0}
+    ScenePath: 
+  children: []
+  ports:
+  - OwnerNodeGUID: a5bd4b998459cf044bc2aad478b4b9e6
+    IsOutputPort: 1
+    PortDirection: Output
+    PortType: 0
+    PortColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33,40 +69,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b85ad94b6b588c4a9a1e4c57ebe2c01, type: 3}
   m_Name: WorldGraph
   m_EditorClassIdentifier: 
-  edges:
-  - BaseSceneHandle: {fileID: 3605775009967667421}
-    BaseNodeGUID: fafed189fd50e384ea9d0aef81bfbb95
-    TargetSceneHandle: {fileID: -474839152628605055}
-    TargetNodeGUID: 65d48a272b5b2af4299ce414b402499c
-  - BaseSceneHandle: {fileID: 3605775009967667421}
-    BaseNodeGUID: fafed189fd50e384ea9d0aef81bfbb95
-    TargetSceneHandle: {fileID: 6214747587689969737}
-    TargetNodeGUID: 6ed99a21573790544a15b0de49ebc86d
   sceneHandles:
-  - {fileID: 3605775009967667421}
-  - {fileID: -474839152628605055}
-  - {fileID: 6214747587689969737}
-  - {fileID: 219359900687776611}
+  - {fileID: -94233046595546844}
+  - {fileID: 580822018275226188}
+  - {fileID: -7992984004803731891}
+  - {fileID: 922939305413851944}
   settingA: 
   settingB: 
   settingC: 
   settingD: 
   settingE: 
   stringParameters:
-  - m_Name: StringLabel
-    m_Reference: StringLabel
+  - m_Name: StringParameter
+    m_Reference: _StringParameter
     m_Exposed: 1
     m_ParameterType: 0
     m_Value: Default_Value
-  floatParameters:
-  - m_Name: FloatLabel
-    m_Reference: FloatLabel
-    m_Exposed: 1
-    m_ParameterType: 1
-    m_Value: 69
+  floatParameters: []
   intParameters: []
-  boolParameters: []
---- !u!114 &219359900687776611
+  boolParameters:
+  - m_Name: boolA
+    m_Reference: _BoolParameter
+    m_Exposed: 1
+    m_ParameterType: 3
+    m_Value: 1
+--- !u!114 &580822018275226188
 MonoBehaviour:
   m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
@@ -78,57 +105,43 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03a72a9984864b28a97b386a9620a419, type: 3}
   m_Name: CutsceneHandle
   m_EditorClassIdentifier: 
-  guid: d4f01feba423ac44e97ee6c2b45270d1
-  position: {x: -18, y: 160.99998}
-  ports: []
+  guid: da9a22e72dad3cf4ea373bb708ee7779
+  position: {x: 253.17389, y: -127.565216}
   Active: 1
   HandleName: CutsceneHandle
   scene:
     sceneAsset: {fileID: 0}
     ScenePath: 
   children: []
---- !u!114 &3605775009967667421
-MonoBehaviour:
-  m_ObjectHideFlags: 2
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 18d79ccd3f254ac29f26006f4b3a23b9, type: 3}
-  m_Name: BaseHandle
-  m_EditorClassIdentifier: 
-  guid: fafed189fd50e384ea9d0aef81bfbb95
-  position: {x: 0, y: 0}
-  ports: []
-  Active: 1
-  HandleName: BaseHandle
-  scene:
-    sceneAsset: {fileID: 0}
-    ScenePath: 
-  children: []
---- !u!114 &6214747587689969737
-MonoBehaviour:
-  m_ObjectHideFlags: 2
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: db8d3b437e4741e2996521a15c9a76ef, type: 3}
-  m_Name: BattleHandle
-  m_EditorClassIdentifier: 
-  guid: 6ed99a21573790544a15b0de49ebc86d
-  position: {x: 279, y: 67}
   ports:
-  - IsOutputPort: 0
-    IsParameterPort: 1
-    PortColor: {r: 0.94, g: 0.7, b: 0.31, a: 1}
+  - OwnerNodeGUID: da9a22e72dad3cf4ea373bb708ee7779
+    IsOutputPort: 1
+    PortDirection: Output
+    PortType: 0
+    PortColor: {r: 0.81, g: 0.29, b: 0.28, a: 1}
+  - OwnerNodeGUID: da9a22e72dad3cf4ea373bb708ee7779
+    IsOutputPort: 0
+    PortDirection: Input
+    PortType: 0
+    PortColor: {r: 0.81, g: 0.29, b: 0.28, a: 1}
+--- !u!114 &922939305413851944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad03071f12ab4005b61556313031bdaf, type: 3}
+  m_Name: DefaultHandle
+  m_EditorClassIdentifier: 
+  guid: 31eda769439686649a5009efea0b3d41
+  position: {x: 0, y: 0}
   Active: 1
-  HandleName: BattleHandle
+  HandleName: 
   scene:
     sceneAsset: {fileID: 0}
     ScenePath: 
   children: []
+  ports: []
