@@ -1,3 +1,10 @@
+## [1.0.27](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.26...v1.0.27) (2022-09-12)
+
+
+### Bug Fixes
+
+* save and load parameter pill nodes ([939b9fc](https://github.com/vazeraja/TN_SceneManagement/commit/939b9fc757a8b6ea5376924e301d56de3fbc058c))
+
 ## [1.0.26](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.25...v1.0.26) (2022-09-09)
 
 
