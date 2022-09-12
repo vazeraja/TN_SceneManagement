@@ -1,31 +1,30 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-94233046595546844
+--- !u!114 &-5559526146098278955
 MonoBehaviour:
-  m_ObjectHideFlags: 2
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 18d79ccd3f254ac29f26006f4b3a23b9, type: 3}
-  m_Name: BaseHandle
+  m_Script: {fileID: 11500000, guid: 03a72a9984864b28a97b386a9620a419, type: 3}
+  m_Name: CutsceneHandle
   m_EditorClassIdentifier: 
-  guid: a5bd4b998459cf044bc2aad478b4b9e6
+  guid: 86f62d33111a1fd4f8ae7cf0dd7d96b3
   position: {x: 0, y: 0}
+  ports: []
   Active: 1
-  HandleName: BaseHandle
+  HandleName: 
   scene:
     sceneAsset: {fileID: 0}
     ScenePath: 
   children: []
-  ports:
-  - OwnerNodeGUID: a5bd4b998459cf044bc2aad478b4b9e6
-    IsOutputPort: 1
-    PortDirection: Output
-    PortType: 0
-    PortColor: {r: 1, g: 1, b: 1, a: 1}
+  stringParameters: []
+  floatParameters: []
+  intParameters: []
+  boolParameters: []
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -39,28 +38,18 @@ MonoBehaviour:
   m_Name: WorldGraph
   m_EditorClassIdentifier: 
   sceneHandles:
-  - {fileID: -94233046595546844}
-  - {fileID: 922939305413851944}
+  - {fileID: 2910663584399617394}
+  - {fileID: -5559526146098278955}
   settingA: 
   settingB: 
   settingC: 
   settingD: 
   settingE: 
-  stringParameters:
-  - m_Name: StringParameter
-    m_Reference: _StringParameter
-    m_Exposed: 1
-    m_ParameterType: 0
-    m_Value: Default_Value
+  stringParameters: []
   floatParameters: []
   intParameters: []
-  boolParameters:
-  - m_Name: boolA
-    m_Reference: _BoolParameter
-    m_Exposed: 1
-    m_ParameterType: 3
-    m_Value: 1
---- !u!114 &922939305413851944
+  boolParameters: []
+--- !u!114 &2910663584399617394
 MonoBehaviour:
   m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
@@ -69,25 +58,47 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ad03071f12ab4005b61556313031bdaf, type: 3}
-  m_Name: DefaultHandle
+  m_Script: {fileID: 11500000, guid: 18d79ccd3f254ac29f26006f4b3a23b9, type: 3}
+  m_Name: BaseHandle
   m_EditorClassIdentifier: 
-  guid: 31eda769439686649a5009efea0b3d41
-  position: {x: 280, y: 119}
+  guid: b80a8d7361be4de4ab449e78dd4704e9
+  position: {x: 32, y: 5}
+  ports:
+  - OwnerNodeGUID: b80a8d7361be4de4ab449e78dd4704e9
+    GUID: e80413b78f348fb4495b7f06e16291f0
+    PortDirection: Output
+    PortType: 0
+    PortColor: {r: 1, g: 1, b: 1, a: 1}
+    Parameter:
+      m_guid: 
+      m_Name: 
+      m_Reference: 
+      m_Exposed: 0
+      m_Displayed: 0
+      m_ConnectedPortGUID: 
+      position: {x: 0, y: 0}
+      m_ParameterType: 0
+  - OwnerNodeGUID: b80a8d7361be4de4ab449e78dd4704e9
+    GUID: 3b784a230f8db8e4a85c8294f3c4b291
+    PortDirection: Input
+    PortType: 0
+    PortColor: {r: 1, g: 1, b: 1, a: 1}
+    Parameter:
+      m_guid: 
+      m_Name: 
+      m_Reference: 
+      m_Exposed: 0
+      m_Displayed: 0
+      m_ConnectedPortGUID: 
+      position: {x: 0, y: 0}
+      m_ParameterType: 0
   Active: 1
-  HandleName: DefaultHandle
+  HandleName: BaseHandle
   scene:
     sceneAsset: {fileID: 0}
     ScenePath: 
   children: []
-  ports:
-  - OwnerNodeGUID: 31eda769439686649a5009efea0b3d41
-    IsOutputPort: 1
-    PortDirection: Output
-    PortType: 0
-    PortColor: {r: 0.12, g: 0.44, b: 0.81, a: 1}
-  - OwnerNodeGUID: 31eda769439686649a5009efea0b3d41
-    IsOutputPort: 0
-    PortDirection: Input
-    PortType: 0
-    PortColor: {r: 0.12, g: 0.44, b: 0.81, a: 1}
+  stringParameters: []
+  floatParameters: []
+  intParameters: []
+  boolParameters: []

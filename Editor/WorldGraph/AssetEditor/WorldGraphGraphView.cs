@@ -9,7 +9,17 @@ namespace ThunderNut.SceneManagement.Editor {
 
     public class WorldGraphGraphView : GraphView {
 
-        public WorldGraphGraphView() { }
+        public WorldGraphGraphView() {
+            styleSheets.Add(Resources.Load<StyleSheet>("Styles/WGGraphView"));
+            
+            this.AddManipulator(new ContentDragger());
+            this.AddManipulator(new SelectionDragger());
+            this.AddManipulator(new RectangleSelector());
+            this.AddManipulator(new ClickSelector());
+            
+            SetupZoom(0.05f, 8);
+            AddToClassList("drop-area");
+        }
      
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter) {
             return ports.ToList().Where(endPort =>
@@ -17,6 +27,10 @@ namespace ThunderNut.SceneManagement.Editor {
                     ((WorldGraphPort)endPort).PortData.PortDirection != ((WorldGraphPort)startPort).PortData.PortDirection &&
                     ((WorldGraphPort)endPort).PortData.PortType == ((WorldGraphPort)startPort).PortData.PortType) 
                 .ToList();
+        }
+
+        public override void AddToSelection(ISelectable selectable) {
+            base.AddToSelection(selectable);
         }
     }
 

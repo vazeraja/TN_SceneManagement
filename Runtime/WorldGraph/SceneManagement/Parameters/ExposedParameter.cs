@@ -6,6 +6,12 @@ namespace ThunderNut.SceneManagement {
 
     [Serializable]
     public class ExposedParameter {
+        [SerializeField] private string m_guid;
+        public string GUID {
+            get => m_guid;
+            set => m_guid = value;
+        }
+        
         [SerializeField] private string m_Name;
         public string Name {
             get => m_Name;
@@ -23,6 +29,19 @@ namespace ThunderNut.SceneManagement {
             get => m_Exposed;
             set => m_Exposed = value;
         }
+        [SerializeField] private bool m_Displayed;
+        public bool Displayed {
+            get => m_Displayed;
+            set => m_Displayed = value;
+        }
+        
+        [SerializeField] private string m_ConnectedPortGUID;
+        public string ConnectedPortGUID {
+            get => m_ConnectedPortGUID;
+            set => m_ConnectedPortGUID = value;
+        }
+        
+        public Vector2 position;
 
         [SerializeField] private ParameterType m_ParameterType;
         public ParameterType ParameterType {

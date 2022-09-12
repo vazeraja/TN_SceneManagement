@@ -67,6 +67,11 @@ namespace ThunderNut.SceneManagement.Editor {
                         outputPortData = sceneHandle.CreatePort(viewDataKey, isOutput: true, false, portColor);
                     output = new WorldGraphPort(this, loadedOutputPort ?? outputPortData, connectorListener);
                     outputContainer.Add(output);
+                    
+                    if (loadedInputPort == null)
+                        inputPortData = sceneHandle.CreatePort(viewDataKey, isOutput: false, false, portColor);
+                    input = new WorldGraphPort(this, loadedInputPort ?? inputPortData, connectorListener);
+                    inputContainer.Add(input);
 
                     capabilities &= ~Capabilities.Deletable;
 
@@ -133,6 +138,10 @@ namespace ThunderNut.SceneManagement.Editor {
                     inputContainer.Add(parameterPort);
                 }
             }
+        }
+
+        public override void OnSelected() {
+            base.OnSelected();
         }
 
         public override void SetPosition(Rect newPos) {

@@ -31,6 +31,18 @@ namespace ThunderNut.SceneManagement {
         public List<IntParameterField> intParameters = new List<IntParameterField>();
         public List<BoolParameterField> boolParameters = new List<BoolParameterField>();
 
+        public IEnumerable<ExposedParameter> allParameters {
+            get {
+                List<ExposedParameter> list = new List<ExposedParameter>();
+                list.AddRange(stringParameters);
+                list.AddRange(floatParameters);
+                list.AddRange(intParameters);
+                list.AddRange(boolParameters);
+                return list;
+            }
+        }
+
+
         public bool IsEmpty => sceneHandles.Count == 0;
         
         public void ChangeScene() {
@@ -108,22 +120,18 @@ namespace ThunderNut.SceneManagement {
 
         private void AddSceneHandle(SceneHandle handle) {
             sceneHandles.Add(handle);
-            EditorUtility.SetDirty(this);
         }
 
         private void RemoveSceneHandle(SceneHandle handle) {
             sceneHandles.Remove(handle);
-            EditorUtility.SetDirty(this);
         }
 
         public void AddChild(SceneHandle parent, SceneHandle child) {
             parent.children.Add(child);
-            EditorUtility.SetDirty(this);
         }
 
         public void RemoveChild(SceneHandle parent, SceneHandle child) {
             parent.children.Remove(child);
-            EditorUtility.SetDirty(this);
         }
 
         #region Editor

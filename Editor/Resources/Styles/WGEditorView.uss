@@ -1,15 +1,3 @@
-WorldGraphEditorView > #TwoPaneSplitView {
-    flex: 1;
-}
-WorldGraphEditorView > #TwoPaneSplitView > #left-panel > #GraphView {
-    flex: 1;
-    flex-grow: 1;
-}
-
-/*
-------- UNUSED ------
-Credit: Originally ShaderGraph USS
-*/
 WorldGraphEditorView {
     flex-direction: column;
     flex: 1;

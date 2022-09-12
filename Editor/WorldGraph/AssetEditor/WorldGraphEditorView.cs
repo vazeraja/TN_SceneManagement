@@ -11,7 +11,7 @@ using Object = UnityEngine.Object;
 namespace ThunderNut.SceneManagement.Editor {
 
     public class WorldGraphEditorView : VisualElement, IDisposable {
-        private readonly EditorWindow editorWindow;
+        public readonly WorldGraphEditorWindow editorWindow;
         public WorldGraphGraphView graphView { get; private set; }
         private readonly WorldGraph graph;
 
@@ -67,7 +67,9 @@ namespace ThunderNut.SceneManagement.Editor {
             }
         }
 
-        public WorldGraphEditorView(EditorWindow editorWindow, WorldGraph graph, string graphName) {
+        public BlackboardFieldDragAndDrop BlackboardFieldDragAndDrop;
+
+        public WorldGraphEditorView(WorldGraphEditorWindow editorWindow, WorldGraph graph, string graphName) {
             this.editorWindow = editorWindow;
             this.graph = graph;
             _AssetName = graphName;
@@ -82,15 +84,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
             var content = new VisualElement {name = "content"};
             {
-                graphView = new WorldGraphGraphView() {
-                    name = "GraphView", viewDataKey = "MaterialGraphView"
-                };
-                graphView.styleSheets.Add(Resources.Load<StyleSheet>("Styles/WGGraphView"));
-                graphView.AddManipulator(new ContentDragger());
-                graphView.AddManipulator(new SelectionDragger());
-                graphView.AddManipulator(new RectangleSelector());
-                graphView.AddManipulator(new ClickSelector());
-                graphView.SetupZoom(0.05f, 8);
+                graphView = new WorldGraphGraphView {name = "GraphView", viewDataKey = "MaterialGraphView"};
 
                 content.Add(graphView);
 
@@ -121,6 +115,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
                 RegisterCallback<GeometryChangedEvent>(ApplySerializedWindowLayouts);
             }
+            Add(content);
 
             m_SearchWindowProvider = ScriptableObject.CreateInstance<WorldGraphSearcherProvider>();
             m_SearchWindowProvider.Initialize(editorWindow, graphView, CreateNode);
@@ -134,52 +129,98 @@ namespace ThunderNut.SceneManagement.Editor {
             };
 
             edgeConnectorListener = new EdgeConnectorListener(this.editorWindow, m_SearchWindowProvider);
+            BlackboardFieldDragAndDrop = new BlackboardFieldDragAndDrop(this);
 
             LoadGraph();
-
-            Add(content);
         }
 
-        private void LoadGraph() {
-            if (graph.IsEmpty) {
-                graph.CreateSubAsset(typeof(BaseHandle));
-            }
 
+        private void LoadGraph() {
+            // ------------------ Create Base SceneHandle ------------------
+            if (graph.IsEmpty) graph.CreateSubAsset(typeof(BaseHandle));
+
+            // ------------------ Create GraphView Nodes for every scene handle ------------------
             foreach (var sceneHandle in graph.sceneHandles) {
                 CreateGraphNode(sceneHandle);
             }
 
-            foreach (var edge in from parent in graph.sceneHandles
-                let children = WorldGraph.GetChildren(parent)
-                from child in children
-                let baseView = graphView.GetNodeByGuid(parent.guid) as WorldGraphNodeView
-                let targetView = graphView.GetNodeByGuid(child.guid) as WorldGraphNodeView
-                select baseView?.output.ConnectTo(targetView?.input)) {
-                graphView.AddElement(edge);
+            // ------------------ Create Exposed Parameters in the blackboard ------------------
+            foreach (var exposedParam in graph.allParameters) {
+                switch (exposedParam) {
+                    case StringParameterField:
+                        var blackboardStringField = AddProperty(ParameterType.String, exposedParam);
+                        if (exposedParam.Displayed) {
+                            CreateParameterGraphNode(blackboardStringField, exposedParam.position);
+                        }
+
+                        break;
+                    case FloatParameterField:
+                        var blackboardFloatField = AddProperty(ParameterType.Float, exposedParam);
+                        if (exposedParam.Displayed) {
+                            CreateParameterGraphNode(blackboardFloatField, exposedParam.position);
+                        }
+
+                        break;
+                    case IntParameterField:
+                        var blackboardIntField = AddProperty(ParameterType.Int, exposedParam);
+                        if (exposedParam.Displayed) {
+                            CreateParameterGraphNode(blackboardIntField, exposedParam.position);
+                        }
+
+                        break;
+                    case BoolParameterField:
+                        var blackboardBoolField = AddProperty(ParameterType.Bool, exposedParam);
+                        if (exposedParam.Displayed) {
+                            CreateParameterGraphNode(blackboardBoolField, exposedParam.position);
+                        }
+
+                        break;
+                }
             }
 
-            foreach (var exposedParam in graph.stringParameters) {
-                AddProperty(ParameterType.String, exposedParam);
+            // ------------------ Create edges for the nodes ------------------
+            foreach (var parent1 in graph.sceneHandles) {
+                IEnumerable<SceneHandle> children = WorldGraph.GetChildren(parent1);
+                foreach (var child in children) {
+                    WorldGraphNodeView baseView = (WorldGraphNodeView) graphView.GetNodeByGuid(parent1.guid);
+                    WorldGraphNodeView targetView = (WorldGraphNodeView) graphView.GetNodeByGuid(child.guid);
+                    var edge = baseView?.output.ConnectTo(targetView?.input);
+                    graphView.AddElement(edge);
+                }
             }
 
-            foreach (var exposedParam in graph.floatParameters) {
-                AddProperty(ParameterType.Float, exposedParam);
-            }
-
-            foreach (var exposedParam in graph.intParameters) {
-                AddProperty(ParameterType.Int, exposedParam);
-            }
-
-            foreach (var exposedParam in graph.boolParameters) {
-                AddProperty(ParameterType.Bool, exposedParam);
+            // ------------------ Create edges for parameter nodes ------------------
+            foreach (var nodeView in graphView.nodes.OfType<WorldGraphNodeView>()) {
+                List<WorldGraphPort> ports = nodeView.inputContainer.Query<WorldGraphPort>().ToList();
+                foreach (var port in ports) {
+                    foreach (var paramView in graphView.nodes.OfType<ParameterPropertyNodeView>()) {
+                        if (paramView.Parameter.ConnectedPortGUID == port.PortData.GUID) {
+                            var edge = paramView.output.ConnectTo(port);
+                            graphView.AddElement(edge);
+                        }
+                    }
+                }
             }
         }
 
-        private void CreateNode(Type type, Vector2 position) {
+        public void CreateNode(Type type, Vector2 position) {
             SceneHandle node = graph.CreateSubAsset(type);
             node.position = position;
 
             CreateGraphNode(node);
+        }
+
+        public void CreateParameterGraphNode(BlackboardField field, Vector2 position) {
+            var outputPort = new PortData {
+                PortColor = new Color(0.52f, 0.89f, 0.91f),
+                PortDirection = "Output",
+                PortType = PortType.Parameter,
+            };
+            var outputPortView = new WorldGraphPort(outputPort, edgeConnectorListener);
+            ((ExposedParameter) field.userData).position = position;
+
+            var parameterNodeView = new ParameterPropertyNodeView(field, outputPortView) { };
+            graphView.AddElement(parameterNodeView);
         }
 
         private void CreateGraphNode(SceneHandle node) {
@@ -195,13 +236,31 @@ namespace ThunderNut.SceneManagement.Editor {
                         graph.RemoveSubAsset(nodeView.sceneHandle);
                         break;
                     case Edge edgeView:
-                        var output = edgeView.output.node as WorldGraphNodeView;
-                        var input = edgeView.input.node as WorldGraphNodeView;
-                        graph.RemoveChild(output?.sceneHandle, input?.sceneHandle);
+                        WorldGraphPort outputPort = (WorldGraphPort) edgeView.output;
+                        WorldGraphPort inputPort = (WorldGraphPort) edgeView.input;
+
+                        switch (outputPort.PortData.PortType) {
+                            case PortType.Default:
+                                var output = outputPort.node as WorldGraphNodeView;
+                                var input = inputPort.node as WorldGraphNodeView;
+                                graph.RemoveChild(output?.sceneHandle, input?.sceneHandle);
+                                break;
+                            case PortType.Parameter:
+                                WorldGraphNodeView nodeView = ((WorldGraphNodeView) inputPort.node);
+                                ExposedParameter parameter = ((ParameterPropertyNodeView) outputPort.node).Parameter;
+
+                                nodeView.sceneHandle.RemoveParameter(parameter);
+                                parameter.ConnectedPortGUID = null;
+                                inputPort.PortData.Parameter = null;
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+
                         break;
                     case BlackboardField blackboardField:
                         ExposedParameter fieldData = blackboardField.userData as ExposedParameter;
-                        
+
                         switch (fieldData) {
                             case StringParameterField stringParameterField:
                                 graph.stringParameters.Remove(stringParameterField);
@@ -216,18 +275,41 @@ namespace ThunderNut.SceneManagement.Editor {
                                 graph.boolParameters.Remove(boolParameterField);
                                 break;
                         }
-                        
+
                         // Get Visual Element container that holds the blackboard field
-                        var ancestor = WGEditorGUI.GetFirstAncestorWhere(blackboardField, i => i.name == "b_field");
-                        exposedPropertiesBlackboard.Remove(ancestor);
+                        var container = WGEditorGUI.GetFirstAncestorWhere(blackboardField, i => i.name == "b_field");
+                        exposedPropertiesBlackboard.Remove(container);
+                        break;
+                    case ParameterPropertyNodeView parameterNodeView:
+                        parameterNodeView.Parameter.Displayed = false;
                         break;
                 }
             });
 
             graphViewChange.edgesToCreate?.ForEach(edgeView => {
-                var output = edgeView.output.node as WorldGraphNodeView;
-                var input = edgeView.input.node as WorldGraphNodeView;
-                graph.AddChild(output?.sceneHandle, input?.sceneHandle);
+                WorldGraphPort outputPort = (WorldGraphPort) edgeView.output;
+                WorldGraphPort inputPort = (WorldGraphPort) edgeView.input;
+
+                switch (outputPort.PortData.PortType) {
+                    case PortType.Parameter:
+                        ExposedParameter parameter = ((ParameterPropertyNodeView) outputPort.node).Parameter;
+                        WorldGraphNodeView nodeView = ((WorldGraphNodeView) inputPort.node);
+
+                        parameter.ConnectedPortGUID = inputPort.PortData.GUID;
+
+                        inputPort.PortData.Parameter = graph.allParameters.ToList().Find(param => param == parameter);
+                        nodeView.sceneHandle.AddParameter(parameter);
+                        break;
+                    case PortType.Default: {
+                        var output = outputPort.node as WorldGraphNodeView;
+                        var input = inputPort.node as WorldGraphNodeView;
+
+                        graph.AddChild(output?.sceneHandle, input?.sceneHandle);
+                        break;
+                    }
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             });
             return graphViewChange;
         }
@@ -260,7 +342,11 @@ namespace ThunderNut.SceneManagement.Editor {
         }
 
         private void CreateExposedPropertiesBlackboard() {
-            exposedPropertiesBlackboard = new Blackboard(graphView) {title = "Exposed Properties", subTitle = "WorldGraph"};
+            exposedPropertiesBlackboard = new Blackboard(graphView) {
+                name = "ExposedPropertiesBlackboard",
+                title = "Exposed Properties",
+                subTitle = "WorldGraph"
+            };
             {
                 exposedPropertiesBlackboard.Add(new BlackboardSection {
                     title = "Exposed Variables"
@@ -269,16 +355,16 @@ namespace ThunderNut.SceneManagement.Editor {
                     var param = (ExposedParameter) ((BlackboardField) element).userData;
                     switch (((ExposedParameter) ((BlackboardField) element).userData).ParameterType) {
                         case ParameterType.String:
-                            graph.stringParameters.Find(x => x == param).Name = newValue;
+                            param.Name = newValue;
                             break;
                         case ParameterType.Float:
-                            graph.floatParameters.Find(x => x == param).Name = newValue;
+                            param.Name = newValue;
                             break;
                         case ParameterType.Int:
-                            graph.intParameters.Find(x => x == param).Name = newValue;
+                            param.Name = newValue;
                             break;
                         case ParameterType.Bool:
-                            graph.boolParameters.Find(x => x == param).Name = newValue;
+                            param.Name = newValue;
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
@@ -300,7 +386,7 @@ namespace ThunderNut.SceneManagement.Editor {
             graphView.Add(exposedPropertiesBlackboard);
         }
 
-        private void AddProperty(ParameterType type, ExposedParameter parameter = null) {
+        private BlackboardField AddProperty(ParameterType type, ExposedParameter parameter = null) {
             ExposedParameter parameterToCreate = null;
             VisualElement valueField;
 
@@ -383,7 +469,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
             var container = new VisualElement {name = "b_field"};
             BlackboardField field;
-            
+
             if (parameter == null) {
                 field = new BlackboardField {
                     userData = parameterToCreate,
@@ -403,11 +489,12 @@ namespace ThunderNut.SceneManagement.Editor {
                 container.Add(field);
             }
 
-
             var row = new BlackboardRow(field, valueField);
             container.Add(row);
 
             exposedPropertiesBlackboard.Add(container);
+
+            return field;
         }
 
         #region Serialize Window Layouts
@@ -444,6 +531,7 @@ namespace ThunderNut.SceneManagement.Editor {
         public void Dispose() {
             if (graphView != null) {
                 toolbar.Dispose();
+                BlackboardFieldDragAndDrop.target.RemoveManipulator(BlackboardFieldDragAndDrop);
                 graphView.graphElements.OfType<IWorldGraphNodeView>().ToList().ForEach(node => node.Dispose());
                 graphView.nodeCreationRequest = null;
                 graphView = null;
