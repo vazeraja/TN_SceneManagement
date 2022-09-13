@@ -1,3 +1,10 @@
+## [1.0.29](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.28...v1.0.29) (2022-09-13)
+
+
+### Bug Fixes
+
+* show graph elements in inspector ([bf19624](https://github.com/vazeraja/TN_SceneManagement/commit/bf19624f04d7a1786b7ebe3fe212695d9b581f25))
+
 ## [1.0.28](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.27...v1.0.28) (2022-09-13)
 
 
