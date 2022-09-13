@@ -1,3 +1,10 @@
+## [1.0.28](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.27...v1.0.28) (2022-09-13)
+
+
+### Bug Fixes
+
+* update  port connection logic ([3a89f8f](https://github.com/vazeraja/TN_SceneManagement/commit/3a89f8f5e2a57c818d974b82800b82d7453c8b61))
+
 ## [1.0.27](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.26...v1.0.27) (2022-09-12)
 
 
