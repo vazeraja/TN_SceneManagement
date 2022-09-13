@@ -12,23 +12,22 @@ namespace ThunderNut.SceneManagement.Editor {
     public class WorldGraphNodeView : Node, IWorldGraphNodeView {
         public Node gvNode => this;
         public SceneHandle sceneHandle { get; private set; }
-        public readonly WorldGraphGraphView graphView;
+        public WorldGraphGraphView graphView => GetFirstAncestorOfType<WorldGraphGraphView>();
 
         public WorldGraphPort input;
         public WorldGraphPort output;
         public Color portColor;
 
-        private readonly IEdgeConnectorListener connectorListener;
+        private IEdgeConnectorListener connectorListener;
 
         private Button addParameterButton;
         private Button playSceneButton;
-        private readonly TextField titleTextField;
+        private TextField titleTextField;
 
         public WorldGraphNodeView(WorldGraphGraphView graphView, SceneHandle sceneHandle, IEdgeConnectorListener connectorListener) :
             base(AssetDatabase.GetAssetPath(Resources.Load<VisualTreeAsset>("UXML/WGGraphNode"))) {
             this.connectorListener = connectorListener;
             this.sceneHandle = sceneHandle;
-            this.graphView = graphView;
 
             userData = sceneHandle;
             name = sceneHandle.HandleName;
@@ -36,15 +35,23 @@ namespace ThunderNut.SceneManagement.Editor {
             style.left = sceneHandle.position.x;
             style.top = sceneHandle.position.y;
 
-            var serializedHandle = new SerializedObject(sceneHandle);
-
             addParameterButton = this.Q<Button>("add-parameter-button");
             addParameterButton.style.backgroundImage = Resources.Load<Texture2D>("Sprite-0001");
             playSceneButton = this.Q<Button>("play-button");
 
+            SetupTitleField();
+
+            LoadDefaultPorts(sceneHandle.ports);
+            LoadParameterPorts(sceneHandle.ports);
+
+            addParameterButton.clicked += AddParameterPort;
+            playSceneButton.clicked += PlayScene;
+        }
+
+        private void SetupTitleField() {
             Label titleLabel = this.Q<Label>("title-label");
             {
-                titleLabel.Bind(serializedHandle);
+                titleLabel.Bind(new SerializedObject(sceneHandle));
                 titleLabel.bindingPath = "HandleName";
 
                 titleTextField = new TextField {isDelayed = true};
@@ -88,12 +95,6 @@ namespace ThunderNut.SceneManagement.Editor {
                     title = sceneHandle.HandleName ?? sceneHandle.GetType().Name;
                 }
             }
-
-            LoadDefaultPorts(sceneHandle.ports);
-            LoadParameterPorts(sceneHandle.ports);
-
-            addParameterButton.clicked += AddParameterPort;
-            playSceneButton.clicked += PlayScene;
         }
 
 
@@ -102,20 +103,20 @@ namespace ThunderNut.SceneManagement.Editor {
             PortData inputPortData = null;
 
             var portDatas = portData.ToList();
-            var loadedOutputPort = portDatas.ToList().Find(x => x.PortType == PortType.Default && x.PortDirection == "Output");
-            var loadedInputPort = portDatas.ToList().Find(x => x.PortType == PortType.Default && x.PortDirection == "Input");
+            var loadedOutputPort = portDatas.Find(x => x.PortType == PortType.Default && x.PortDirection == "Output");
+            var loadedInputPort = portDatas.Find(x => x.PortType == PortType.Default && x.PortDirection == "Input");
 
             switch (sceneHandle) {
                 case BaseHandle _:
                     AddToClassList("base");
                     portColor = Color.white;
 
-                    if (loadedOutputPort == null) outputPortData = sceneHandle.CreatePort(viewDataKey, true, false, portColor);
-                    output = new WorldGraphPort(this, loadedOutputPort ?? outputPortData, connectorListener);
+                    if (loadedOutputPort == null) outputPortData = sceneHandle.CreatePort(viewDataKey, true, true, false, portColor);
+                    output = new WorldGraphPort(loadedOutputPort ?? outputPortData, connectorListener);
                     outputContainer.Add(output);
 
-                    if (loadedInputPort == null) inputPortData = sceneHandle.CreatePort(viewDataKey, false, false, portColor);
-                    input = new WorldGraphPort(this, loadedInputPort ?? inputPortData, connectorListener);
+                    if (loadedInputPort == null) inputPortData = sceneHandle.CreatePort(viewDataKey, false, true, false, portColor);
+                    input = new WorldGraphPort(loadedInputPort ?? inputPortData, connectorListener);
                     inputContainer.Add(input);
 
                     capabilities &= ~Capabilities.Deletable;
@@ -125,12 +126,12 @@ namespace ThunderNut.SceneManagement.Editor {
                     AddToClassList("defaultHandle");
                     portColor = new Color(0.12f, 0.44f, 0.81f);
 
-                    if (loadedOutputPort == null) outputPortData = sceneHandle.CreatePort(viewDataKey, true, false, portColor);
-                    output = new WorldGraphPort(this, loadedOutputPort ?? outputPortData, connectorListener);
+                    if (loadedOutputPort == null) outputPortData = sceneHandle.CreatePort(viewDataKey, true, true, false, portColor);
+                    output = new WorldGraphPort(loadedOutputPort ?? outputPortData, connectorListener);
                     outputContainer.Add(output);
 
-                    if (loadedInputPort == null) inputPortData = sceneHandle.CreatePort(viewDataKey, false, false, portColor);
-                    input = new WorldGraphPort(this, loadedInputPort ?? inputPortData, connectorListener);
+                    if (loadedInputPort == null) inputPortData = sceneHandle.CreatePort(viewDataKey, false, true, false, portColor);
+                    input = new WorldGraphPort(loadedInputPort ?? inputPortData, connectorListener);
                     inputContainer.Add(input);
 
                     break;
@@ -138,12 +139,12 @@ namespace ThunderNut.SceneManagement.Editor {
                     AddToClassList("battleHandle");
                     portColor = new Color(0.94f, 0.7f, 0.31f);
 
-                    if (loadedOutputPort == null) outputPortData = sceneHandle.CreatePort(viewDataKey, true, false, portColor);
-                    output = new WorldGraphPort(this, loadedOutputPort ?? outputPortData, connectorListener);
+                    if (loadedOutputPort == null) outputPortData = sceneHandle.CreatePort(viewDataKey, true, true, false, portColor);
+                    output = new WorldGraphPort(loadedOutputPort ?? outputPortData, connectorListener);
                     outputContainer.Add(output);
 
-                    if (loadedInputPort == null) inputPortData = sceneHandle.CreatePort(viewDataKey, false, false, portColor);
-                    input = new WorldGraphPort(this, loadedInputPort ?? inputPortData, connectorListener);
+                    if (loadedInputPort == null) inputPortData = sceneHandle.CreatePort(viewDataKey, false, true, false, portColor);
+                    input = new WorldGraphPort(loadedInputPort ?? inputPortData, connectorListener);
                     inputContainer.Add(input);
 
                     break;
@@ -151,12 +152,12 @@ namespace ThunderNut.SceneManagement.Editor {
                     AddToClassList("cutsceneHandle");
                     portColor = new Color(0.81f, 0.29f, 0.28f);
 
-                    if (loadedOutputPort == null) outputPortData = sceneHandle.CreatePort(viewDataKey, true, false, portColor);
-                    output = new WorldGraphPort(this, loadedOutputPort ?? outputPortData, connectorListener);
+                    if (loadedOutputPort == null) outputPortData = sceneHandle.CreatePort(viewDataKey, true, true, false, portColor);
+                    output = new WorldGraphPort(loadedOutputPort ?? outputPortData, connectorListener);
                     outputContainer.Add(output);
 
-                    if (loadedInputPort == null) inputPortData = sceneHandle.CreatePort(viewDataKey, false, false, portColor);
-                    input = new WorldGraphPort(this, loadedInputPort ?? inputPortData, connectorListener);
+                    if (loadedInputPort == null) inputPortData = sceneHandle.CreatePort(viewDataKey, false, true, false, portColor);
+                    input = new WorldGraphPort(loadedInputPort ?? inputPortData, connectorListener);
                     inputContainer.Add(input);
 
                     break;
@@ -166,23 +167,28 @@ namespace ThunderNut.SceneManagement.Editor {
         private void LoadParameterPorts(IEnumerable<PortData> portData) {
             foreach (var data in portData) {
                 if (data.PortType != PortType.Parameter) continue;
-                var parameterPort = new WorldGraphPort(this, data, connectorListener);
+                var parameterPort = new WorldGraphPort(data, connectorListener);
                 inputContainer.Add(parameterPort);
             }
         }
 
         private void AddParameterPort() {
-            var portData = sceneHandle.CreatePort(viewDataKey, false, true, portColor);
-            var parameterPort = new WorldGraphPort(this, portData, connectorListener);
+            var portData = sceneHandle.CreatePort(viewDataKey, false, false, true, portColor);
+            var parameterPort = new WorldGraphPort(portData, connectorListener);
 
             inputContainer.Add(parameterPort);
-            graphView.RegisterPortCallbacks();
+            graphView.InitializePortBehavior(parameterPort);
+        }
+
+        public override void OnSelected() {
+            graphView.DrawInspector(sceneHandle);
+            base.OnSelected();
         }
 
         private void PlayScene() {
             EditorSceneManager.OpenScene(sceneHandle.scene.ScenePath);
         }
-        
+
         public override void SetPosition(Rect newPos) {
             base.SetPosition(newPos);
 

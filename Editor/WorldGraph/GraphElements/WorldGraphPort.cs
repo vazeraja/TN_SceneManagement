@@ -14,27 +14,17 @@ namespace ThunderNut.SceneManagement.Editor {
         public event Action<Node, WorldGraphPort, Edge> OnConnected;
         public event Action<Node, WorldGraphPort, Edge> OnDisconnected;
 
-        public WorldGraphPort(PortData portData, IEdgeConnectorListener connectorListener)
-            : base(Orientation.Horizontal, portData.PortDirection == "Output" ? Direction.Output : Direction.Input, Capacity.Single,
-                typeof(bool)) {
+        public WorldGraphPort(PortData portData, IEdgeConnectorListener connectorListener) :
+            base(Orientation.Horizontal, portData.PortDirection == "Output" ? Direction.Output : Direction.Input,
+                portData.PortCapacity == "Multi" ? Capacity.Multi : Capacity.Single, typeof(bool)) {
             m_EdgeConnector = new EdgeConnector<WorldGraphEdge>(connectorListener);
             this.AddManipulator(m_EdgeConnector);
-            
-            PortData = portData;
-            portColor = portData.PortColor;
-        }
 
-        public WorldGraphPort(Node node, PortData portData, IEdgeConnectorListener connectorListener)
-            : base(Orientation.Horizontal, portData.PortDirection == "Output" ? Direction.Output : Direction.Input, Capacity.Multi,
-                typeof(bool)) {
-            m_EdgeConnector = new EdgeConnector<WorldGraphEdge>(connectorListener);
-            this.AddManipulator(m_EdgeConnector);
-            
             PortData = portData;
             portColor = portData.PortColor;
 
             // Make StyleSheet for this
-            if (portData.PortType == PortType.Parameter) {
+            if (portData.PortType == PortType.Parameter && node is WorldGraphNodeView) {
                 int outputPortCount = node.inputContainer.Query("connector").ToList().Count();
                 portName = $"{portData.PortType.ToString()}({outputPortCount})";
 
@@ -58,13 +48,14 @@ namespace ThunderNut.SceneManagement.Editor {
             OnConnected?.Invoke(node, this, edge);
             base.Connect(edge);
         }
+
         public override void Disconnect(Edge edge) {
             OnDisconnected?.Invoke(node, this, edge);
             base.Disconnect(edge);
         }
 
         public void RemoveParameterPort(PortData portData) {
-            var Edges = ((WorldGraphNodeView) node).graphView.edges.ToList();
+            var Edges = m_GraphView.edges.ToList();
 
             Edge connectedEdge = Edges.Find(edge => ((WorldGraphPort) edge.input).PortData.GUID == portData.GUID);
 

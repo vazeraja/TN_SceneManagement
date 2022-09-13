@@ -15,6 +15,7 @@ namespace ThunderNut.SceneManagement {
         public string GUID;
 
         public string PortDirection;
+        public string PortCapacity;
         public PortType PortType;
         public Color PortColor;
         
@@ -109,12 +110,13 @@ namespace ThunderNut.SceneManagement {
             }
         }
 
-        public PortData CreatePort(string ownerGUID, bool isOutput, bool isParameter, Color portColor) {
+        public PortData CreatePort(string ownerGUID, bool isOutput, bool isMulti, bool isParameter, Color portColor) {
             var portData = new PortData {
                 OwnerNodeGUID = ownerGUID,
                 GUID = Guid.NewGuid().ToString(),
 
                 PortDirection = isOutput ? "Output" : "Input",
+                PortCapacity = isOutput ? "Multi" : "Single",
                 PortType = isParameter ? PortType.Parameter : PortType.Default,
                 PortColor = portColor,
             };

@@ -6,5 +6,6 @@ namespace ThunderNut.SceneManagement.Editor {
     public interface IWorldGraphNodeView : IDisposable {
         public Node gvNode { get; }
         public SceneHandle sceneHandle { get; }
+        public WorldGraphGraphView graphView { get; }
     }
 }

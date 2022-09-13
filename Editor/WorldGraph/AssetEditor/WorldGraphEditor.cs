@@ -2,6 +2,7 @@
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace ThunderNut.SceneManagement.Editor {
 
@@ -15,6 +16,14 @@ namespace ThunderNut.SceneManagement.Editor {
         private bool _settingsMenuDropdown;
         private static bool _debugView = false;
         private GUIStyle _playingStyle;
+        
+        // public override VisualElement CreateInspectorGUI()
+        // {
+        //     var root = new VisualElement();
+        //     root.Add(new IMGUIContainer(OnInspectorGUI));
+        //     root.Add(new Label("Test"));
+        //     return root;
+        // }
 
         private void OnEnable() {
             // ------------------------------- Initialize Properties -------------------------------

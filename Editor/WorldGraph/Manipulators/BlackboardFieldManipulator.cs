@@ -38,15 +38,15 @@ namespace ThunderNut.SceneManagement.Editor {
         void OnDragLeave(DragLeaveEvent _) { }
 
         private void OnDragUpdate(DragUpdatedEvent evt) {
-            if (UnityEditor.DragAndDrop.GetGenericData("DragSelection") is not List<ISelectable> selection) return;
+            if (DragAndDrop.GetGenericData("DragSelection") is not List<ISelectable> selection) return;
 
             foreach (var selectedElement in selection.OfType<BlackboardField>()) {
-                UnityEditor.DragAndDrop.visualMode = DragAndDropVisualMode.Generic;
+                DragAndDrop.visualMode = DragAndDropVisualMode.Generic;
             }
         }
 
         private void OnDragPerform(DragPerformEvent evt) {
-            if (UnityEditor.DragAndDrop.GetGenericData("DragSelection") is not List<ISelectable> selection)
+            if (DragAndDrop.GetGenericData("DragSelection") is not List<ISelectable> selection)
                 return;
 
             var windowRoot = editorView.editorWindow.rootVisualElement;

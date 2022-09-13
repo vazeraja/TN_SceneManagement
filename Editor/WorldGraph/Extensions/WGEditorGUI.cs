@@ -156,6 +156,14 @@ namespace ThunderNut.SceneManagement.Editor {
 
             return backgroundRect;
         }
+        public static Label CreateLabel(string text, int indentLevel = 0, FontStyle fontStyle = FontStyle.Normal)
+        {
+            string label = new string(' ', indentLevel * 4);
+            var labelVisualElement = new Label(label + text);
+            labelVisualElement.style.unityFontStyleAndWeight = fontStyle;
+            labelVisualElement.name = "header";
+            return labelVisualElement;
+        }
         
         public static VisualElement GetFirstAncestorWhere(VisualElement target, Predicate<VisualElement> predicate) {
             for (VisualElement parent = target.hierarchy.parent; parent != null; parent = parent.hierarchy.parent) {
@@ -171,7 +179,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 .Find(x => x.titleContent.ToString() == name);
         }
 
-        public static void RepaintInspector(System.Type t) {
+        public static void RepaintInspector(Type t) {
             UnityEditor.Editor[] ed = Resources.FindObjectsOfTypeAll<UnityEditor.Editor>();
             foreach (var t1 in ed) {
                 if (t1.GetType() != t) continue;
