@@ -45,8 +45,8 @@ namespace ThunderNut.SceneManagement.Editor {
                     m_GraphEditorView.toolbar.saveAsRequested += () => { };
                     m_GraphEditorView.toolbar.showInProjectRequested += PingAsset;
                     m_GraphEditorView.toolbar.refreshRequested += Refresh;
-                    // m_GraphEditorView.toolbar.isCheckedOut += IsGraphAssetCheckedOut;
-                    // m_GraphEditorView.toolbar.checkOut += CheckoutAsset;
+                    m_GraphEditorView.toolbar.isCheckedOut += () => false;
+                    m_GraphEditorView.toolbar.checkOut += () => { };
                     m_GraphEditorView.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
                     m_FrameAllAfterLayout = true;
                     rootVisualElement.Add(graphEditorView);
@@ -56,6 +56,17 @@ namespace ThunderNut.SceneManagement.Editor {
 
         private static readonly ProfilerMarker GraphLoadMarker = new ProfilerMarker("GraphLoad");
         private static readonly ProfilerMarker CreateGraphEditorViewMarker = new ProfilerMarker("CreateGraphEditorView");
+
+        [MenuItem("Tools/ThunderNut/WorldGraph")]
+        public static bool OpenWindow() {
+            var worldGraph = WGEditorGUI.FindAssetsByType<WorldGraph>().ToList().First();
+            if (worldGraph == null)
+                return false;
+
+            string path = AssetDatabase.GetAssetPath(worldGraph);
+
+            return ShowWorldGraphEditorWindow(path);
+        }
 
         public static bool ShowWorldGraphEditorWindow(string path) {
             string guid = AssetDatabase.AssetPathToGUID(path);

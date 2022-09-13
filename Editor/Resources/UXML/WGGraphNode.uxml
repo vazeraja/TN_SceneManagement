@@ -13,7 +13,8 @@
         <ui:VisualElement name="contents" style="background-color: rgb(43, 43, 43);">
             <ui:VisualElement name="divider" class="horizontal" />
             <ui:VisualElement name="button-container">
-                <ui:Button tabindex="-1" display-tooltip-when-elided="true" enable-rich-text="false" name="left-button" style="width: 15px; height: 15px; margin-left: 5px; margin-top: 6px; margin-bottom: 2px;" />
+                <ui:Button tabindex="-1" display-tooltip-when-elided="true" enable-rich-text="false" name="add-parameter-button" style="width: 15px; height: 15px; margin-left: 5px; margin-top: 6px; margin-bottom: 2px;" />
+                <ui:Button tabindex="-1" text="Play" display-tooltip-when-elided="true" enable-rich-text="true" name="play-button" />
             </ui:VisualElement>
             <ui:VisualElement name="top">
                 <ui:VisualElement name="input" />

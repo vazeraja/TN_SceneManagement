@@ -6,15 +6,7 @@ using UnityEditor;
 using UnityEngine;
 
 namespace ThunderNut.SceneManagement {
-    
-    [Serializable]
-    public class EdgeData {
-        public SceneHandle BaseSceneHandle;
-        public string BaseNodeGUID;
-        public SceneHandle TargetSceneHandle;
-        public string TargetNodeGUID;
-    }
-    
+
     [CreateAssetMenu(fileName = "WorldGraph", menuName = "World Graph/World Graph")]
     public class WorldGraph : ScriptableObject {
         public List<SceneHandle> sceneHandles;
@@ -26,10 +18,14 @@ namespace ThunderNut.SceneManagement {
         public string settingD;
         public string settingE;
 
-        public List<StringParameterField> stringParameters = new List<StringParameterField>();
-        public List<FloatParameterField> floatParameters = new List<FloatParameterField>();
-        public List<IntParameterField> intParameters = new List<IntParameterField>();
-        public List<BoolParameterField> boolParameters = new List<BoolParameterField>();
+        [SerializeField, SerializeReference]
+        private List<StringParameterField> stringParameters;
+        [SerializeField, SerializeReference]
+        private List<FloatParameterField> floatParameters;
+        [SerializeField, SerializeReference]
+        private List<IntParameterField> intParameters;
+        [SerializeField, SerializeReference]
+        private List<BoolParameterField> boolParameters;
 
         public IEnumerable<ExposedParameter> allParameters {
             get {
@@ -39,12 +35,11 @@ namespace ThunderNut.SceneManagement {
                 list.AddRange(intParameters);
                 list.AddRange(boolParameters);
                 return list;
-            }
+            } 
         }
 
-
         public bool IsEmpty => sceneHandles.Count == 0;
-        
+
         public void ChangeScene() {
             activeSceneHandle.ChangeToScene();
         }
@@ -56,63 +51,129 @@ namespace ThunderNut.SceneManagement {
             boolParameters.Clear();
         }
 
+        #if UNITY_EDITOR
         public ExposedParameter CreateParameter(ParameterType type) {
             switch (type) {
                 case ParameterType.String:
-                    var stringParameter = new StringParameterField();
+                    var stringParameter = (StringParameterField) CreateInstance(typeof(StringParameterField));
                     stringParameters.Add(stringParameter);
+
+                    if (!Application.isPlaying) AssetDatabase.AddObjectToAsset(stringParameter, this);
+                    AssetDatabase.SaveAssets();
+
+                    EditorUtility.SetDirty(this);
                     return stringParameter;
                 case ParameterType.Float:
-                    var floatParameter = new FloatParameterField();
+                    var floatParameter = (FloatParameterField) CreateInstance(typeof(FloatParameterField));
                     floatParameters.Add(floatParameter);
+
+                    if (!Application.isPlaying) AssetDatabase.AddObjectToAsset(floatParameter, this);
+                    AssetDatabase.SaveAssets();
+
+                    EditorUtility.SetDirty(this);
                     return floatParameter;
                 case ParameterType.Int:
-                    var intParameter = new IntParameterField();
+                    var intParameter = (IntParameterField) CreateInstance(typeof(IntParameterField));
                     intParameters.Add(intParameter);
+
+                    if (!Application.isPlaying) AssetDatabase.AddObjectToAsset(intParameter, this);
+                    AssetDatabase.SaveAssets();
+
+                    EditorUtility.SetDirty(this);
                     return intParameter;
                 case ParameterType.Bool:
-                    var boolParameter = new BoolParameterField();
+                    var boolParameter = (BoolParameterField) CreateInstance(typeof(BoolParameterField));
                     boolParameters.Add(boolParameter);
+
+                    if (!Application.isPlaying) AssetDatabase.AddObjectToAsset(boolParameter, this);
+                    AssetDatabase.SaveAssets();
+
+                    EditorUtility.SetDirty(this);
                     return boolParameter;
                 default:
                     return null;
             }
         }
-        public ExposedParameter CreateParameter(ParameterType type, string attrName) {
-            switch (type) {
+        // public ExposedParameter CreateParameter(ParameterType type, string attrName) {
+        //     // switch (type) {
+        //     //     case ParameterType.String:
+        //     //         var stringParameter = CreateInstance<StringParameterField>();
+        //     //         stringParameter.Name = attrName;
+        //     //         stringParameter.Reference = attrName;
+        //     //         stringParameters.Add(stringParameter);
+        //     //         EditorUtility.SetDirty(this);
+        //     //         return stringParameter;
+        //     //     case ParameterType.Float:
+        //     //         var floatParameter = CreateInstance<FloatParameterField>();
+        //     //         floatParameter.Name = attrName;
+        //     //         floatParameter.Reference = attrName;
+        //     //         floatParameters.Add(floatParameter);
+        //     //         EditorUtility.SetDirty(this);
+        //     //         return floatParameter;
+        //     //     case ParameterType.Int:
+        //     //         var intParameter = CreateInstance<IntParameterField>();
+        //     //         intParameter.Name = attrName;
+        //     //         intParameter.Reference = attrName;
+        //     //         intParameters.Add(intParameter);
+        //     //         EditorUtility.SetDirty(this);
+        //     //         return intParameter;
+        //     //     case ParameterType.Bool:
+        //     //         var boolParameter = CreateInstance<BoolParameterField>();
+        //     //         boolParameter.Name = attrName;
+        //     //         boolParameter.Reference = attrName;
+        //     //         boolParameters.Add(boolParameter);
+        //     //         EditorUtility.SetDirty(this);
+        //     //         return boolParameter;
+        //     //     default:
+        //     //         return null;
+        //     // }
+        // }
+
+        public void RemoveParameter(ExposedParameter parameter) {
+            switch (parameter.ParameterType) {
                 case ParameterType.String:
-                    var stringParameter = new StringParameterField();
-                    stringParameter.Name = attrName;
-                    stringParameter.Reference = attrName;
-                    stringParameters.Add(stringParameter);
-                    return stringParameter;
+                    stringParameters.Remove((StringParameterField) parameter);
+
+                    AssetDatabase.RemoveObjectFromAsset(parameter);
+                    AssetDatabase.SaveAssets();
+
+                    EditorUtility.SetDirty(this);
+                    break;
                 case ParameterType.Float:
-                    var floatParameter = new FloatParameterField();
-                    floatParameter.Name = attrName;
-                    floatParameter.Reference = attrName;
-                    floatParameters.Add(floatParameter);
-                    return floatParameter;
+                    floatParameters.Remove((FloatParameterField) parameter);
+
+                    AssetDatabase.RemoveObjectFromAsset(parameter);
+                    AssetDatabase.SaveAssets();
+
+                    EditorUtility.SetDirty(this);
+                    break;
                 case ParameterType.Int:
-                    var intParameter = new IntParameterField();
-                    intParameter.Name = attrName;
-                    intParameter.Reference = attrName;
-                    intParameters.Add(intParameter);
-                    return intParameter;
+                    intParameters.Remove((IntParameterField) parameter);
+
+                    AssetDatabase.RemoveObjectFromAsset(parameter);
+                    AssetDatabase.SaveAssets();
+
+                    EditorUtility.SetDirty(this);
+                    break;
                 case ParameterType.Bool:
-                    var boolParameter = new BoolParameterField();
-                    boolParameter.Name = attrName;
-                    boolParameter.Reference = attrName;
-                    boolParameters.Add(boolParameter);
-                    return boolParameter;
+                    boolParameters.Remove((BoolParameterField) parameter);
+
+                    AssetDatabase.RemoveObjectFromAsset(parameter);
+                    AssetDatabase.SaveAssets();
+
+                    EditorUtility.SetDirty(this);
+                    break;
                 default:
-                    return null;
+                    throw new ArgumentOutOfRangeException();
             }
+
+            AssetDatabase.SaveAssets();
         }
 
         private SceneHandle CreateSceneHandle(Type type) {
             SceneHandle newHandle = (SceneHandle) CreateInstance(type);
             newHandle.name = type.Name;
-            newHandle.guid = GUID.Generate().ToString();
+            newHandle.guid = Guid.NewGuid().ToString();
 
             AddSceneHandle(newHandle);
             return newHandle;
@@ -120,29 +181,28 @@ namespace ThunderNut.SceneManagement {
 
         private void AddSceneHandle(SceneHandle handle) {
             sceneHandles.Add(handle);
+            EditorUtility.SetDirty(this);
         }
 
         private void RemoveSceneHandle(SceneHandle handle) {
             sceneHandles.Remove(handle);
+            EditorUtility.SetDirty(this);
         }
 
         public void AddChild(SceneHandle parent, SceneHandle child) {
             parent.children.Add(child);
+            EditorUtility.SetDirty(this);
         }
 
         public void RemoveChild(SceneHandle parent, SceneHandle child) {
             parent.children.Remove(child);
+            EditorUtility.SetDirty(this);
         }
 
-        #region Editor
-
-        #if UNITY_EDITOR
         public SceneHandle CreateSubAsset(Type type) {
             var newHandle = CreateSceneHandle(type);
 
-            if (!Application.isPlaying)
-                AssetDatabase.AddObjectToAsset(newHandle, this);
-
+            if (!Application.isPlaying) AssetDatabase.AddObjectToAsset(newHandle, this);
             AssetDatabase.SaveAssets();
 
             return newHandle;
@@ -155,16 +215,10 @@ namespace ThunderNut.SceneManagement {
         }
 
         public static IEnumerable<SceneHandle> GetChildren(SceneHandle parent) {
-            if (parent.children.Any()) {
-                return parent.children;
-            }
-            
-            return Enumerable.Empty<SceneHandle>();
+            return parent.children.Any() ? parent.children : Enumerable.Empty<SceneHandle>();
         }
 
         #endif
-
-        #endregion
     }
 
 }

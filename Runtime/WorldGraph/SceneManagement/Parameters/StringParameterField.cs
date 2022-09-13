@@ -1,10 +1,10 @@
 ﻿using System;
 
 namespace ThunderNut.SceneManagement {
-
-    [Serializable]
+    
     public class StringParameterField : ParameterField<string> {
         public StringParameterField() {
+            GUID = Guid.NewGuid().ToString();
             Name = "StringParameter";
             Reference = "_StringParameter";
             Exposed = true;

@@ -1,10 +1,10 @@
 ﻿using System;
 
 namespace ThunderNut.SceneManagement {
-
-    [Serializable]
+    
     public class FloatParameterField : ParameterField<float> {
         public FloatParameterField() {
+            GUID = Guid.NewGuid().ToString();
             Name = "FloatParameter";
             Reference = "_FloatParameter";
             Exposed = true;

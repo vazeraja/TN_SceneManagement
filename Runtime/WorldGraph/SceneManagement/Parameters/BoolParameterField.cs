@@ -2,9 +2,9 @@
 
 namespace ThunderNut.SceneManagement {
 
-    [Serializable]
     public class BoolParameterField : ParameterField<bool> {
         public BoolParameterField() {
+            GUID = Guid.NewGuid().ToString();
             Name = "BoolParameter";
             Reference = "_BoolParameter";
             Exposed = true;

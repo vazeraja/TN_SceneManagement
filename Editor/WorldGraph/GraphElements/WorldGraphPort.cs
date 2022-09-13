@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -6,30 +7,30 @@ using UnityEngine.UIElements;
 namespace ThunderNut.SceneManagement.Editor {
 
     public sealed class WorldGraphPort : Port {
-        private IEdgeConnectorListener ConnectorListener;
-
         public readonly PortData PortData;
-        public readonly WorldGraphNodeView Node;
 
         public readonly Button deleteParameterButton;
 
-        public WorldGraphPort(PortData portData, IEdgeConnectorListener connectorListener) :
-            base(Orientation.Horizontal, portData.PortDirection == "Output" ? Direction.Output : Direction.Input, Capacity.Single, typeof(bool)) {
+        public event Action<Node, WorldGraphPort, Edge> OnConnected;
+        public event Action<Node, WorldGraphPort, Edge> OnDisconnected;
+
+        public WorldGraphPort(PortData portData, IEdgeConnectorListener connectorListener)
+            : base(Orientation.Horizontal, portData.PortDirection == "Output" ? Direction.Output : Direction.Input, Capacity.Single,
+                typeof(bool)) {
             m_EdgeConnector = new EdgeConnector<WorldGraphEdge>(connectorListener);
             this.AddManipulator(m_EdgeConnector);
             
             PortData = portData;
+            portColor = portData.PortColor;
         }
 
-        public WorldGraphPort(WorldGraphNodeView node, PortData portData, IEdgeConnectorListener connectorListener)
-            : base(Orientation.Horizontal, portData.PortDirection == "Output" ? Direction.Output : Direction.Input, Capacity.Multi, typeof(bool)) {
+        public WorldGraphPort(Node node, PortData portData, IEdgeConnectorListener connectorListener)
+            : base(Orientation.Horizontal, portData.PortDirection == "Output" ? Direction.Output : Direction.Input, Capacity.Multi,
+                typeof(bool)) {
             m_EdgeConnector = new EdgeConnector<WorldGraphEdge>(connectorListener);
             this.AddManipulator(m_EdgeConnector);
-
-            ConnectorListener = connectorListener;
+            
             PortData = portData;
-            Node = node;
-
             portColor = portData.PortColor;
 
             // Make StyleSheet for this
@@ -53,25 +54,29 @@ namespace ThunderNut.SceneManagement.Editor {
             }
         }
 
-        private void RemoveParameterPort(PortData portData) {
-            var Edges = Node.graphView.edges.ToList();
+        public override void Connect(Edge edge) {
+            OnConnected?.Invoke(node, this, edge);
+            base.Connect(edge);
+        }
+        public override void Disconnect(Edge edge) {
+            OnDisconnected?.Invoke(node, this, edge);
+            base.Disconnect(edge);
+        }
+
+        public void RemoveParameterPort(PortData portData) {
+            var Edges = ((WorldGraphNodeView) node).graphView.edges.ToList();
+
             Edge connectedEdge = Edges.Find(edge => ((WorldGraphPort) edge.input).PortData.GUID == portData.GUID);
 
             if (connectedEdge != null) {
                 connectedEdge.input.Disconnect(connectedEdge);
-                
-                portData.Parameter.ConnectedPortGUID = null;
-                Node.sceneHandle.RemoveParameter(portData.Parameter);
-                
-                Node.graphView.RemoveElement(connectedEdge);
-                Node.graphView.RemoveElement(connectedEdge.output.node);
-            }
-            
-            Node.sceneHandle.RemovePort(portData);
-            Node.inputContainer.Remove(this);
+                connectedEdge.output.Disconnect(connectedEdge);
 
-            Node.RefreshPorts();
-            Node.RefreshExpandedState();
+                m_GraphView.RemoveElement(connectedEdge);
+            }
+
+            ((WorldGraphNodeView) node).sceneHandle.RemovePort(portData);
+            node.inputContainer.Remove(this);
         }
     }
 

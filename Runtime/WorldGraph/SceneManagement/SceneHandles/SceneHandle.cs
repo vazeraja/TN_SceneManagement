@@ -13,11 +13,11 @@ namespace ThunderNut.SceneManagement {
     public class PortData {
         public string OwnerNodeGUID;
         public string GUID;
-        
+
         public string PortDirection;
         public PortType PortType;
         public Color PortColor;
-
+        
         public ExposedParameter Parameter;
     }
 
@@ -25,6 +25,7 @@ namespace ThunderNut.SceneManagement {
         Default,
         Parameter,
     }
+
     public abstract class SceneHandle : ScriptableObject {
         public string guid;
         public Vector2 position;
@@ -37,45 +38,71 @@ namespace ThunderNut.SceneManagement {
 
         public SceneReference scene;
         public List<SceneHandle> children = new List<SceneHandle>();
-        
-        public List<StringParameterField> stringParameters = new List<StringParameterField>();
-        public List<FloatParameterField> floatParameters = new List<FloatParameterField>();
-        public List<IntParameterField> intParameters = new List<IntParameterField>();
-        public List<BoolParameterField> boolParameters = new List<BoolParameterField>();
+
+        [SerializeField, SerializeReference]
+        private List<StringParameterField> stringParameters = new List<StringParameterField>();
+        [SerializeField, SerializeReference]
+        private List<FloatParameterField> floatParameters = new List<FloatParameterField>();
+        [SerializeField, SerializeReference]
+        private List<IntParameterField> intParameters = new List<IntParameterField>();
+        [SerializeField, SerializeReference]
+        private List<BoolParameterField> boolParameters = new List<BoolParameterField>();
+
+        public IEnumerable<ExposedParameter> allParameters {
+            get {
+                List<ExposedParameter> list = new List<ExposedParameter>();
+                list.AddRange(stringParameters);
+                list.AddRange(floatParameters);
+                list.AddRange(intParameters);
+                list.AddRange(boolParameters);
+                return list;
+            }
+        }
 
         public abstract void ChangeToScene();
+
+        #if UNITY_EDITOR
 
         public void AddParameter(ExposedParameter param) {
             switch (param.ParameterType) {
                 case ParameterType.String:
-                    stringParameters.Add(param as StringParameterField);
+                    stringParameters.Add((StringParameterField) param);
+                    EditorUtility.SetDirty(this);
                     break;
                 case ParameterType.Float:
-                    floatParameters.Add(param as FloatParameterField);
+                    floatParameters.Add((FloatParameterField) param);
+                    EditorUtility.SetDirty(this);
                     break;
                 case ParameterType.Int:
-                    intParameters.Add(param as IntParameterField);
+                    intParameters.Add((IntParameterField) param);
+                    EditorUtility.SetDirty(this);
                     break;
                 case ParameterType.Bool:
-                    boolParameters.Add(param as BoolParameterField);
+                    boolParameters.Add((BoolParameterField) param);
+                    EditorUtility.SetDirty(this);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
-        public void RemoveParameter(ExposedParameter param) {
+
+        public void RemoveParameter(ExposedParameter param) { 
             switch (param.ParameterType) {
                 case ParameterType.String:
-                    stringParameters.Remove(param as StringParameterField);
+                    stringParameters.Remove((StringParameterField) param);
+                    EditorUtility.SetDirty(this);
                     break;
                 case ParameterType.Float:
-                    floatParameters.Remove(param as FloatParameterField);
+                    floatParameters.Remove((FloatParameterField) param);
+                    EditorUtility.SetDirty(this);
                     break;
                 case ParameterType.Int:
-                    intParameters.Remove(param as IntParameterField);
+                    intParameters.Remove((IntParameterField) param);
+                    EditorUtility.SetDirty(this);
                     break;
                 case ParameterType.Bool:
-                    boolParameters.Remove(param as BoolParameterField);
+                    boolParameters.Remove((BoolParameterField) param);
+                    EditorUtility.SetDirty(this);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -85,19 +112,22 @@ namespace ThunderNut.SceneManagement {
         public PortData CreatePort(string ownerGUID, bool isOutput, bool isParameter, Color portColor) {
             var portData = new PortData {
                 OwnerNodeGUID = ownerGUID,
-                GUID = GUID.Generate().ToString(),
-                
+                GUID = Guid.NewGuid().ToString(),
+
                 PortDirection = isOutput ? "Output" : "Input",
                 PortType = isParameter ? PortType.Parameter : PortType.Default,
                 PortColor = portColor,
             };
             ports.Add(portData);
+            EditorUtility.SetDirty(this);
             return portData;
         }
-        
+
         public void RemovePort(PortData portData) {
             ports.Remove(portData);
+            EditorUtility.SetDirty(this);
         }
+        #endif
     }
 
     #if UNITY_EDITOR
@@ -125,7 +155,7 @@ namespace ThunderNut.SceneManagement {
             EditorGUILayout.Space(10);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("scene"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("children"));
-            
+
             EditorGUILayout.PropertyField(serializedObject.FindProperty("stringParameters"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("floatParameters"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("intParameters"));

@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 
 namespace ThunderNut.SceneManagement.Editor {
 
-    public class BlackboardFieldDragAndDrop : PointerManipulator {
+    public class BlackboardFieldManipulator : PointerManipulator {
         private WorldGraphEditorView editorView;
 
         protected override void RegisterCallbacksOnTarget() {
@@ -26,7 +26,7 @@ namespace ThunderNut.SceneManagement.Editor {
             target.UnregisterCallback<DragPerformEvent>(OnDragPerform);
         }
 
-        public BlackboardFieldDragAndDrop(VisualElement root) {
+        public BlackboardFieldManipulator(VisualElement root) {
             target = root.Q<VisualElement>(className: "drop-area");
             editorView = root as WorldGraphEditorView;
         }
@@ -54,7 +54,8 @@ namespace ThunderNut.SceneManagement.Editor {
             var graphMousePosition = editorView.graphView.contentViewContainer.WorldToLocal(windowMousePosition);
 
             foreach (var selectedElement in selection.OfType<BlackboardField>()) {
-                editorView.CreateParameterGraphNode(selectedElement, graphMousePosition);
+                ExposedParameter parameter = selectedElement.userData as ExposedParameter;
+                editorView.CreateParameterGraphNode(parameter, graphMousePosition);
             }
         }
 
