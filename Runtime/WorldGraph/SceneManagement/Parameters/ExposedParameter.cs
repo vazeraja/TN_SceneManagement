@@ -5,11 +5,11 @@ using UnityEngine;
 namespace ThunderNut.SceneManagement {
 
     public class ExposedParameter : ScriptableObject {
-        [ShowInGraphInspector]
+        [WGInspectable]
         public string Name;
-        [ShowInGraphInspector]
+        [WGInspectable]
         public string Reference;
-        [ShowInGraphInspector]
+        [WGInspectable]
         public bool Exposed;
 
         public ParameterType ParameterType;

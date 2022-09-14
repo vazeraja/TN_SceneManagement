@@ -4,7 +4,7 @@ using UnityEngine;
 namespace ThunderNut.SceneManagement {
 
     public class ParameterField<TValueType> : ExposedParameter {
-        [ShowInGraphInspector]
+        [WGInspectable(ChangeCheck = true)]
         public TValueType Value;
     }
 

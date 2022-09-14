@@ -5,8 +5,12 @@ using UnityEngine.UIElements;
 
 namespace ThunderNut.SceneManagement.Editor {
 
-    public class ParameterPropertyNodeView : TokenNode {
+    public class ParameterPropertyNodeView : TokenNode, IWorldGraphNodeView {
         public readonly ExposedParameter parameter;
+
+        public Node gvNode => this;
+        public SceneHandle sceneHandle => null;
+        public WorldGraphGraphView graphView => GetFirstAncestorOfType<WorldGraphGraphView>();
         
         public ParameterPropertyNodeView(ExposedParameter parameter, Port output) : base(null, output) { 
             styleSheets.Add(Resources.Load<StyleSheet>("Styles/PropertyNodeView"));
@@ -29,6 +33,10 @@ namespace ThunderNut.SceneManagement.Editor {
             parameter.Position.x = newPos.xMin;
             parameter.Position.y = newPos.yMin;
         }
+
+        public void Dispose() {
+        }
+        
     }
 
 }

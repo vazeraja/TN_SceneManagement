@@ -17,6 +17,8 @@ namespace ThunderNut.SceneManagement {
     }
 
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class ShowInGraphInspectorAttribute : PropertyAttribute { }
+    public class WGInspectableAttribute : PropertyAttribute {
+        public bool ChangeCheck;
+    }
 
 }

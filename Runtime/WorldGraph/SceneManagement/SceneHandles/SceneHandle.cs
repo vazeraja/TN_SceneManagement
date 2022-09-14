@@ -34,15 +34,13 @@ namespace ThunderNut.SceneManagement {
         protected virtual Color HandleColor => Color.white;
         public virtual Color color => HandleColor;
 
-        [ShowInGraphInspector]
+        [WGInspectable]
         public bool Active = true;
-        [ShowInGraphInspector]
+        [WGInspectable]
         public string HandleName = "";
-        
-
-        [ShowInGraphInspector]
+        [WGInspectable]
         public SceneReference scene;
-        [ShowInGraphInspector]
+        [WGInspectable]
         public List<SceneHandle> children = new List<SceneHandle>();
 
         [SerializeField, SerializeReference]
