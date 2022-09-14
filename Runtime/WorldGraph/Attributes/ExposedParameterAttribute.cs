@@ -16,4 +16,7 @@ namespace ThunderNut.SceneManagement {
         public string Name;
     }
 
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    public class ShowInGraphInspectorAttribute : PropertyAttribute { }
+
 }

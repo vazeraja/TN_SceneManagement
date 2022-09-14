@@ -16,14 +16,6 @@ namespace ThunderNut.SceneManagement.Editor {
         private bool _settingsMenuDropdown;
         private static bool _debugView = false;
         private GUIStyle _playingStyle;
-        
-        // public override VisualElement CreateInspectorGUI()
-        // {
-        //     var root = new VisualElement();
-        //     root.Add(new IMGUIContainer(OnInspectorGUI));
-        //     root.Add(new Label("Test"));
-        //     return root;
-        // }
 
         private void OnEnable() {
             // ------------------------------- Initialize Properties -------------------------------
@@ -37,7 +29,6 @@ namespace ThunderNut.SceneManagement.Editor {
             for (var i = 0; i < _sceneHandles.arraySize; i++) {
                 AddEditor(_sceneHandles.GetArrayElementAtIndex(i).objectReferenceValue as SceneHandle);
             }
-
 
             // ------------------------------- Get Display Options ---------------------------------
 
@@ -110,9 +101,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
             WGEditorGUI.DrawSection("Scene Handles");
 
-            for (int i = 0;
-                i < _sceneHandles.arraySize;
-                i++) {
+            for (int i = 0; i < _sceneHandles.arraySize; i++) {
                 WGEditorGUI.DrawSplitter();
 
                 SerializedProperty property = _sceneHandles.GetArrayElementAtIndex(i);
@@ -210,10 +199,10 @@ namespace ThunderNut.SceneManagement.Editor {
                 }
             }
 
-// -------------------------------------------- Apply Changes --------------------------------------------
+            // -------------------------------------------- Apply Changes --------------------------------------------
             serializedObject.ApplyModifiedProperties();
 
-// -------------------------------------------- Debug Area --------------------------------------------
+            // -------------------------------------------- Debug Area --------------------------------------------
             WGEditorGUI.DrawSection("All Scenes Debug");
             EditorGUI.BeginDisabledGroup(!Application.isPlaying);
             EditorGUILayout.BeginHorizontal();

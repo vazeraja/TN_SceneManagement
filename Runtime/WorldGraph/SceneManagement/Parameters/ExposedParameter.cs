@@ -3,21 +3,24 @@ using UnityEditor;
 using UnityEngine;
 
 namespace ThunderNut.SceneManagement {
-    
+
     public class ExposedParameter : ScriptableObject {
-        public string GUID;
+        [ShowInGraphInspector]
         public string Name;
+        [ShowInGraphInspector]
         public string Reference;
+        [ShowInGraphInspector]
         public bool Exposed;
-        public bool Displayed;
+
         public ParameterType ParameterType;
-        
-        public string ConnectedPortGUID;
+        public string GUID;
         public Vector2 Position;
+        public string ConnectedPortGUID;
+        public bool Displayed;
 
         public void Awake() {
             name = Name;
-        } 
+        }
     }
- 
+
 }

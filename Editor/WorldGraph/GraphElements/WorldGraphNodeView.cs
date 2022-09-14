@@ -35,6 +35,10 @@ namespace ThunderNut.SceneManagement.Editor {
             style.left = sceneHandle.position.x;
             style.top = sceneHandle.position.y;
 
+            if (string.IsNullOrEmpty(sceneHandle.HandleName)) {
+                sceneHandle.HandleName = sceneHandle.GetType().Name;
+            }
+
             addParameterButton = this.Q<Button>("add-parameter-button");
             addParameterButton.style.backgroundImage = Resources.Load<Texture2D>("Sprite-0001");
             playSceneButton = this.Q<Button>("play-button");
@@ -112,11 +116,11 @@ namespace ThunderNut.SceneManagement.Editor {
                     portColor = Color.white;
 
                     if (loadedOutputPort == null) outputPortData = sceneHandle.CreatePort(viewDataKey, true, true, false, portColor);
-                    output = new WorldGraphPort(loadedOutputPort ?? outputPortData, connectorListener);
+                    output = new WorldGraphPort(loadedOutputPort ?? outputPortData, connectorListener, this);
                     outputContainer.Add(output);
 
                     if (loadedInputPort == null) inputPortData = sceneHandle.CreatePort(viewDataKey, false, true, false, portColor);
-                    input = new WorldGraphPort(loadedInputPort ?? inputPortData, connectorListener);
+                    input = new WorldGraphPort(loadedInputPort ?? inputPortData, connectorListener, this);
                     inputContainer.Add(input);
 
                     capabilities &= ~Capabilities.Deletable;
@@ -127,11 +131,11 @@ namespace ThunderNut.SceneManagement.Editor {
                     portColor = new Color(0.12f, 0.44f, 0.81f);
 
                     if (loadedOutputPort == null) outputPortData = sceneHandle.CreatePort(viewDataKey, true, true, false, portColor);
-                    output = new WorldGraphPort(loadedOutputPort ?? outputPortData, connectorListener);
+                    output = new WorldGraphPort(loadedOutputPort ?? outputPortData, connectorListener, this);
                     outputContainer.Add(output);
 
                     if (loadedInputPort == null) inputPortData = sceneHandle.CreatePort(viewDataKey, false, true, false, portColor);
-                    input = new WorldGraphPort(loadedInputPort ?? inputPortData, connectorListener);
+                    input = new WorldGraphPort(loadedInputPort ?? inputPortData, connectorListener, this);
                     inputContainer.Add(input);
 
                     break;
@@ -140,11 +144,11 @@ namespace ThunderNut.SceneManagement.Editor {
                     portColor = new Color(0.94f, 0.7f, 0.31f);
 
                     if (loadedOutputPort == null) outputPortData = sceneHandle.CreatePort(viewDataKey, true, true, false, portColor);
-                    output = new WorldGraphPort(loadedOutputPort ?? outputPortData, connectorListener);
+                    output = new WorldGraphPort(loadedOutputPort ?? outputPortData, connectorListener, this);
                     outputContainer.Add(output);
 
                     if (loadedInputPort == null) inputPortData = sceneHandle.CreatePort(viewDataKey, false, true, false, portColor);
-                    input = new WorldGraphPort(loadedInputPort ?? inputPortData, connectorListener);
+                    input = new WorldGraphPort(loadedInputPort ?? inputPortData, connectorListener, this);
                     inputContainer.Add(input);
 
                     break;
@@ -153,11 +157,11 @@ namespace ThunderNut.SceneManagement.Editor {
                     portColor = new Color(0.81f, 0.29f, 0.28f);
 
                     if (loadedOutputPort == null) outputPortData = sceneHandle.CreatePort(viewDataKey, true, true, false, portColor);
-                    output = new WorldGraphPort(loadedOutputPort ?? outputPortData, connectorListener);
+                    output = new WorldGraphPort(loadedOutputPort ?? outputPortData, connectorListener, this);
                     outputContainer.Add(output);
 
                     if (loadedInputPort == null) inputPortData = sceneHandle.CreatePort(viewDataKey, false, true, false, portColor);
-                    input = new WorldGraphPort(loadedInputPort ?? inputPortData, connectorListener);
+                    input = new WorldGraphPort(loadedInputPort ?? inputPortData, connectorListener, this);
                     inputContainer.Add(input);
 
                     break;
@@ -166,18 +170,20 @@ namespace ThunderNut.SceneManagement.Editor {
 
         private void LoadParameterPorts(IEnumerable<PortData> portData) {
             foreach (var data in portData) {
-                if (data.PortType != PortType.Parameter) continue;
-                var parameterPort = new WorldGraphPort(data, connectorListener);
-                inputContainer.Add(parameterPort);
+                if (data.PortType == PortType.Parameter) {
+                    var parameterPort = new WorldGraphPort(data, connectorListener, this);
+                    inputContainer.Add(parameterPort);
+                }
             }
         }
 
         private void AddParameterPort() {
             var portData = sceneHandle.CreatePort(viewDataKey, false, false, true, portColor);
-            var parameterPort = new WorldGraphPort(portData, connectorListener);
+            var parameterPort = new WorldGraphPort(portData, connectorListener, this);
 
             inputContainer.Add(parameterPort);
             graphView.InitializePortBehavior(parameterPort);
+            ScreenCapture.CaptureScreenshot("Assets/TN_SceneManagement/Editor/Resources/temp.png", 1);
         }
 
         public override void OnSelected() {
@@ -200,6 +206,7 @@ namespace ThunderNut.SceneManagement.Editor {
         public void Dispose() {
             // Debug.Log($"Disposing: {name}");
             addParameterButton = null;
+            playSceneButton = null;
         }
     }
 

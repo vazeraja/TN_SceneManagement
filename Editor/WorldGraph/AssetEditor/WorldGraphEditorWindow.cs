@@ -143,6 +143,7 @@ namespace ThunderNut.SceneManagement.Editor {
         }
 
         protected void OnDisable() {
+            worldGraph = null;
             graphEditorView = null;
         }
 

@@ -130,33 +130,33 @@ namespace ThunderNut.SceneManagement {
         // }
 
         public void RemoveParameter(ExposedParameter parameter) {
-            switch (parameter.ParameterType) {
-                case ParameterType.String:
-                    stringParameters.Remove((StringParameterField) parameter);
+            switch (parameter) {
+                case StringParameterField stringParameterField:
+                    stringParameters.Remove(stringParameterField);
 
                     AssetDatabase.RemoveObjectFromAsset(parameter);
                     AssetDatabase.SaveAssets();
 
                     EditorUtility.SetDirty(this);
                     break;
-                case ParameterType.Float:
-                    floatParameters.Remove((FloatParameterField) parameter);
+                case FloatParameterField floatParameterField:
+                    floatParameters.Remove(floatParameterField);
 
                     AssetDatabase.RemoveObjectFromAsset(parameter);
                     AssetDatabase.SaveAssets();
 
                     EditorUtility.SetDirty(this);
                     break;
-                case ParameterType.Int:
-                    intParameters.Remove((IntParameterField) parameter);
+                case IntParameterField intParameterField:
+                    intParameters.Remove(intParameterField);
 
                     AssetDatabase.RemoveObjectFromAsset(parameter);
                     AssetDatabase.SaveAssets();
 
                     EditorUtility.SetDirty(this);
                     break;
-                case ParameterType.Bool:
-                    boolParameters.Remove((BoolParameterField) parameter);
+                case BoolParameterField boolParameterField:
+                    boolParameters.Remove(boolParameterField);
 
                     AssetDatabase.RemoveObjectFromAsset(parameter);
                     AssetDatabase.SaveAssets();

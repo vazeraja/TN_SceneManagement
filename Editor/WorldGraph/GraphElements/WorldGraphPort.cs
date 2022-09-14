@@ -9,12 +9,14 @@ namespace ThunderNut.SceneManagement.Editor {
     public sealed class WorldGraphPort : Port {
         public readonly PortData PortData;
 
-        public readonly Button deleteParameterButton;
+        public Button deleteParameterButton;
+
+        public Node nodeView;
 
         public event Action<Node, WorldGraphPort, Edge> OnConnected;
         public event Action<Node, WorldGraphPort, Edge> OnDisconnected;
 
-        public WorldGraphPort(PortData portData, IEdgeConnectorListener connectorListener) :
+        public WorldGraphPort(PortData portData, IEdgeConnectorListener connectorListener, Node nodeView = null) :
             base(Orientation.Horizontal, portData.PortDirection == "Output" ? Direction.Output : Direction.Input,
                 portData.PortCapacity == "Multi" ? Capacity.Multi : Capacity.Single, typeof(bool)) {
             m_EdgeConnector = new EdgeConnector<WorldGraphEdge>(connectorListener);
@@ -22,12 +24,13 @@ namespace ThunderNut.SceneManagement.Editor {
 
             PortData = portData;
             portColor = portData.PortColor;
+            portName = portData.PortDirection;
+            this.nodeView = nodeView;
 
-            // Make StyleSheet for this
-            if (portData.PortType == PortType.Parameter && node is WorldGraphNodeView) {
-                int outputPortCount = node.inputContainer.Query("connector").ToList().Count();
+            if (portData.PortType == PortType.Parameter && nodeView != null) {
+                int outputPortCount = nodeView.inputContainer.Query("connector").ToList().Count;
                 portName = $"{portData.PortType.ToString()}({outputPortCount})";
-
+                
                 deleteParameterButton = new Button(() => { RemoveParameterPort(portData); });
                 deleteParameterButton.style.backgroundImage = Resources.Load<Texture2D>("Sprite-0003");
                 deleteParameterButton.style.width = 15;
@@ -36,13 +39,11 @@ namespace ThunderNut.SceneManagement.Editor {
                 deleteParameterButton.style.marginRight = 3;
                 deleteParameterButton.style.marginTop = 6;
                 deleteParameterButton.style.marginBottom = 5;
-
+                
                 contentContainer.Add(deleteParameterButton);
             }
-            else {
-                portName = portData.PortDirection;
-            }
         }
+        
 
         public override void Connect(Edge edge) {
             OnConnected?.Invoke(node, this, edge);
@@ -55,7 +56,7 @@ namespace ThunderNut.SceneManagement.Editor {
         }
 
         public void RemoveParameterPort(PortData portData) {
-            var Edges = m_GraphView.edges.ToList();
+            var Edges = ((WorldGraphNodeView) nodeView).graphView.edges.ToList();
 
             Edge connectedEdge = Edges.Find(edge => ((WorldGraphPort) edge.input).PortData.GUID == portData.GUID);
 
@@ -66,8 +67,8 @@ namespace ThunderNut.SceneManagement.Editor {
                 m_GraphView.RemoveElement(connectedEdge);
             }
 
-            ((WorldGraphNodeView) node).sceneHandle.RemovePort(portData);
-            node.inputContainer.Remove(this);
+            ((WorldGraphNodeView) nodeView).sceneHandle.RemovePort(portData);
+            nodeView.inputContainer.Remove(this);
         }
     }
 

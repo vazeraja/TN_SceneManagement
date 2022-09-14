@@ -18,7 +18,7 @@ namespace ThunderNut.SceneManagement {
         public string PortCapacity;
         public PortType PortType;
         public Color PortColor;
-        
+
         public ExposedParameter Parameter;
     }
 
@@ -31,13 +31,18 @@ namespace ThunderNut.SceneManagement {
         public string guid;
         public Vector2 position;
         public List<PortData> ports = new List<PortData>();
-
-        public bool Active = true;
-        public string HandleName = "";
         protected virtual Color HandleColor => Color.white;
-        public Color color => HandleColor;
+        public virtual Color color => HandleColor;
 
+        [ShowInGraphInspector]
+        public bool Active = true;
+        [ShowInGraphInspector]
+        public string HandleName = "";
+        
+
+        [ShowInGraphInspector]
         public SceneReference scene;
+        [ShowInGraphInspector]
         public List<SceneHandle> children = new List<SceneHandle>();
 
         [SerializeField, SerializeReference]
@@ -65,21 +70,21 @@ namespace ThunderNut.SceneManagement {
         #if UNITY_EDITOR
 
         public void AddParameter(ExposedParameter param) {
-            switch (param.ParameterType) {
-                case ParameterType.String:
-                    stringParameters.Add((StringParameterField) param);
+            switch (param) {
+                case StringParameterField stringParameterField:
+                    stringParameters.Add(stringParameterField);
                     EditorUtility.SetDirty(this);
                     break;
-                case ParameterType.Float:
-                    floatParameters.Add((FloatParameterField) param);
+                case FloatParameterField floatParameterField:
+                    floatParameters.Add(floatParameterField);
                     EditorUtility.SetDirty(this);
                     break;
-                case ParameterType.Int:
-                    intParameters.Add((IntParameterField) param);
+                case IntParameterField intParameterField:
+                    intParameters.Add(intParameterField);
                     EditorUtility.SetDirty(this);
                     break;
-                case ParameterType.Bool:
-                    boolParameters.Add((BoolParameterField) param);
+                case BoolParameterField boolParameterField:
+                    boolParameters.Add(boolParameterField);
                     EditorUtility.SetDirty(this);
                     break;
                 default:
@@ -87,22 +92,22 @@ namespace ThunderNut.SceneManagement {
             }
         }
 
-        public void RemoveParameter(ExposedParameter param) { 
-            switch (param.ParameterType) {
-                case ParameterType.String:
-                    stringParameters.Remove((StringParameterField) param);
+        public void RemoveParameter(ExposedParameter param) {
+            switch (param) {
+                case StringParameterField stringParameterField:
+                    stringParameters.Remove(stringParameterField);
                     EditorUtility.SetDirty(this);
                     break;
-                case ParameterType.Float:
-                    floatParameters.Remove((FloatParameterField) param);
+                case FloatParameterField floatParameterField:
+                    floatParameters.Remove(floatParameterField);
                     EditorUtility.SetDirty(this);
                     break;
-                case ParameterType.Int:
-                    intParameters.Remove((IntParameterField) param);
+                case IntParameterField intParameterField:
+                    intParameters.Remove(intParameterField);
                     EditorUtility.SetDirty(this);
                     break;
-                case ParameterType.Bool:
-                    boolParameters.Remove((BoolParameterField) param);
+                case BoolParameterField boolParameterField:
+                    boolParameters.Remove(boolParameterField);
                     EditorUtility.SetDirty(this);
                     break;
                 default:
@@ -116,7 +121,7 @@ namespace ThunderNut.SceneManagement {
                 GUID = Guid.NewGuid().ToString(),
 
                 PortDirection = isOutput ? "Output" : "Input",
-                PortCapacity = isOutput ? "Multi" : "Single",
+                PortCapacity = isMulti ? "Multi" : "Single",
                 PortType = isParameter ? PortType.Parameter : PortType.Default,
                 PortColor = portColor,
             };
@@ -131,42 +136,5 @@ namespace ThunderNut.SceneManagement {
         }
         #endif
     }
-
-    #if UNITY_EDITOR
-
-    [CustomEditor(typeof(SceneHandle), true)]
-    public class SceneHandleEditor : Editor {
-        private bool _settingsDropdown;
-
-        public override void OnInspectorGUI() {
-            serializedObject.Update();
-
-            using (new EditorGUI.DisabledGroupScope(true)) {
-                _settingsDropdown = EditorGUILayout.Foldout(_settingsDropdown, "Internal Settings", true, EditorStyles.foldout);
-                if (_settingsDropdown) {
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("guid"));
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("position"));
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("ports"));
-                }
-            }
-
-            EditorGUILayout.Space(10);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("Active"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("HandleName"));
-
-            EditorGUILayout.Space(10);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("scene"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("children"));
-
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("stringParameters"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("floatParameters"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("intParameters"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("boolParameters"));
-
-            serializedObject.ApplyModifiedProperties();
-        }
-    }
-
-    #endif
 
 }

@@ -12,12 +12,11 @@ namespace ThunderNut.SceneManagement.Editor {
     public class WorldGraphGraphView : GraphView {
         private readonly EditorWindow window;
         private readonly WorldGraph graph;
-        
-        private UnityEditor.Editor editor;
-        private Vector2 scrollPos;
 
         public Blackboard inspectorBlackboard;
-        
+
+        private readonly VisualElement _RootElement;
+
         public WorldGraphGraphView(EditorWindow window, WorldGraph graph) {
             this.window = window;
             this.graph = graph;
@@ -27,37 +26,96 @@ namespace ThunderNut.SceneManagement.Editor {
             this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());
             this.AddManipulator(new ClickSelector());
-
             SetupZoom(0.05f, 8);
             AddToClassList("drop-area");
+
+            _RootElement = new VisualElement();
+            var visualTreeAsset = Resources.Load<VisualTreeAsset>($"UXML/InspectorContainer");
+            _RootElement.styleSheets.Add(Resources.Load<StyleSheet>("UXML/InspectorContainer"));
+            visualTreeAsset.CloneTree(_RootElement);
+
         }
 
         public override void AddToSelection(ISelectable selectable) {
             base.AddToSelection(selectable);
-            if (selectable is BlackboardField field) {
-                DrawInspector((ExposedParameter)field.userData);
+            switch (selectable) {
+                case BlackboardField field:
+                    DrawInspector((ExposedParameter) field.userData);
+                    break;
+                case ParameterPropertyNodeView paramView:
+                    DrawInspector(paramView.parameter);
+                    break;
             }
         }
+        
+        
 
         public void DrawInspector(Object objectToDisplay) {
             inspectorBlackboard.Clear();
-            Object.DestroyImmediate(editor);
+            _RootElement.Q<ScrollView>("content-container").Clear();
 
-            editor = UnityEditor.Editor.CreateEditor(objectToDisplay);
+            switch (objectToDisplay) {
+                case SceneHandle sceneHandle: {
+                    var serializedHandle = new SerializedObject(sceneHandle);
+                    var fieldInfos =
+                        WGReflectionHelper.GetFieldInfosWithAttribute(sceneHandle, typeof(ShowInGraphInspectorAttribute));
 
-            var section = new BlackboardSection{title = $"{objectToDisplay.name} Node"};
-            section.Q<Label>("sectionTitleLabel").style.color = new Color(0.77f, 0.77f, 0.77f);
-            section.Q<Label>("sectionTitleLabel").style.unityFontStyleAndWeight = FontStyle.Bold;
-            section.Q<Label>("sectionTitleLabel").style.fontSize = 15;
+                    _RootElement.Q<Label>("title-label").text = $"{sceneHandle.HandleName} Node";
+                    var imguiContainer = new IMGUIContainer(() => {
+                        serializedHandle.Update();
 
-            inspectorBlackboard.Add(section);
-            inspectorBlackboard.Add(new IMGUIContainer(() => {
-                using var scrollViewScope = new EditorGUILayout.ScrollViewScope(scrollPos);
-                scrollPos = scrollViewScope.scrollPosition;
-                if (editor && editor.target) {
-                    editor.OnInspectorGUI();
+                        foreach (var field in fieldInfos) {
+                            EditorGUILayout.PropertyField(serializedHandle.FindProperty(field.Name));
+                        }
+
+                        serializedHandle.ApplyModifiedProperties();
+                    });
+                    _RootElement.Q<ScrollView>("content-container").Add(imguiContainer);
+
+                    inspectorBlackboard.Add(_RootElement);
+                    break;
                 }
-            }));
+                case ExposedParameter exposedParameter: {
+                    switch (exposedParameter) {
+                        case FloatParameterField floatParameterField:
+                            DrawExposedParameterProperties(floatParameterField);
+                            break;
+                        case IntParameterField intParameterField:
+                            DrawExposedParameterProperties(intParameterField);
+                            break;
+                        case BoolParameterField boolParameterField:
+                            DrawExposedParameterProperties(boolParameterField);
+                            break;
+                        case StringParameterField stringParameterField:
+                            DrawExposedParameterProperties(stringParameterField);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(exposedParameter));
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        private void DrawExposedParameterProperties(ExposedParameter exposedParameter) {
+            var serializedParameter = new SerializedObject(exposedParameter);
+            var fieldInfos =
+                WGReflectionHelper.GetFieldInfosWithAttribute(exposedParameter, typeof(ShowInGraphInspectorAttribute));
+
+            _RootElement.Q<Label>("title-label").text = $"{exposedParameter.Name} Parameter";
+            var imguiContainer = new IMGUIContainer(() => {
+                serializedParameter.Update();
+
+                foreach (var field in fieldInfos) {
+                    EditorGUILayout.PropertyField(serializedParameter.FindProperty(field.Name));
+                }
+
+                serializedParameter.ApplyModifiedProperties();
+            });
+            _RootElement.Q<ScrollView>("content-container").Add(imguiContainer);
+
+            inspectorBlackboard.Add(_RootElement);
         }
 
         public void RegisterPortCallbacks() {
@@ -70,6 +128,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 WorldGraphPort outputPort = (WorldGraphPort) edge.output;
                 WorldGraphPort inputPort = (WorldGraphPort) edge.input;
 
+                // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
                 switch (port.PortData.PortType) {
                     case PortType.Default when port.direction == Direction.Output: {
                         var output = (WorldGraphNodeView) outputPort.node;
@@ -95,6 +154,8 @@ namespace ThunderNut.SceneManagement.Editor {
                 WorldGraphPort outputPort = (WorldGraphPort) edge.output;
                 WorldGraphPort inputPort = (WorldGraphPort) edge.input;
 
+
+                // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
                 switch (port.PortData.PortType) {
                     case PortType.Default when port.direction == Direction.Output: {
                         var output = (WorldGraphNodeView) outputPort.node;
@@ -115,21 +176,6 @@ namespace ThunderNut.SceneManagement.Editor {
                 }
             };
         }
-
-        public ExposedParameter CreateExposedParameter(ParameterType type) {
-            return graph.CreateParameter(type);
-        }
-
-        public BlackboardField CreateBlackboardField(ExposedParameter parameter) {
-            var field = new BlackboardField {
-                userData = parameter,
-                text = $"{parameter.Name}",
-                typeText = parameter.ParameterType.ToString(),
-                icon = parameter.Exposed ? Resources.Load<Texture2D>("GraphView/Nodes/BlackboardFieldExposed") : null
-            };
-            return field;
-        }
-
 
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter) {
             return ports.ToList().Where(endPort =>
