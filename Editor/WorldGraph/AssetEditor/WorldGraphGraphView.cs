@@ -93,7 +93,7 @@ namespace ThunderNut.SceneManagement.Editor {
             foreach (var sceneHandle in graph.sceneHandles) {
                 CreateGraphNode(sceneHandle);
             }
-
+            
             // ------------------ Create edges for the nodes ------------------
             foreach (var parent in graph.sceneHandles) {
                 IEnumerable<SceneHandle> children = WorldGraph.GetChildren(parent);
@@ -109,10 +109,11 @@ namespace ThunderNut.SceneManagement.Editor {
             foreach (var exposedParam in graph.allParameters) {
                 CreateBlackboardField(exposedParam);
                 if (exposedParam.Displayed) {
-                    CreateParameterGraphNode(exposedParam);
+                    CreateParameterGraphNode(exposedParam, false);
                 }
             }
-
+            
+            
             // ------------------ Connect Parameter Nodes to the respective Parameter Ports ------------------
             foreach (var sceneHandle in graph.sceneHandles) {
                 WorldGraphNodeView baseView = (WorldGraphNodeView) GetNodeByGuid(sceneHandle.GUID);
@@ -141,7 +142,7 @@ namespace ThunderNut.SceneManagement.Editor {
             AddElement(graphNode);
         }
 
-        public void CreateParameterGraphNode(ExposedParameter parameter) {
+        public void CreateParameterGraphNode(ExposedParameter parameter, bool isDropped) {
             var outputPort = new PortData {
                 PortColor = new Color(0.52f, 0.89f, 0.91f),
                 PortDirection = "Output",
@@ -150,6 +151,7 @@ namespace ThunderNut.SceneManagement.Editor {
             };
 
             var outputPortView = new WorldGraphPort(outputPort, edgeConnectorListener);
+            if (isDropped) InitializePortBehavior(outputPortView);
             var parameterNodeView = new ParameterPropertyNodeView(parameter, outputPortView);
 
             AddElement(parameterNodeView);

@@ -4,8 +4,8 @@ using UnityEngine;
 namespace ThunderNut.SceneManagement {
 
     public enum FloatParamOptions {
-        GreaterThan = 0,
-        LessThan = 1,
+        GreaterThan,
+        LessThan
     }
 
     public class FloatParameterField : ParameterField<float> {

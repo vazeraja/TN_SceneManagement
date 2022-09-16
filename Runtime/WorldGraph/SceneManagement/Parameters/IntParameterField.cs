@@ -1,8 +1,17 @@
 ﻿using System;
 
 namespace ThunderNut.SceneManagement {
-    
+
+    public enum IntParamOptions {
+        GreaterThan,
+        LessThan,
+        Equals,
+        NotEquals,
+    }
+
     public class IntParameterField : ParameterField<int> {
+        public IntParamOptions options = IntParamOptions.Equals;
+
         public IntParameterField() {
             GUID = Guid.NewGuid().ToString();
             Name = "IntParameter";
@@ -11,7 +20,6 @@ namespace ThunderNut.SceneManagement {
             ParameterType = ParameterType.Int;
             Value = 69;
         }
-
     }
 
 }

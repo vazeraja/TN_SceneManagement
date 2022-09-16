@@ -18,7 +18,8 @@ namespace ThunderNut.SceneManagement.Editor {
 
         public TreeViewPopupWindow() {
             m_SearchField = new SearchField();
-            multiColumnTreeView = WGSimpleTreeView.Create(ref multiColumnTreeViewState, ref multiColumnHeaderState, ForceClose);
+            multiColumnTreeView = WGSimpleTreeView.Create(ref multiColumnTreeViewState, ref multiColumnHeaderState, null);
+            multiColumnTreeView.onDoubleClicked = parameter => { ForceClose(); };
         }
 
         public override void OnGUI(Rect rect) {

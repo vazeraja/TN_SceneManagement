@@ -2,7 +2,13 @@
 
 namespace ThunderNut.SceneManagement {
     
+    public enum StringParamOptions {
+        Equals,
+        NotEquals,
+    }
     public class StringParameterField : ParameterField<string> {
+        public StringParamOptions options = StringParamOptions.Equals;
+        
         public StringParameterField() {
             GUID = Guid.NewGuid().ToString();
             Name = "StringParameter";

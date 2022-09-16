@@ -9,39 +9,12 @@ using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
 namespace ThunderNut.SceneManagement {
-
-    [Serializable]
-    public class PortData {
-        public string OwnerNodeGUID;
-        public string GUID;
-
-        public string PortDirection;
-        public string PortCapacity;
-        public PortType PortType;
-        public Color PortColor;
-
-        public ExposedParameter Parameter;
-    }
-
-    public enum PortType {
-        Default,
-        Parameter,
-    }
-
-
+    
     [Serializable]
     public class Transition {
-        public FloatParameterField Parameter;
-        public SceneHandle Output;
-        public SceneHandle Input;
-        
-        public Func<bool> Condition;
+        public ExposedParameter Parameter;
 
-        public Transition(SceneHandle output, SceneHandle input, Func<bool> condition) {
-            Output = output;
-            Input = input;
-            Condition = condition;
-        }
+        public Func<bool> Condition;
     }
 
     public abstract class SceneHandle : ScriptableObject {
@@ -78,7 +51,7 @@ namespace ThunderNut.SceneManagement {
                 return list;
             }
         }
-        
+
         public abstract void ChangeToScene();
 
         #if UNITY_EDITOR
