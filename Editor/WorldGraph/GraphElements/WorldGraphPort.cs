@@ -15,6 +15,8 @@ namespace ThunderNut.SceneManagement.Editor {
 
         public event Action<Node, WorldGraphPort, Edge> OnConnected;
         public event Action<Node, WorldGraphPort, Edge> OnDisconnected;
+        
+        // public WorldGraphEdge Connect(Port other) => ConnectTo<WorldGraphEdge>(other);
 
         public WorldGraphPort(PortData portData, IEdgeConnectorListener connectorListener, Node nodeView = null) :
             base(Orientation.Horizontal, portData.PortDirection == "Output" ? Direction.Output : Direction.Input,
@@ -27,10 +29,14 @@ namespace ThunderNut.SceneManagement.Editor {
             portName = portData.PortDirection;
             this.nodeView = nodeView;
 
+            CheckPortType(portData, nodeView);
+        }
+
+        private void CheckPortType(PortData portData, Node nodeView) {
             if (portData.PortType == PortType.Parameter && nodeView != null) {
                 int outputPortCount = nodeView.inputContainer.Query("connector").ToList().Count;
                 portName = $"{portData.PortType.ToString()}({outputPortCount})";
-                
+
                 deleteParameterButton = new Button(() => { RemoveParameterPort(portData); });
                 deleteParameterButton.style.backgroundImage = Resources.Load<Texture2D>("Sprite-0003");
                 deleteParameterButton.style.width = 15;
@@ -39,11 +45,11 @@ namespace ThunderNut.SceneManagement.Editor {
                 deleteParameterButton.style.marginRight = 3;
                 deleteParameterButton.style.marginTop = 6;
                 deleteParameterButton.style.marginBottom = 5;
-                
+
                 contentContainer.Add(deleteParameterButton);
             }
         }
-        
+
 
         public override void Connect(Edge edge) {
             OnConnected?.Invoke(node, this, edge);

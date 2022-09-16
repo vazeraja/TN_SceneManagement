@@ -1,0 +1,21 @@
+#graph-settings {
+    margin-left: 1px;
+    width: 107px;
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+}
+
+#node-settings {
+    margin-left: 0;
+    width: 107px;
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+}
+
+.graphSettings:checked {
+    background-color: rgb(43, 43, 43);
+}

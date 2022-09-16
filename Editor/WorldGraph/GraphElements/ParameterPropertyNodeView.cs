@@ -12,13 +12,15 @@ namespace ThunderNut.SceneManagement.Editor {
         public SceneHandle sceneHandle => null;
         public WorldGraphGraphView graphView => GetFirstAncestorOfType<WorldGraphGraphView>();
         
-        public ParameterPropertyNodeView(ExposedParameter parameter, Port output) : base(null, output) { 
+        public ParameterPropertyNodeView(ExposedParameter parameter, WorldGraphPort output) : base(null, output) { 
             styleSheets.Add(Resources.Load<StyleSheet>("Styles/PropertyNodeView"));
             viewDataKey = parameter.GUID;
             this.parameter = parameter;
+
+            parameter.Displayed = true;
             
             output.portName = parameter.Name;
-            output.portColor = ((WorldGraphPort) output).PortData.PortColor;
+            output.portColor = output.PortData.PortColor;
             icon = parameter.Exposed ? Resources.Load<Texture2D>("GraphView/Nodes/BlackboardFieldExposed") : null;
             style.left = this.parameter.Position.x;
             style.top = this.parameter.Position.y;
@@ -26,7 +28,12 @@ namespace ThunderNut.SceneManagement.Editor {
             this.Q("title-label").RemoveFromHierarchy();
             Add(new VisualElement() { name = "disabledOverlay", pickingMode = PickingMode.Ignore });
         }
-        
+
+        public override void OnSelected() {
+            graphView.DrawInspector(parameter);
+            base.OnSelected();
+        }
+
         public override void SetPosition(Rect newPos) {
             base.SetPosition(newPos);
 

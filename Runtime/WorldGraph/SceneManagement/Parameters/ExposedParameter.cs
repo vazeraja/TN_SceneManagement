@@ -3,8 +3,8 @@ using UnityEditor;
 using UnityEngine;
 
 namespace ThunderNut.SceneManagement {
-
-    public class ExposedParameter : ScriptableObject {
+    
+    public abstract class ExposedParameter : ScriptableObject {
         [WGInspectable]
         public string Name;
         [WGInspectable]
@@ -18,9 +18,10 @@ namespace ThunderNut.SceneManagement {
         public string ConnectedPortGUID;
         public bool Displayed;
 
-        public void Awake() {
+        private void Awake() {
             name = Name;
         }
     }
+
 
 }

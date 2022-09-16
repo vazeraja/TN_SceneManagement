@@ -9,7 +9,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
     public class MasterPreviewView : VisualElement {
         private readonly WorldGraph m_Graph;
-        private WorldGraphGraphView graphGraphView;
+        private WorldGraphGraphView graphView;
         private EditorWindow editorWindow;
 
         private readonly Label m_Title;
@@ -21,8 +21,8 @@ namespace ThunderNut.SceneManagement.Editor {
         private ResizeBorderFrame m_PreviewResizeBorderFrame;
         public ResizeBorderFrame previewResizeBorderFrame => m_PreviewResizeBorderFrame;
 
-        public MasterPreviewView(WorldGraphGraphView mGraphGraphView, EditorWindow mEditorWindow, WorldGraph graph) {
-            graphGraphView = mGraphGraphView;
+        public MasterPreviewView(WorldGraphGraphView mGraphView, EditorWindow mEditorWindow, WorldGraph graph) {
+            graphView = mGraphView;
             editorWindow = mEditorWindow;
             m_Graph = graph;
 
@@ -41,9 +41,9 @@ namespace ThunderNut.SceneManagement.Editor {
 
             preview = new VisualElement {name = "middle"};
             {
-                // previewTextureView = CreatePreview(Texture2D.blackTexture);
-                // m_PreviewScrollPosition = new Vector2(0f, 0f);
-                // preview.Add(previewTextureView);
+                previewTextureView = CreatePreview(Texture2D.redTexture);
+                m_PreviewScrollPosition = new Vector2(0f, 0f);
+                preview.Add(previewTextureView);
                 
                 preview.AddManipulator(new Scrollable((x) => { }));
             }

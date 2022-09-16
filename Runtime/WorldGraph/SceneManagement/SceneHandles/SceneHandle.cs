@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
@@ -27,22 +28,37 @@ namespace ThunderNut.SceneManagement {
         Parameter,
     }
 
+
+    [Serializable]
+    public class Transition {
+        public FloatParameterField Parameter;
+        public SceneHandle Output;
+        public SceneHandle Input;
+        
+        public Func<bool> Condition;
+
+        public Transition(SceneHandle output, SceneHandle input, Func<bool> condition) {
+            Output = output;
+            Input = input;
+            Condition = condition;
+        }
+    }
+
     public abstract class SceneHandle : ScriptableObject {
-        public string guid;
-        public Vector2 position;
-        public List<PortData> ports = new List<PortData>();
+        public string GUID;
+        public Vector2 Position;
+        public List<PortData> Ports = new List<PortData>();
         protected virtual Color HandleColor => Color.white;
-        public virtual Color color => HandleColor;
+        public Color Color => HandleColor;
 
-        [WGInspectable]
+        public WorldGraph WorldGraph;
         public bool Active = true;
-        [WGInspectable]
         public string HandleName = "";
-        [WGInspectable]
         public SceneReference scene;
-        [WGInspectable]
         public List<SceneHandle> children = new List<SceneHandle>();
+        public List<Transition> transitions = new List<Transition>();
 
+        // Polymorphic serialization
         [SerializeField, SerializeReference]
         private List<StringParameterField> stringParameters = new List<StringParameterField>();
         [SerializeField, SerializeReference]
@@ -62,7 +78,7 @@ namespace ThunderNut.SceneManagement {
                 return list;
             }
         }
-
+        
         public abstract void ChangeToScene();
 
         #if UNITY_EDITOR
@@ -123,13 +139,13 @@ namespace ThunderNut.SceneManagement {
                 PortType = isParameter ? PortType.Parameter : PortType.Default,
                 PortColor = portColor,
             };
-            ports.Add(portData);
+            Ports.Add(portData);
             EditorUtility.SetDirty(this);
             return portData;
         }
 
         public void RemovePort(PortData portData) {
-            ports.Remove(portData);
+            Ports.Remove(portData);
             EditorUtility.SetDirty(this);
         }
         #endif

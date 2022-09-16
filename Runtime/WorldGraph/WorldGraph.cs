@@ -11,7 +11,7 @@ namespace ThunderNut.SceneManagement {
     public class WorldGraph : ScriptableObject {
         public List<SceneHandle> sceneHandles;
         private SceneHandle activeSceneHandle;
-
+        
         public string settingA;
         public string settingB;
         public string settingC;
@@ -35,20 +35,7 @@ namespace ThunderNut.SceneManagement {
                 list.AddRange(intParameters);
                 list.AddRange(boolParameters);
                 return list;
-            } 
-        }
-
-        public bool IsEmpty => sceneHandles.Count == 0;
-
-        public void ChangeScene() {
-            activeSceneHandle.ChangeToScene();
-        }
-
-        public void ClearAllParameters() {
-            stringParameters.Clear();
-            floatParameters.Clear();
-            intParameters.Clear();
-            boolParameters.Clear();
+            }
         }
 
         #if UNITY_EDITOR
@@ -173,7 +160,7 @@ namespace ThunderNut.SceneManagement {
         private SceneHandle CreateSceneHandle(Type type) {
             SceneHandle newHandle = (SceneHandle) CreateInstance(type);
             newHandle.name = type.Name;
-            newHandle.guid = Guid.NewGuid().ToString();
+            newHandle.GUID = Guid.NewGuid().ToString();
 
             AddSceneHandle(newHandle);
             return newHandle;

@@ -21,6 +21,7 @@ namespace ThunderNut.SceneManagement.Editor {
         public Action saveAsRequested { get; set; }
         public Action showInProjectRequested { get; set; }
         public Action refreshRequested { get; set; }
+        public Action showGraphSettings { get; set; }
         public Func<bool> isCheckedOut { get; set; }
         public Action checkOut { get; set; }
         
@@ -51,6 +52,11 @@ namespace ThunderNut.SceneManagement.Editor {
                 GUILayout.Space(6);
                 if (GUILayout.Button("Refresh", EditorStyles.toolbarButton)) {
                     refreshRequested?.Invoke();
+                }
+                
+                GUILayout.Space(6);
+                if (GUILayout.Button("Show Graph Settings", EditorStyles.toolbarButton)) {
+                    showGraphSettings?.Invoke();
                 }
 
                 GUILayout.FlexibleSpace();
@@ -87,6 +93,7 @@ namespace ThunderNut.SceneManagement.Editor {
             saveAsRequested = null;
             showInProjectRequested = null;
             refreshRequested = null;
+            showGraphSettings = null;
             isCheckedOut = null;
             checkOut = null;
 

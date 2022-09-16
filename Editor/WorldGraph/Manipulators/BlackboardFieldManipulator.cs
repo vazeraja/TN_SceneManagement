@@ -54,8 +54,9 @@ namespace ThunderNut.SceneManagement.Editor {
             var graphMousePosition = editorView.graphView.contentViewContainer.WorldToLocal(windowMousePosition);
 
             foreach (var selectedElement in selection.OfType<BlackboardField>()) {
-                ExposedParameter parameter = selectedElement.userData as ExposedParameter;
-                editorView.graphView.CreateParameterGraphNode(parameter, graphMousePosition);
+                ExposedParameter parameter = (ExposedParameter) selectedElement.userData;
+                parameter.Position = graphMousePosition;
+                editorView.graphView.CreateParameterGraphNode(parameter);
             }
         }
 

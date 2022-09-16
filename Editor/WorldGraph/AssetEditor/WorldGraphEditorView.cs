@@ -24,7 +24,7 @@ namespace ThunderNut.SceneManagement.Editor {
         private GenericMenu exposedPropertiesItemMenu;
 
         public WorldGraphEditorToolbar toolbar { get; }
-        
+
         const string k_PreviewWindowLayoutKey = "TN.WorldGraph.PreviewWindowLayout";
         private WindowDockingLayout previewDockingLayout => m_PreviewDockingLayout;
         private readonly WindowDockingLayout m_PreviewDockingLayout = new WindowDockingLayout {
@@ -71,7 +71,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
             styleSheets.Add(Resources.Load<StyleSheet>("Styles/WGEditorView"));
 
-            toolbar = new WorldGraphEditorToolbar {changeCheck = UpdateSubWindowsVisibility};
+            toolbar = new WorldGraphEditorToolbar();
             var toolbarGUI = new IMGUIContainer(() => { toolbar.OnGUI(); });
             Add(toolbarGUI);
 
@@ -90,6 +90,9 @@ namespace ThunderNut.SceneManagement.Editor {
 
                 UpdateSubWindowsVisibility();
 
+                toolbar.changeCheck = UpdateSubWindowsVisibility;
+                toolbar.showGraphSettings = graphView.ShowGraphSettings;
+                
                 graphView.graphViewChanged = GraphViewChanged;
                 graphView.inspectorBlackboard = inspectorBlackboard;
                 graphView.exposedParametersBlackboard = exposedParametersBlackboard;
@@ -97,14 +100,14 @@ namespace ThunderNut.SceneManagement.Editor {
                 RegisterCallback<GeometryChangedEvent>(ApplySerializedWindowLayouts);
             }
             Add(content);
-            
+
             blackboardFieldManipulator = new BlackboardFieldManipulator(this);
 
             graphView.Initialize();
             graphView.RegisterPortCallbacks();
         }
-        
-        
+
+
         private GraphViewChange GraphViewChanged(GraphViewChange graphViewChange) {
             graphViewChange.elementsToRemove?.ForEach(elem => {
                 switch (elem) {
@@ -155,7 +158,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 ApplySerializedLayout(masterPreviewView, previewDockingLayout, k_PreviewWindowLayoutKey);
             };
         }
-        
+
         private void CreateInspectorBlackboard() {
             inspectorBlackboard = new Blackboard(graphView) {title = "Inspector", subTitle = ""};
             graphView.Add(inspectorBlackboard);
@@ -181,24 +184,20 @@ namespace ThunderNut.SceneManagement.Editor {
                 exposedPropertiesItemMenu = new GenericMenu();
 
                 exposedPropertiesItemMenu.AddItem(new GUIContent("String"), false, () => {
-                    var exposedParameter = graphView.CreateExposedParameter(ParameterType.String);
-                    var blackboardField = graphView.CreateBlackboardField(exposedParameter);
-                    exposedParametersBlackboard.Add(blackboardField);
+                    var exposedParameter = graph.CreateParameter(ParameterType.String);
+                    graphView.CreateBlackboardField(exposedParameter);
                 });
                 exposedPropertiesItemMenu.AddItem(new GUIContent("Float"), false, () => {
-                    var exposedParameter = graphView.CreateExposedParameter(ParameterType.Float);
-                    var blackboardField = graphView.CreateBlackboardField(exposedParameter);
-                    exposedParametersBlackboard.Add(blackboardField);
+                    var exposedParameter = graph.CreateParameter(ParameterType.Float);
+                    graphView.CreateBlackboardField(exposedParameter);
                 });
                 exposedPropertiesItemMenu.AddItem(new GUIContent("Int"), false, () => {
-                    var exposedParameter = graphView.CreateExposedParameter(ParameterType.Int);
-                    var blackboardField = graphView.CreateBlackboardField(exposedParameter);
-                    exposedParametersBlackboard.Add(blackboardField);
+                    var exposedParameter = graph.CreateParameter(ParameterType.Int);
+                    graphView.CreateBlackboardField(exposedParameter);
                 });
                 exposedPropertiesItemMenu.AddItem(new GUIContent("Bool"), false, () => {
-                    var exposedParameter = graphView.CreateExposedParameter(ParameterType.Bool);
-                    var blackboardField = graphView.CreateBlackboardField(exposedParameter);
-                    exposedParametersBlackboard.Add(blackboardField);
+                    var exposedParameter = graph.CreateParameter(ParameterType.Bool);
+                    graphView.CreateBlackboardField(exposedParameter);
                 });
                 exposedPropertiesItemMenu.AddSeparator($"/");
 
@@ -251,7 +250,7 @@ namespace ThunderNut.SceneManagement.Editor {
             if (graphView != null) {
                 toolbar.Dispose();
                 graphView.Dispose();
-                
+
                 blackboardFieldManipulator.target.RemoveManipulator(blackboardFieldManipulator);
                 graphView = null;
             }

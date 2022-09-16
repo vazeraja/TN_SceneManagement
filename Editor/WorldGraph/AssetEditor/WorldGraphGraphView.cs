@@ -22,13 +22,14 @@ namespace ThunderNut.SceneManagement.Editor {
         public Blackboard inspectorBlackboard;
         public Blackboard exposedParametersBlackboard;
 
-        private readonly VisualElement _RootElement;
-        private readonly Label titleLabel;
-        private readonly ScrollView inspectorContentContainer;
+        private VisualElement _RootElement;
+        private Label titleLabel;
+        private ScrollView inspectorContentContainer;
         private IMGUIContainer GUIContainer;
+        private WorldGraphEditor graphEditor;
 
         private List<ParameterPropertyNodeView> ParameterNodeViews => graphElements.OfType<ParameterPropertyNodeView>().ToList();
-        
+
         public void Dispose() {
             graphElements.OfType<IWorldGraphNodeView>().ToList().ForEach(node => node.Dispose());
 
@@ -36,11 +37,15 @@ namespace ThunderNut.SceneManagement.Editor {
             Object.DestroyImmediate(m_SearchWindowProvider);
             m_SearchWindowProvider = null;
 
+            _RootElement = null;
+            titleLabel = null;
+            inspectorContentContainer = null;
             GUIContainer = null;
+
             inspectorBlackboard = null;
             exposedParametersBlackboard = null;
         }
-        
+
         public WorldGraphGraphView(EditorWindow editorWindow, WorldGraph graph) {
             this.editorWindow = editorWindow;
             this.graph = graph;
@@ -60,6 +65,8 @@ namespace ThunderNut.SceneManagement.Editor {
             titleLabel = _RootElement.Q<Label>("title-label");
             inspectorContentContainer = _RootElement.Q<ScrollView>("content-container");
 
+            graphEditor = UnityEditor.Editor.CreateEditor(graph) as WorldGraphEditor;
+
             m_SearchWindowProvider = ScriptableObject.CreateInstance<WorldGraphSearcherProvider>();
             m_SearchWindowProvider.Initialize(editorWindow, this, CreateNode);
             nodeCreationRequest = c => {
@@ -74,9 +81,12 @@ namespace ThunderNut.SceneManagement.Editor {
         }
 
         public void Initialize() {
+            ShowGraphSettings();
+
             // ------------------ Create Base SceneHandle ------------------
-            if (graph.IsEmpty) {
-                graph.CreateSubAsset(typeof(BaseHandle));
+            if (!graph.sceneHandles.Any()) {
+                SceneHandle baseHandle = graph.CreateSubAsset(typeof(BaseHandle));
+                baseHandle.WorldGraph = graph;
             }
 
             // ------------------ Create nodes for every scene handle ------------------
@@ -85,33 +95,33 @@ namespace ThunderNut.SceneManagement.Editor {
             }
 
             // ------------------ Create edges for the nodes ------------------
-            foreach (var parent1 in graph.sceneHandles) {
-                IEnumerable<SceneHandle> children = WorldGraph.GetChildren(parent1);
+            foreach (var parent in graph.sceneHandles) {
+                IEnumerable<SceneHandle> children = WorldGraph.GetChildren(parent);
                 foreach (var child in children) {
-                    WorldGraphNodeView baseView = (WorldGraphNodeView) GetNodeByGuid(parent1.guid);
-                    WorldGraphNodeView targetView = (WorldGraphNodeView) GetNodeByGuid(child.guid);
-                    var edge = baseView?.output.ConnectTo(targetView?.input);
+                    WorldGraphNodeView baseView = (WorldGraphNodeView) GetNodeByGuid(parent.GUID);
+                    WorldGraphNodeView targetView = (WorldGraphNodeView) GetNodeByGuid(child.GUID);
+                    var edge = baseView.output.ConnectTo<WorldGraphEdge>(targetView.input);
                     AddElement(edge);
                 }
             }
 
             // ------------------ Create Parameters in Blackboard + Create Parameter Nodes ------------------
             foreach (var exposedParam in graph.allParameters) {
-                exposedParametersBlackboard.Add(CreateBlackboardField(exposedParam));
+                CreateBlackboardField(exposedParam);
                 if (exposedParam.Displayed) {
-                    CreateParameterGraphNode(exposedParam, exposedParam.Position);
+                    CreateParameterGraphNode(exposedParam);
                 }
             }
 
             // ------------------ Connect Parameter Nodes to the respective Parameter Ports ------------------
             foreach (var sceneHandle in graph.sceneHandles) {
-                WorldGraphNodeView baseView = (WorldGraphNodeView) GetNodeByGuid(sceneHandle.guid);
+                WorldGraphNodeView baseView = (WorldGraphNodeView) GetNodeByGuid(sceneHandle.GUID);
                 List<WorldGraphPort> ports = baseView.inputContainer.Query<WorldGraphPort>().ToList();
                 foreach (var parameter in sceneHandle.allParameters) {
                     ParameterPropertyNodeView paramView = (ParameterPropertyNodeView) GetNodeByGuid(parameter.GUID);
                     foreach (var port in ports) {
                         if (parameter.ConnectedPortGUID == port.PortData.GUID) {
-                            var edge = paramView.output.ConnectTo(port);
+                            var edge = ((WorldGraphPort) paramView.output).ConnectTo<WorldGraphEdge>(port);
                             AddElement(edge);
                         }
                     }
@@ -119,21 +129,19 @@ namespace ThunderNut.SceneManagement.Editor {
             }
         }
 
-        public void CreateNode(Type type, Vector2 position) {
+        private void CreateNode(Type type, Vector2 position) {
             SceneHandle node = graph.CreateSubAsset(type);
-            node.position = position;
+            node.WorldGraph = graph;
+            node.Position = position;
             CreateGraphNode(node);
         }
 
-        public void CreateGraphNode(SceneHandle sceneHandle) {
+        private void CreateGraphNode(SceneHandle sceneHandle) {
             var graphNode = new WorldGraphNodeView(this, sceneHandle, edgeConnectorListener);
             AddElement(graphNode);
         }
 
-        public void CreateParameterGraphNode(ExposedParameter parameter, Vector2 position) {
-            parameter.Position = position;
-            parameter.Displayed = true;
-
+        public void CreateParameterGraphNode(ExposedParameter parameter) {
             var outputPort = new PortData {
                 PortColor = new Color(0.52f, 0.89f, 0.91f),
                 PortDirection = "Output",
@@ -147,31 +155,9 @@ namespace ThunderNut.SceneManagement.Editor {
             AddElement(parameterNodeView);
         }
 
-        public ExposedParameter CreateExposedParameter(ParameterType type) {
-            return graph.CreateParameter(type);
-        }
-
-        public BlackboardField CreateBlackboardField(ExposedParameter parameter) {
-            var field = new BlackboardField {
-                userData = parameter,
-                text = $"{parameter.Name}",
-                typeText = parameter.ParameterType.ToString(),
-                icon = parameter.Exposed ? Resources.Load<Texture2D>("GraphView/Nodes/BlackboardFieldExposed") : null
-            };
-            field.Bind(new SerializedObject(parameter));
-            return field;
-        }
-
-        public override void AddToSelection(ISelectable selectable) {
-            base.AddToSelection(selectable);
-            switch (selectable) {
-                case BlackboardField field:
-                    DrawInspector((ExposedParameter) field.userData);
-                    break;
-                case ParameterPropertyNodeView paramView:
-                    DrawInspector(paramView.parameter);
-                    break;
-            }
+        public void CreateBlackboardField(ExposedParameter parameter) {
+            var blackboardField = new WGBlackboardField(parameter);
+            exposedParametersBlackboard.Add(blackboardField);
         }
 
         public void DrawInspector(Object objectToDisplay) {
@@ -180,7 +166,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
             switch (objectToDisplay) {
                 case SceneHandle sceneHandle:
-                    DrawProperties(sceneHandle, $"{sceneHandle.HandleName} Node");
+                    DrawProperties(sceneHandle, $"{sceneHandle.HandleName} Node", true);
                     break;
                 case FloatParameterField floatParameterField:
                     DrawProperties(floatParameterField, $"{floatParameterField.Name} Parameter");
@@ -199,24 +185,48 @@ namespace ThunderNut.SceneManagement.Editor {
             }
         }
 
-
-        private void DrawProperties(Object exposedParameter, string label) {
-            var serializedParameter = new SerializedObject(exposedParameter);
-            var fieldInfos =
-                WGReflectionHelper.GetFieldInfosWithAttribute(exposedParameter, typeof(WGInspectableAttribute));
+        private void DrawProperties(Object obj, string label, bool isSceneHandle = false) {
+            var serializedParameter = new SerializedObject(obj);
+            var fieldInfos = WGHelper.GetFieldInfosWithAttribute(obj, typeof(WGInspectableAttribute));
 
             titleLabel.text = label;
             GUIContainer = new IMGUIContainer(() => {
-                serializedParameter.Update();
-
-                foreach (var field in fieldInfos) {
-                    EditorGUILayout.PropertyField(serializedParameter.FindProperty(field.Name));
+                if (!isSceneHandle) {
+                    serializedParameter.Update();
+                    foreach (var field in fieldInfos) {
+                        var prop = serializedParameter.FindProperty(field.Name);
+                        EditorGUILayout.PropertyField(prop);
+                    }
+                    serializedParameter.ApplyModifiedProperties();
                 }
-
-                serializedParameter.ApplyModifiedProperties();
+                else {
+                    var editor = UnityEditor.Editor.CreateEditor((SceneHandle) obj);
+                    editor.OnInspectorGUI();
+                }
             });
             inspectorContentContainer.Add(GUIContainer);
+            inspectorBlackboard.Add(_RootElement);
+        }
 
+        public void ShowGraphSettings() {
+            inspectorBlackboard.Clear();
+            inspectorContentContainer.Clear();
+            
+            titleLabel.text = "Graph Settings";
+            GUIContainer = new IMGUIContainer(() => { graphEditor.OnInspectorGUI(); });
+
+            inspectorContentContainer.Add(GUIContainer);
+            inspectorBlackboard.Add(_RootElement);
+        }
+
+        public void ShowTransitionInformation(SceneHandle output, SceneHandle input) {
+            inspectorBlackboard.Clear();
+            inspectorContentContainer.Clear();
+            titleLabel.text = $"{output.HandleName} ----> {input.HandleName}";
+
+            GUIContainer = new IMGUIContainer(() => { });
+
+            inspectorContentContainer.Add(GUIContainer);
             inspectorBlackboard.Add(_RootElement);
         }
 
@@ -290,7 +300,6 @@ namespace ThunderNut.SceneManagement.Editor {
         public void RegisterCompleteObjectUndo(string name) {
             Undo.RegisterCompleteObjectUndo(graph, name);
         }
-        
     }
 
 }

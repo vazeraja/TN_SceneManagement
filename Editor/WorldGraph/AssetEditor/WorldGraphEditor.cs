@@ -116,7 +116,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 bool isExpanded = property.isExpanded;
                 string label = handle.name;
 
-                WGEditorGUI.DrawSimpleHeader(ref isExpanded, ref handle.Active, ref handle.HandleName, handle.color, menu => {
+                WGEditorGUI.DrawSimpleHeader(ref isExpanded, ref handle.Active, ref handle.HandleName, handle.Color, menu => {
                     if (Application.isPlaying)
                         menu.AddItem(new GUIContent("Play"), false, () => Debug.Log("Play"));
                     else

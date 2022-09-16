@@ -32,9 +32,9 @@ namespace ThunderNut.SceneManagement.Editor {
 
             userData = sceneHandle;
             name = sceneHandle.HandleName;
-            viewDataKey = sceneHandle.guid;
-            style.left = sceneHandle.position.x;
-            style.top = sceneHandle.position.y;
+            viewDataKey = sceneHandle.GUID;
+            style.left = sceneHandle.Position.x;
+            style.top = sceneHandle.Position.y;
 
             if (string.IsNullOrEmpty(sceneHandle.HandleName)) {
                 sceneHandle.HandleName = sceneHandle.GetType().Name;
@@ -46,8 +46,8 @@ namespace ThunderNut.SceneManagement.Editor {
 
             SetupTitleField();
 
-            LoadDefaultPorts(sceneHandle.ports);
-            LoadParameterPorts(sceneHandle.ports);
+            LoadDefaultPorts(sceneHandle.Ports);
+            LoadParameterPorts(sceneHandle.Ports);
 
             addParameterButton.clicked += AddParameterPort;
             playSceneButton.clicked += PlayScene;
@@ -199,8 +199,8 @@ namespace ThunderNut.SceneManagement.Editor {
         public override void SetPosition(Rect newPos) {
             base.SetPosition(newPos);
 
-            sceneHandle.position.x = newPos.xMin;
-            sceneHandle.position.y = newPos.yMin;
+            sceneHandle.Position.x = newPos.xMin;
+            sceneHandle.Position.y = newPos.yMin;
         }
 
 

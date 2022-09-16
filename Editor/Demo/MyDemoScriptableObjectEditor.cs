@@ -11,9 +11,9 @@ namespace ThunderNut.SceneManagement.Editor {
         
         private void OnEnable() {
             _RootElement = new VisualElement();
-            _VisualTree = Resources.Load<VisualTreeAsset>($"UXML/SceneHandle");
+            _VisualTree = Resources.Load<VisualTreeAsset>($"UXML/InspectorContainer");
 
-            StyleSheet styleSheet = Resources.Load<StyleSheet>("UXML/SceneHandle");
+            StyleSheet styleSheet = Resources.Load<StyleSheet>("UXML/InspectorContainer");
             _RootElement.styleSheets.Add(styleSheet);
         }
 
