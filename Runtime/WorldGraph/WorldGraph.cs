@@ -8,11 +8,51 @@ using UnityEngine;
 namespace ThunderNut.SceneManagement {
     
     [Serializable]
-    public class EdgeData {
-        public string outputNodeGUID;
-        public SceneHandle outputNode;
-        public string inputNodeGUID;
-        public SceneHandle inputNode;
+    public class ConditionValue {
+        public string StringValue;
+        public float FloatValue;
+        public int IntValue;
+        public bool BoolValue;
+    }
+    [Serializable]
+    public class Condition {
+        public ExposedParameter Parameter;
+        public ConditionValue Value;
+    }
+    
+    [Serializable]
+    public class SerializableEdge : ISerializationCallbackReceiver {
+        public WorldGraph WorldGraph;
+        
+        public string OutputNodeGUID;
+        public SceneHandle OutputNode;
+        public string InputNodeGUID;
+        public SceneHandle InputNode;
+
+        public List<Condition> Conditions = new List<Condition>();
+        
+        public SerializableEdge() {}
+
+        public static SerializableEdge CreateNewEdge(WorldGraph graph, SceneHandle output, SceneHandle input) {
+            SerializableEdge edge = new SerializableEdge {
+                WorldGraph = graph,
+                OutputNodeGUID = output.GUID,
+                OutputNode = output,
+                InputNodeGUID = input.GUID,
+                InputNode = input
+            };
+            return edge;
+        }
+        
+        public void OnBeforeSerialize() {
+            if (OutputNode == null || InputNode == null)
+                return;
+
+            OutputNodeGUID = OutputNode.GUID;
+            InputNodeGUID = InputNode.GUID;
+        }
+
+        public void OnAfterDeserialize() { }
     }
 
     [CreateAssetMenu(fileName = "WorldGraph", menuName = "World Graph/World Graph")]
@@ -20,7 +60,7 @@ namespace ThunderNut.SceneManagement {
         public List<SceneHandle> sceneHandles;
         private SceneHandle activeSceneHandle;
 
-        public List<EdgeData> edges = new List<EdgeData>();
+        public List<SerializableEdge> edges = new List<SerializableEdge>();
 
         public string settingA;
         public string settingB;

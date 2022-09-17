@@ -10,21 +10,6 @@ using Object = UnityEngine.Object;
 
 namespace ThunderNut.SceneManagement {
 
-    [Serializable]
-    public class ConditionValue {
-        public string StringValue;
-        public float FloatValue;
-        public int IntValue;
-        public bool BoolValue;
-    }
-    [Serializable]
-    public class Condition {
-        public ExposedParameter Parameter;
-        public SceneHandle Target;
-        
-        [SerializeField] private ConditionValue Value;
-    }
-
     public abstract class SceneHandle : ScriptableObject {
         public string GUID;
         public Vector2 Position;

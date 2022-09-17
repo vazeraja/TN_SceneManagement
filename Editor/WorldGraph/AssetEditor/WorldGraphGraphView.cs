@@ -96,8 +96,8 @@ namespace ThunderNut.SceneManagement.Editor {
             
             // ------------------ Connect Nodes ------------------
             foreach (WorldGraphEdge graphEdge in from edge in graph.edges
-                let outputView = (WorldGraphNodeView) GetNodeByGuid(edge.outputNodeGUID)
-                let inputView = (WorldGraphNodeView) GetNodeByGuid(edge.inputNodeGUID)
+                let outputView = (WorldGraphNodeView) GetNodeByGuid(edge.OutputNodeGUID)
+                let inputView = (WorldGraphNodeView) GetNodeByGuid(edge.InputNodeGUID)
                 select outputView.output.ConnectTo<WorldGraphEdge>(inputView.input)) {
                 AddElement(graphEdge);
             }
@@ -243,12 +243,7 @@ namespace ThunderNut.SceneManagement.Editor {
                         var input = (WorldGraphNodeView) inputPort.node;
 
                         graph.AddChild(output.sceneHandle, input.sceneHandle);
-                        graph.edges.Add(new EdgeData {
-                            outputNodeGUID = output.sceneHandle.GUID,
-                            outputNode = output.sceneHandle,
-                            inputNodeGUID = input.sceneHandle.GUID,
-                            inputNode = input.sceneHandle
-                        });
+                        graph.edges.Add(SerializableEdge.CreateNewEdge(graph, output.sceneHandle, input.sceneHandle));
                         break;
                     }
                     case PortType.Parameter when node is WorldGraphNodeView nodeView: {
@@ -276,8 +271,9 @@ namespace ThunderNut.SceneManagement.Editor {
                         var input = (WorldGraphNodeView) inputPort.node;
 
                         graph.RemoveChild(output.sceneHandle, input.sceneHandle);
+                        
                         var edgeToRemove = graph.edges.Find(e =>
-                            e.outputNodeGUID == output.sceneHandle.GUID && e.inputNodeGUID == input.sceneHandle.GUID);
+                            e.OutputNodeGUID == output.sceneHandle.GUID && e.InputNodeGUID == input.sceneHandle.GUID);
                         graph.edges.Remove(edgeToRemove);
 
                         break;
