@@ -66,7 +66,8 @@ namespace ThunderNut.SceneManagement.Editor {
 
                 EditorGUILayout.Space(10);
                 EditorGUILayout.LabelField("Graph Data", EditorStyles.boldLabel);
-
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("edges"));
+                EditorGUILayout.Space(10);
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("stringParameters"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("floatParameters"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("intParameters"));

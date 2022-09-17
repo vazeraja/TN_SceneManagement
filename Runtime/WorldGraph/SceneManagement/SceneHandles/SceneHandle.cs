@@ -9,12 +9,20 @@ using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
 namespace ThunderNut.SceneManagement {
-    
-    [Serializable]
-    public class Transition {
-        public ExposedParameter Parameter;
 
-        public Func<bool> Condition;
+    [Serializable]
+    public class ConditionValue {
+        public string StringValue;
+        public float FloatValue;
+        public int IntValue;
+        public bool BoolValue;
+    }
+    [Serializable]
+    public class Condition {
+        public ExposedParameter Parameter;
+        public SceneHandle Target;
+        
+        [SerializeField] private ConditionValue Value;
     }
 
     public abstract class SceneHandle : ScriptableObject {
@@ -29,7 +37,8 @@ namespace ThunderNut.SceneManagement {
         public string HandleName = "";
         public SceneReference scene;
         public List<SceneHandle> children = new List<SceneHandle>();
-        public List<Transition> transitions = new List<Transition>();
+        
+        public List<Condition> transitions = new List<Condition>();
 
         // Polymorphic serialization
         [SerializeField, SerializeReference]

@@ -12,7 +12,7 @@ namespace ThunderNut.SceneManagement {
         [WGInspectable]
         public bool Exposed;
 
-        public ParameterType ParameterType;
+        public string ParameterType;
         public string GUID;
         public Vector2 Position;
         public string ConnectedPortGUID;

@@ -6,12 +6,22 @@ using UnityEditor;
 using UnityEngine;
 
 namespace ThunderNut.SceneManagement {
+    
+    [Serializable]
+    public class EdgeData {
+        public string outputNodeGUID;
+        public SceneHandle outputNode;
+        public string inputNodeGUID;
+        public SceneHandle inputNode;
+    }
 
     [CreateAssetMenu(fileName = "WorldGraph", menuName = "World Graph/World Graph")]
     public class WorldGraph : ScriptableObject {
         public List<SceneHandle> sceneHandles;
         private SceneHandle activeSceneHandle;
-        
+
+        public List<EdgeData> edges = new List<EdgeData>();
+
         public string settingA;
         public string settingB;
         public string settingC;
@@ -39,9 +49,10 @@ namespace ThunderNut.SceneManagement {
         }
 
         #if UNITY_EDITOR
-        public ExposedParameter CreateParameter(ParameterType type) {
+
+        public ExposedParameter CreateParameter(string type) {
             switch (type) {
-                case ParameterType.String:
+                case "String":
                     var stringParameter = (StringParameterField) CreateInstance(typeof(StringParameterField));
                     stringParameters.Add(stringParameter);
 
@@ -50,7 +61,7 @@ namespace ThunderNut.SceneManagement {
 
                     EditorUtility.SetDirty(this);
                     return stringParameter;
-                case ParameterType.Float:
+                case "Float":
                     var floatParameter = (FloatParameterField) CreateInstance(typeof(FloatParameterField));
                     floatParameters.Add(floatParameter);
 
@@ -59,7 +70,7 @@ namespace ThunderNut.SceneManagement {
 
                     EditorUtility.SetDirty(this);
                     return floatParameter;
-                case ParameterType.Int:
+                case "Int":
                     var intParameter = (IntParameterField) CreateInstance(typeof(IntParameterField));
                     intParameters.Add(intParameter);
 
@@ -68,7 +79,7 @@ namespace ThunderNut.SceneManagement {
 
                     EditorUtility.SetDirty(this);
                     return intParameter;
-                case ParameterType.Bool:
+                case "Bool":
                     var boolParameter = (BoolParameterField) CreateInstance(typeof(BoolParameterField));
                     boolParameters.Add(boolParameter);
 
@@ -81,40 +92,6 @@ namespace ThunderNut.SceneManagement {
                     return null;
             }
         }
-        // public ExposedParameter CreateParameter(ParameterType type, string attrName) {
-        //     // switch (type) {
-        //     //     case ParameterType.String:
-        //     //         var stringParameter = CreateInstance<StringParameterField>();
-        //     //         stringParameter.Name = attrName;
-        //     //         stringParameter.Reference = attrName;
-        //     //         stringParameters.Add(stringParameter);
-        //     //         EditorUtility.SetDirty(this);
-        //     //         return stringParameter;
-        //     //     case ParameterType.Float:
-        //     //         var floatParameter = CreateInstance<FloatParameterField>();
-        //     //         floatParameter.Name = attrName;
-        //     //         floatParameter.Reference = attrName;
-        //     //         floatParameters.Add(floatParameter);
-        //     //         EditorUtility.SetDirty(this);
-        //     //         return floatParameter;
-        //     //     case ParameterType.Int:
-        //     //         var intParameter = CreateInstance<IntParameterField>();
-        //     //         intParameter.Name = attrName;
-        //     //         intParameter.Reference = attrName;
-        //     //         intParameters.Add(intParameter);
-        //     //         EditorUtility.SetDirty(this);
-        //     //         return intParameter;
-        //     //     case ParameterType.Bool:
-        //     //         var boolParameter = CreateInstance<BoolParameterField>();
-        //     //         boolParameter.Name = attrName;
-        //     //         boolParameter.Reference = attrName;
-        //     //         boolParameters.Add(boolParameter);
-        //     //         EditorUtility.SetDirty(this);
-        //     //         return boolParameter;
-        //     //     default:
-        //     //         return null;
-        //     // }
-        // }
 
         public void RemoveParameter(ExposedParameter parameter) {
             switch (parameter) {

@@ -83,29 +83,26 @@ namespace ThunderNut.SceneManagement.Editor {
         public void Initialize() {
             ShowGraphSettings();
 
-            // ------------------ Create Base SceneHandle ------------------
+            // ------------------ Create Base Node ------------------
             if (!graph.sceneHandles.Any()) {
                 SceneHandle baseHandle = graph.CreateSubAsset(typeof(BaseHandle));
                 baseHandle.WorldGraph = graph;
             }
 
-            // ------------------ Create nodes for every scene handle ------------------
+            // ------------------ Create Nodes ------------------
             foreach (var sceneHandle in graph.sceneHandles) {
                 CreateGraphNode(sceneHandle);
             }
             
-            // ------------------ Create edges for the nodes ------------------
-            foreach (var parent in graph.sceneHandles) {
-                IEnumerable<SceneHandle> children = WorldGraph.GetChildren(parent);
-                foreach (var child in children) {
-                    WorldGraphNodeView baseView = (WorldGraphNodeView) GetNodeByGuid(parent.GUID);
-                    WorldGraphNodeView targetView = (WorldGraphNodeView) GetNodeByGuid(child.GUID);
-                    var edge = baseView.output.ConnectTo<WorldGraphEdge>(targetView.input);
-                    AddElement(edge);
-                }
+            // ------------------ Connect Nodes ------------------
+            foreach (WorldGraphEdge graphEdge in from edge in graph.edges
+                let outputView = (WorldGraphNodeView) GetNodeByGuid(edge.outputNodeGUID)
+                let inputView = (WorldGraphNodeView) GetNodeByGuid(edge.inputNodeGUID)
+                select outputView.output.ConnectTo<WorldGraphEdge>(inputView.input)) {
+                AddElement(graphEdge);
             }
 
-            // ------------------ Create Parameters in Blackboard + Create Parameter Nodes ------------------
+            // ------------------ Create Parameters ------------------
             foreach (var exposedParam in graph.allParameters) {
                 CreateBlackboardField(exposedParam);
                 if (exposedParam.Displayed) {
@@ -113,20 +110,16 @@ namespace ThunderNut.SceneManagement.Editor {
                 }
             }
             
-            
-            // ------------------ Connect Parameter Nodes to the respective Parameter Ports ------------------
-            foreach (var sceneHandle in graph.sceneHandles) {
-                WorldGraphNodeView baseView = (WorldGraphNodeView) GetNodeByGuid(sceneHandle.GUID);
-                List<WorldGraphPort> ports = baseView.inputContainer.Query<WorldGraphPort>().ToList();
-                foreach (var parameter in sceneHandle.allParameters) {
-                    ParameterPropertyNodeView paramView = (ParameterPropertyNodeView) GetNodeByGuid(parameter.GUID);
-                    foreach (var port in ports) {
-                        if (parameter.ConnectedPortGUID == port.PortData.GUID) {
-                            var edge = ((WorldGraphPort) paramView.output).ConnectTo<WorldGraphEdge>(port);
-                            AddElement(edge);
-                        }
-                    }
-                }
+            // ------------------ Connect Parameter Nodes  ------------------
+            foreach (WorldGraphEdge edge in from sceneHandle in graph.sceneHandles
+                let baseView = (WorldGraphNodeView) GetNodeByGuid(sceneHandle.GUID)
+                let ports = baseView.inputContainer.Query<WorldGraphPort>().ToList()
+                from parameter in sceneHandle.allParameters
+                let paramView = (ParameterPropertyNodeView) GetNodeByGuid(parameter.GUID)
+                from port in ports
+                where parameter.ConnectedPortGUID == port.PortData.GUID
+                select ((WorldGraphPort) paramView.output).ConnectTo<WorldGraphEdge>(port)) {
+                AddElement(edge);
             }
         }
 
@@ -199,6 +192,7 @@ namespace ThunderNut.SceneManagement.Editor {
                         var prop = serializedParameter.FindProperty(field.Name);
                         EditorGUILayout.PropertyField(prop);
                     }
+
                     serializedParameter.ApplyModifiedProperties();
                 }
                 else {
@@ -213,7 +207,7 @@ namespace ThunderNut.SceneManagement.Editor {
         public void ShowGraphSettings() {
             inspectorBlackboard.Clear();
             inspectorContentContainer.Clear();
-            
+
             titleLabel.text = "Graph Settings";
             GUIContainer = new IMGUIContainer(() => { graphEditor.OnInspectorGUI(); });
 
@@ -249,6 +243,12 @@ namespace ThunderNut.SceneManagement.Editor {
                         var input = (WorldGraphNodeView) inputPort.node;
 
                         graph.AddChild(output.sceneHandle, input.sceneHandle);
+                        graph.edges.Add(new EdgeData {
+                            outputNodeGUID = output.sceneHandle.GUID,
+                            outputNode = output.sceneHandle,
+                            inputNodeGUID = input.sceneHandle.GUID,
+                            inputNode = input.sceneHandle
+                        });
                         break;
                     }
                     case PortType.Parameter when node is WorldGraphNodeView nodeView: {
@@ -276,6 +276,10 @@ namespace ThunderNut.SceneManagement.Editor {
                         var input = (WorldGraphNodeView) inputPort.node;
 
                         graph.RemoveChild(output.sceneHandle, input.sceneHandle);
+                        var edgeToRemove = graph.edges.Find(e =>
+                            e.outputNodeGUID == output.sceneHandle.GUID && e.inputNodeGUID == input.sceneHandle.GUID);
+                        graph.edges.Remove(edgeToRemove);
+
                         break;
                     }
                     case PortType.Parameter when node is WorldGraphNodeView nodeView:

@@ -16,7 +16,7 @@ namespace ThunderNut.SceneManagement {
             Name = "FloatParameter";
             Reference = "_FloatParameter";
             Exposed = true;
-            ParameterType = ParameterType.Float;
+            ParameterType = "Float";
             Value = 69f;
         }
     }

@@ -11,16 +11,15 @@ namespace ThunderNut.SceneManagement.Editor {
     public class TemporaryPopupWindow : PopupWindowContent {
         private readonly SearchField m_SearchField;
 
-        private WGSimpleTreeView multiColumnTreeView;
-        private TreeViewState multiColumnTreeViewState;
-        private MultiColumnHeaderState multiColumnHeaderState;
+        private readonly WGSimpleTreeView multiColumnTreeView;
+        private readonly TreeViewState multiColumnTreeViewState;
 
         private bool m_ShouldClose;
         public float Width;
 
         public TemporaryPopupWindow(List<ExposedParameter> parameters, SerializedProperty property) {
             m_SearchField = new SearchField();
-            multiColumnTreeView = WGSimpleTreeView.Create(ref multiColumnTreeViewState, ref multiColumnHeaderState, parameters);
+            multiColumnTreeView = WGSimpleTreeView.Create(ref multiColumnTreeViewState, parameters);
             multiColumnTreeView.onDoubleClicked = parameter => {
                 property.objectReferenceValue = parameter;
                 property.serializedObject.ApplyModifiedProperties();
@@ -110,17 +109,23 @@ namespace ThunderNut.SceneManagement.Editor {
                 drawElementCallback = (rect, index, active, focused) => {
                     var element = transitionsProperty.GetArrayElementAtIndex(index);
                     var parameterProp = element.FindPropertyRelative("Parameter");
+                    var valueProp = element.FindPropertyRelative("Value");
+
+                    var stringValue = valueProp.FindPropertyRelative("StringValue").stringValue;
+                    var floatValue = valueProp.FindPropertyRelative("FloatValue").floatValue;
+                    var intValue = valueProp.FindPropertyRelative("IntValue").intValue;
+                    var boolValue = valueProp.FindPropertyRelative("BoolValue").boolValue;
+
+                    float width = rect.width / 2;
 
                     if (sceneHandle.allParameters.Any()) {
-                        float width = rect.width / 2;
                         rect.width = width;
-                        
+
                         List<ExposedParameter> allParams = sceneHandle.allParameters.ToList();
 
                         if (EditorGUI.DropdownButton(rect, parameterProp.objectReferenceValue != null
-                                ? new GUIContent(((ExposedParameter) parameterProp.objectReferenceValue).Name)
-                                : new GUIContent("Select a Parameter"),
-                            FocusType.Passive)) {
+                            ? new GUIContent(((ExposedParameter) parameterProp.objectReferenceValue).Name)
+                            : new GUIContent("Select a Parameter"), FocusType.Passive)) {
                             PopupWindow.Show(rect, new TemporaryPopupWindow(allParams, parameterProp) {Width = rect.width});
                         }
 
@@ -131,23 +136,40 @@ namespace ThunderNut.SceneManagement.Editor {
                             case StringParameterField stringParameterField:
                                 stringParameterField.options =
                                     (StringParamOptions) EditorGUI.EnumPopup(rect, stringParameterField.options);
+
+                                rect.x += width / 2;
+                                valueProp.FindPropertyRelative("StringValue").stringValue =
+                                    EditorGUI.TextField(rect, GUIContent.none, stringValue);
+
                                 break;
                             case FloatParameterField floatParameterField:
                                 floatParameterField.options =
                                     (FloatParamOptions) EditorGUI.EnumPopup(rect, floatParameterField.options);
+
+                                rect.x += width / 2;
+                                valueProp.FindPropertyRelative("FloatValue").floatValue =
+                                    EditorGUI.FloatField(rect, GUIContent.none, floatValue);
+
                                 break;
                             case IntParameterField intParameterField:
                                 intParameterField.options =
                                     (IntParamOptions) EditorGUI.EnumPopup(rect, intParameterField.options);
+
+                                rect.x += width / 2;
+                                valueProp.FindPropertyRelative("IntValue").intValue =
+                                    EditorGUI.IntField(rect, GUIContent.none, intValue);
+
                                 break;
                             case BoolParameterField boolParameterField:
                                 boolParameterField.options =
                                     (BoolParamOptions) EditorGUI.EnumPopup(rect, boolParameterField.options);
+
+                                rect.x += width / 2;
+                                valueProp.FindPropertyRelative("BoolValue").boolValue =
+                                    EditorGUI.Toggle(rect, GUIContent.none, boolValue);
+
                                 break;
                         }
-                        
-                        rect.x += width / 2;
-                        EditorGUI.TextField(rect, "Label");
                     }
                     else {
                         EditorGUI.HelpBox(rect, "This SceneHandle has no connected parameters", MessageType.Warning);
@@ -182,8 +204,6 @@ namespace ThunderNut.SceneManagement.Editor {
             EditorGUILayout.PropertyField(serializedObject.FindProperty("scene"));
             childrenReorderableList.DoLayoutList();
             transitionsReorderableList.DoLayoutList();
-            if (sceneHandle.transitions.First().Parameter != null)
-                Debug.Log(sceneHandle.transitions.First().Parameter.Name);
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("stringParameters"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("floatParameters"));

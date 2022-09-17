@@ -184,19 +184,19 @@ namespace ThunderNut.SceneManagement.Editor {
                 exposedPropertiesItemMenu = new GenericMenu();
 
                 exposedPropertiesItemMenu.AddItem(new GUIContent("String"), false, () => {
-                    var exposedParameter = graph.CreateParameter(ParameterType.String);
+                    var exposedParameter = graph.CreateParameter("String");
                     graphView.CreateBlackboardField(exposedParameter);
                 });
                 exposedPropertiesItemMenu.AddItem(new GUIContent("Float"), false, () => {
-                    var exposedParameter = graph.CreateParameter(ParameterType.Float);
+                    var exposedParameter = graph.CreateParameter("Float");
                     graphView.CreateBlackboardField(exposedParameter);
                 });
                 exposedPropertiesItemMenu.AddItem(new GUIContent("Int"), false, () => {
-                    var exposedParameter = graph.CreateParameter(ParameterType.Int);
+                    var exposedParameter = graph.CreateParameter("Int");
                     graphView.CreateBlackboardField(exposedParameter);
                 });
                 exposedPropertiesItemMenu.AddItem(new GUIContent("Bool"), false, () => {
-                    var exposedParameter = graph.CreateParameter(ParameterType.Bool);
+                    var exposedParameter = graph.CreateParameter("Bool");
                     graphView.CreateBlackboardField(exposedParameter);
                 });
                 exposedPropertiesItemMenu.AddSeparator($"/");

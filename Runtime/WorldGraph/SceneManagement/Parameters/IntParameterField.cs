@@ -17,7 +17,7 @@ namespace ThunderNut.SceneManagement {
             Name = "IntParameter";
             Reference = "_IntParameter";
             Exposed = true;
-            ParameterType = ParameterType.Int;
+            ParameterType = "Int";
             Value = 69;
         }
     }

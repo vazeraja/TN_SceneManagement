@@ -14,7 +14,7 @@ namespace ThunderNut.SceneManagement {
             Name = "StringParameter";
             Reference = "_StringParameter";
             Exposed = true;
-            ParameterType = ParameterType.String;
+            ParameterType = "String";
             Value = "Default_Value";
         }
     }

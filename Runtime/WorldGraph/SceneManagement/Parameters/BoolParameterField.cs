@@ -14,7 +14,7 @@ namespace ThunderNut.SceneManagement {
             Name = "BoolParameter";
             Reference = "_BoolParameter";
             Exposed = true;
-            ParameterType = ParameterType.Bool;
+            ParameterType = "Bool";
             Value = true;
         }
         
