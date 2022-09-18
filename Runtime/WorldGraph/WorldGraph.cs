@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace ThunderNut.SceneManagement {
 
-    [CreateAssetMenu(fileName = "WorldGraph", menuName = "World Graph/World Graph")]
+    [CreateAssetMenu(fileName = "WorldGraph", menuName = "World Graph", order = 0)]
     public class WorldGraph : ScriptableObject {
         public List<SceneHandle> sceneHandles;
         [SerializeField] private SceneHandle activeSceneHandle;
@@ -196,15 +196,20 @@ namespace ThunderNut.SceneManagement {
             transitions.Add(edge);
 
             if (!Application.isPlaying) AssetDatabase.AddObjectToAsset(edge, this);
-            AssetDatabase.SaveAssets();
+            SaveAssetsAndSetDirty();
             return edge;
+        }
+
+        private void SaveAssetsAndSetDirty() {
+            AssetDatabase.SaveAssets();
+            EditorUtility.SetDirty(this); 
         }
 
         public void RemoveTransition(Transition edge) {
             transitions.Remove(edge);
 
             AssetDatabase.RemoveObjectFromAsset(edge);
-            AssetDatabase.SaveAssets();
+            SaveAssetsAndSetDirty();
         }
 
         public ExposedParameter CreateParameter(string type) {
@@ -214,7 +219,7 @@ namespace ThunderNut.SceneManagement {
                     stringParameters.Add(stringParameter);
 
                     if (!Application.isPlaying) AssetDatabase.AddObjectToAsset(stringParameter, this);
-                    AssetDatabase.SaveAssets();
+                    SaveAssetsAndSetDirty();
 
                     return stringParameter;
                 case "Float":
@@ -222,7 +227,7 @@ namespace ThunderNut.SceneManagement {
                     floatParameters.Add(floatParameter);
 
                     if (!Application.isPlaying) AssetDatabase.AddObjectToAsset(floatParameter, this);
-                    AssetDatabase.SaveAssets();
+                    SaveAssetsAndSetDirty();
 
                     return floatParameter;
                 case "Int":
@@ -230,7 +235,7 @@ namespace ThunderNut.SceneManagement {
                     intParameters.Add(intParameter);
 
                     if (!Application.isPlaying) AssetDatabase.AddObjectToAsset(intParameter, this);
-                    AssetDatabase.SaveAssets();
+                    SaveAssetsAndSetDirty();
 
                     return intParameter;
                 case "Bool":
@@ -238,7 +243,7 @@ namespace ThunderNut.SceneManagement {
                     boolParameters.Add(boolParameter);
 
                     if (!Application.isPlaying) AssetDatabase.AddObjectToAsset(boolParameter, this);
-                    AssetDatabase.SaveAssets();
+                    SaveAssetsAndSetDirty();
 
                     return boolParameter;
                 default:
@@ -252,45 +257,45 @@ namespace ThunderNut.SceneManagement {
                     stringParameters.Remove(stringParameterField);
 
                     AssetDatabase.RemoveObjectFromAsset(parameter);
-                    AssetDatabase.SaveAssets();
+                    SaveAssetsAndSetDirty();
 
                     break;
                 case FloatParameterField floatParameterField:
                     floatParameters.Remove(floatParameterField);
 
                     AssetDatabase.RemoveObjectFromAsset(parameter);
-                    AssetDatabase.SaveAssets();
+                    SaveAssetsAndSetDirty();
 
                     break;
                 case IntParameterField intParameterField:
                     intParameters.Remove(intParameterField);
 
                     AssetDatabase.RemoveObjectFromAsset(parameter);
-                    AssetDatabase.SaveAssets();
+                    SaveAssetsAndSetDirty();
 
                     break;
                 case BoolParameterField boolParameterField:
                     boolParameters.Remove(boolParameterField);
 
                     AssetDatabase.RemoveObjectFromAsset(parameter);
-                    AssetDatabase.SaveAssets();
+                    SaveAssetsAndSetDirty();
 
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
-            AssetDatabase.SaveAssets();
+            SaveAssetsAndSetDirty();
         }
 
         public void AddChild(SceneHandle parent, SceneHandle child) {
             parent.children.Add(child);
-            EditorUtility.SetDirty(this);
+            SaveAssetsAndSetDirty();
         }
 
         public void RemoveChild(SceneHandle parent, SceneHandle child) {
             parent.children.Remove(child);
-            EditorUtility.SetDirty(this);
+            SaveAssetsAndSetDirty();
         }
 
         public SceneHandle CreateSubAsset(Type type) {
@@ -301,7 +306,7 @@ namespace ThunderNut.SceneManagement {
             sceneHandles.Add(newHandle);
 
             if (!Application.isPlaying) AssetDatabase.AddObjectToAsset(newHandle, this);
-            AssetDatabase.SaveAssets();
+            SaveAssetsAndSetDirty();
 
             return newHandle;
         }
@@ -309,7 +314,7 @@ namespace ThunderNut.SceneManagement {
         public void RemoveSubAsset(SceneHandle handle) {
             sceneHandles.Remove(handle);
             AssetDatabase.RemoveObjectFromAsset(handle);
-            AssetDatabase.SaveAssets();
+            SaveAssetsAndSetDirty();
         }
 
         public static IEnumerable<SceneHandle> GetChildren(SceneHandle parent) {
