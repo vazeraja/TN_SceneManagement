@@ -98,8 +98,12 @@ namespace ThunderNut.SceneManagement.Editor {
                                     (BoolParamOptions) EditorGUI.EnumPopup(rect, boolParameterField.options);
 
                                 rect.x += width / 2;
-                                valueProp.FindPropertyRelative("BoolValue").boolValue =
-                                    EditorGUI.Toggle(rect, GUIContent.none, boolValue);
+
+                                valueProp.FindPropertyRelative("BoolValue").boolValue = boolParameterField.options switch {
+                                    BoolParamOptions.True => true,
+                                    BoolParamOptions.False => false,
+                                    _ => valueProp.FindPropertyRelative("BoolValue").boolValue
+                                };
 
                                 break;
                         }

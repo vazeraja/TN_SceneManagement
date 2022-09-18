@@ -28,7 +28,7 @@ namespace ThunderNut.SceneManagement {
         public Func<bool> BoolIsFalse(BoolParameterField parameter) => () => parameter.Value != Value.BoolValue;
 
         public Func<bool> IntIsGreaterThan(IntParameterField parameter) => () => parameter.Value > Value.IntValue;
-        public Func<bool> IntIsLessThan(IntParameterField parameter) => () => parameter.Value > Value.IntValue;
+        public Func<bool> IntIsLessThan(IntParameterField parameter) => () => parameter.Value < Value.IntValue;
         public Func<bool> IntIsEqual(IntParameterField parameter) => () => parameter.Value == Value.IntValue;
         public Func<bool> IntNotEqual(IntParameterField parameter) => () => parameter.Value != Value.IntValue;
         
