@@ -1,3 +1,10 @@
+## [1.0.34](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.33...v1.0.34) (2022-09-18)
+
+
+### Bug Fixes
+
+* DrawInspector optimization ([e42c4de](https://github.com/vazeraja/TN_SceneManagement/commit/e42c4de2ac8dc19b846746f79eb34380b3b5d6fd))
+
 ## [1.0.33](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.32...v1.0.33) (2022-09-18)
 
 
