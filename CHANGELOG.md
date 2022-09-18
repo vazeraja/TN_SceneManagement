@@ -1,3 +1,10 @@
+## [1.0.32](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.31...v1.0.32) (2022-09-18)
+
+
+### Bug Fixes
+
+* save asset and set dirty moved to method, world graph create asset without folder ([309d3da](https://github.com/vazeraja/TN_SceneManagement/commit/309d3dac019f228ad17916dc9ad398254bf3ac1e))
+
 ## [1.0.31](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.30...v1.0.31) (2022-09-18)
 
 
