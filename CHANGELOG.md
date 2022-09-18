@@ -1,3 +1,10 @@
+## [1.0.33](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.32...v1.0.33) (2022-09-18)
+
+
+### Bug Fixes
+
+* refactored search window, removed parameter value from wg inspector ([b2af0f7](https://github.com/vazeraja/TN_SceneManagement/commit/b2af0f7a1dc9944b9d9132cfe0e85af75b10c029))
+
 ## [1.0.32](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.31...v1.0.32) (2022-09-18)
 
 
