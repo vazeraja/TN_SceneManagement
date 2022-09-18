@@ -13,11 +13,14 @@ namespace ThunderNut.SceneManagement.Editor {
 
         public override void OnSelected() {
             if (output.node is not ParameterPropertyNodeView) {
-                graphView.ShowTransitionInformation(
-                    ((WorldGraphNodeView) output.node).sceneHandle,
-                        ((WorldGraphNodeView) input.node).sceneHandle
-                );
+                var outputView = (WorldGraphNodeView) output.node;
+                var inputView = (WorldGraphNodeView) input.node;
+                var edge = graphView.graph.transitions.Find(e =>
+                    e.OutputNodeGUID == outputView.sceneHandle.GUID && e.InputNodeGUID == inputView.sceneHandle.GUID);
+
+                graphView.ShowTransitionProperties(edge);
             }
+
             base.OnSelected();
         }
     }

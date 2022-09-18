@@ -70,6 +70,54 @@ namespace ThunderNut.SceneManagement.Editor {
             EditorGUI.DrawRect(rect, Splitter);
         }
 
+        public static Rect DrawSimpleHeader(string title) {
+            var backgroundRect = GUILayoutUtility.GetRect(1f, 17f);
+
+            var reorderRect = backgroundRect;
+            reorderRect.xMin -= 8f;
+            reorderRect.y += 5f;
+            reorderRect.width = 9f;
+            reorderRect.height = 9f;
+
+            var foldoutRect = backgroundRect;
+            foldoutRect.x += 10f;
+            foldoutRect.y += 2f;
+            foldoutRect.width = 13f;
+            foldoutRect.height = 13f;
+
+            var toggleRect = backgroundRect;
+            toggleRect.x += 25f;
+            toggleRect.y += 2f;
+            toggleRect.width = 13f;
+            toggleRect.height = 13f;
+            
+            var labelRect = backgroundRect;
+            labelRect.xMin += 90f;
+            labelRect.xMax -= 20f;
+
+            var menuIcon = PaneOptionsIcon;
+            var menuRect = new Rect(labelRect.xMax + 4f, labelRect.y + 1f, menuIcon.width, menuIcon.height);
+
+            var colorRect = new Rect(labelRect.xMin, labelRect.yMin, 5f, 17f);
+            colorRect.xMin = 0f;
+            colorRect.xMax = 5f;
+            EditorGUI.DrawRect(colorRect, Color.cyan);
+
+            // Background rect should be full-width
+            backgroundRect.xMin = 0f;
+            backgroundRect.width += 4f;
+
+            // ------------------------ Background ------------------------
+            EditorGUI.DrawRect(backgroundRect, HeaderBackground);
+            
+            // ------------------------ Title ------------------------
+            using (new EditorGUI.DisabledScope(false)) {
+                EditorGUI.LabelField(labelRect, title, EditorStyles.boldLabel);
+            }
+
+            return backgroundRect;
+        }
+
         /// <summary>
         /// Draw a header similar to the one used for the post-process stack
         /// </summary>

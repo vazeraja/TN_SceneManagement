@@ -22,18 +22,11 @@ namespace ThunderNut.SceneManagement {
         public string HandleName = "";
         public SceneReference scene;
         public List<SceneHandle> children = new List<SceneHandle>();
-        
-        public List<Condition> transitions = new List<Condition>();
 
-        // Polymorphic serialization
-        [SerializeField, SerializeReference]
-        private List<StringParameterField> stringParameters = new List<StringParameterField>();
-        [SerializeField, SerializeReference]
-        private List<FloatParameterField> floatParameters = new List<FloatParameterField>();
-        [SerializeField, SerializeReference]
-        private List<IntParameterField> intParameters = new List<IntParameterField>();
-        [SerializeField, SerializeReference]
-        private List<BoolParameterField> boolParameters = new List<BoolParameterField>();
+        [SerializeField] private List<StringParameterField> stringParameters = new List<StringParameterField>();
+        [SerializeField] private List<FloatParameterField> floatParameters = new List<FloatParameterField>();
+        [SerializeField] private List<IntParameterField> intParameters = new List<IntParameterField>();
+        [SerializeField] private List<BoolParameterField> boolParameters = new List<BoolParameterField>();
 
         public IEnumerable<ExposedParameter> allParameters {
             get {
@@ -45,6 +38,9 @@ namespace ThunderNut.SceneManagement {
                 return list;
             }
         }
+
+        public void Enter() { }
+        public void Exit() { }
 
         public abstract void ChangeToScene();
 

@@ -1,68 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using UnityEditor;
-using UnityEditor.IMGUI.Controls;
 using UnityEditorInternal;
 using UnityEngine;
 using PopupWindow = UnityEditor.PopupWindow;
 
 namespace ThunderNut.SceneManagement.Editor {
-
-    public class TemporaryPopupWindow : PopupWindowContent {
-        private readonly SearchField m_SearchField;
-
-        private readonly WGSimpleTreeView multiColumnTreeView;
-        private readonly TreeViewState multiColumnTreeViewState;
-
-        private bool m_ShouldClose;
-        public float Width;
-
-        public TemporaryPopupWindow(List<ExposedParameter> parameters, SerializedProperty property) {
-            m_SearchField = new SearchField();
-            multiColumnTreeView = WGSimpleTreeView.Create(ref multiColumnTreeViewState, parameters);
-            multiColumnTreeView.onDoubleClicked = parameter => {
-                property.objectReferenceValue = parameter;
-                property.serializedObject.ApplyModifiedProperties();
-                ForceClose();
-            };
-        }
-
-        public override void OnGUI(Rect rect) {
-            if (m_ShouldClose || Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Escape) {
-                GUIUtility.hotControl = 0;
-                editorWindow.Close();
-                GUIUtility.ExitGUI();
-            }
-
-            const int border = 4;
-            const int topPadding = 12;
-            const int searchHeight = 20;
-            const int remainTop = topPadding + searchHeight + border;
-            var searchRect = new Rect(border, topPadding, rect.width - border * 2, searchHeight);
-            var remainingRect = new Rect(border, topPadding + searchHeight + border, rect.width - border * 2,
-                rect.height - remainTop - border);
-
-            multiColumnTreeView.searchString = m_SearchField.OnGUI(searchRect, multiColumnTreeView.searchString);
-            multiColumnTreeView.OnGUI(remainingRect);
-        }
-
-        public override Vector2 GetWindowSize() {
-            var result = base.GetWindowSize();
-            result.x = Width;
-            return result;
-        }
-
-        public override void OnOpen() {
-            m_SearchField.SetFocus();
-            base.OnOpen();
-        }
-
-        public override void OnClose() {
-            base.OnClose();
-        }
-
-        public void ForceClose() => m_ShouldClose = true;
-    }
 
     [CustomEditor(typeof(SceneHandle), true)]
     public class SceneHandleEditor : UnityEditor.Editor {
@@ -76,12 +18,15 @@ namespace ThunderNut.SceneManagement.Editor {
 
         private SerializedProperty childrenProperty;
         private ReorderableList childrenReorderableList;
+        private SerializedProperty worldGraphProperty;
+        private SerializedProperty activeProperty;
+        private SerializedProperty handleNameProperty;
+        private SerializedProperty sceneProperty;
 
         private void OnEnable() {
             sceneHandle = target as SceneHandle;
-            transitionsProperty = serializedObject.FindProperty("transitions");
+            
             childrenProperty = serializedObject.FindProperty("children");
-
             childrenReorderableList = new ReorderableList(serializedObject, childrenProperty) {
                 displayAdd = true,
                 displayRemove = true,
@@ -94,88 +39,11 @@ namespace ThunderNut.SceneManagement.Editor {
                     EditorGUI.PropertyField(rect, element, new GUIContent("SceneHandle"));
                 }
             };
-
-            transitionsReorderableList = new ReorderableList(serializedObject, transitionsProperty) {
-                displayAdd = true,
-                displayRemove = true,
-                draggable = true,
-
-                drawHeaderCallback = rect => EditorGUI.LabelField(rect, transitionsProperty.displayName),
-                elementHeightCallback = index => {
-                    var element = transitionsProperty.GetArrayElementAtIndex(index);
-                    var outputProp = element.FindPropertyRelative("Parameter");
-                    return EditorGUI.GetPropertyHeight(outputProp);
-                },
-                drawElementCallback = (rect, index, active, focused) => {
-                    var element = transitionsProperty.GetArrayElementAtIndex(index);
-                    var parameterProp = element.FindPropertyRelative("Parameter");
-                    var valueProp = element.FindPropertyRelative("Value");
-
-                    var stringValue = valueProp.FindPropertyRelative("StringValue").stringValue;
-                    var floatValue = valueProp.FindPropertyRelative("FloatValue").floatValue;
-                    var intValue = valueProp.FindPropertyRelative("IntValue").intValue;
-                    var boolValue = valueProp.FindPropertyRelative("BoolValue").boolValue;
-
-                    float width = rect.width / 2;
-
-                    if (sceneHandle.allParameters.Any()) {
-                        rect.width = width;
-
-                        List<ExposedParameter> allParams = sceneHandle.allParameters.ToList();
-
-                        if (EditorGUI.DropdownButton(rect, parameterProp.objectReferenceValue != null
-                            ? new GUIContent(((ExposedParameter) parameterProp.objectReferenceValue).Name)
-                            : new GUIContent("Select a Parameter"), FocusType.Passive)) {
-                            PopupWindow.Show(rect, new TemporaryPopupWindow(allParams, parameterProp) {Width = rect.width});
-                        }
-
-                        rect.x += width + 5;
-                        rect.width = width / 2 - 5;
-
-                        switch (parameterProp.objectReferenceValue) {
-                            case StringParameterField stringParameterField:
-                                stringParameterField.options =
-                                    (StringParamOptions) EditorGUI.EnumPopup(rect, stringParameterField.options);
-
-                                rect.x += width / 2;
-                                valueProp.FindPropertyRelative("StringValue").stringValue =
-                                    EditorGUI.TextField(rect, GUIContent.none, stringValue);
-
-                                break;
-                            case FloatParameterField floatParameterField:
-                                floatParameterField.options =
-                                    (FloatParamOptions) EditorGUI.EnumPopup(rect, floatParameterField.options);
-
-                                rect.x += width / 2;
-                                valueProp.FindPropertyRelative("FloatValue").floatValue =
-                                    EditorGUI.FloatField(rect, GUIContent.none, floatValue);
-
-                                break;
-                            case IntParameterField intParameterField:
-                                intParameterField.options =
-                                    (IntParamOptions) EditorGUI.EnumPopup(rect, intParameterField.options);
-
-                                rect.x += width / 2;
-                                valueProp.FindPropertyRelative("IntValue").intValue =
-                                    EditorGUI.IntField(rect, GUIContent.none, intValue);
-
-                                break;
-                            case BoolParameterField boolParameterField:
-                                boolParameterField.options =
-                                    (BoolParamOptions) EditorGUI.EnumPopup(rect, boolParameterField.options);
-
-                                rect.x += width / 2;
-                                valueProp.FindPropertyRelative("BoolValue").boolValue =
-                                    EditorGUI.Toggle(rect, GUIContent.none, boolValue);
-
-                                break;
-                        }
-                    }
-                    else {
-                        EditorGUI.HelpBox(rect, "This SceneHandle has no connected parameters", MessageType.Warning);
-                    }
-                }
-            };
+            
+            worldGraphProperty = serializedObject.FindProperty("WorldGraph");
+            activeProperty = serializedObject.FindProperty("Active");
+            handleNameProperty = serializedObject.FindProperty("HandleName");
+            sceneProperty = serializedObject.FindProperty("scene");
         }
 
         public override void OnInspectorGUI() {
@@ -195,15 +63,14 @@ namespace ThunderNut.SceneManagement.Editor {
             }
 
             EditorGUILayout.Space(10);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("WorldGraph"));
+            EditorGUILayout.PropertyField(worldGraphProperty);
             EditorGUILayout.Space(10);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("Active"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("HandleName"));
+            EditorGUILayout.PropertyField(activeProperty);
+            EditorGUILayout.PropertyField(handleNameProperty);
 
             EditorGUILayout.Space(10);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("scene"));
+            EditorGUILayout.PropertyField(sceneProperty);
             childrenReorderableList.DoLayoutList();
-            transitionsReorderableList.DoLayoutList();
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("stringParameters"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("floatParameters"));

@@ -14,7 +14,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
     public class WorldGraphGraphView : GraphView, IDisposable {
         private readonly EditorWindow editorWindow;
-        private readonly WorldGraph graph;
+        public readonly WorldGraph graph;
 
         public WorldGraphSearcherProvider m_SearchWindowProvider;
         private EdgeConnectorListener edgeConnectorListener;
@@ -93,9 +93,9 @@ namespace ThunderNut.SceneManagement.Editor {
             foreach (var sceneHandle in graph.sceneHandles) {
                 CreateGraphNode(sceneHandle);
             }
-            
+
             // ------------------ Connect Nodes ------------------
-            foreach (WorldGraphEdge graphEdge in from edge in graph.edges
+            foreach (WorldGraphEdge graphEdge in from edge in graph.transitions
                 let outputView = (WorldGraphNodeView) GetNodeByGuid(edge.OutputNodeGUID)
                 let inputView = (WorldGraphNodeView) GetNodeByGuid(edge.InputNodeGUID)
                 select outputView.output.ConnectTo<WorldGraphEdge>(inputView.input)) {
@@ -109,8 +109,8 @@ namespace ThunderNut.SceneManagement.Editor {
                     CreateParameterGraphNode(exposedParam, false);
                 }
             }
-            
-            // ------------------ Connect Parameter Nodes  ------------------
+
+            // ------------------ Connect Parameters  ------------------
             foreach (WorldGraphEdge edge in from sceneHandle in graph.sceneHandles
                 let baseView = (WorldGraphNodeView) GetNodeByGuid(sceneHandle.GUID)
                 let ports = baseView.inputContainer.Query<WorldGraphPort>().ToList()
@@ -215,12 +215,15 @@ namespace ThunderNut.SceneManagement.Editor {
             inspectorBlackboard.Add(_RootElement);
         }
 
-        public void ShowTransitionInformation(SceneHandle output, SceneHandle input) {
+        public void ShowTransitionProperties(Transition edge) {
             inspectorBlackboard.Clear();
             inspectorContentContainer.Clear();
-            titleLabel.text = $"{output.HandleName} ----> {input.HandleName}";
 
-            GUIContainer = new IMGUIContainer(() => { });
+            var editor = UnityEditor.Editor.CreateEditor(edge);
+            titleLabel.text = $"{edge.OutputNode.HandleName} ----> {edge.InputNode.HandleName}";
+            GUIContainer = new IMGUIContainer(() => {
+                editor.OnInspectorGUI();
+            });
 
             inspectorContentContainer.Add(GUIContainer);
             inspectorBlackboard.Add(_RootElement);
@@ -243,7 +246,7 @@ namespace ThunderNut.SceneManagement.Editor {
                         var input = (WorldGraphNodeView) inputPort.node;
 
                         graph.AddChild(output.sceneHandle, input.sceneHandle);
-                        graph.edges.Add(SerializableEdge.CreateNewEdge(graph, output.sceneHandle, input.sceneHandle));
+                        graph.CreateTransition(output.sceneHandle, input.sceneHandle);
                         break;
                     }
                     case PortType.Parameter when node is WorldGraphNodeView nodeView: {
@@ -271,10 +274,10 @@ namespace ThunderNut.SceneManagement.Editor {
                         var input = (WorldGraphNodeView) inputPort.node;
 
                         graph.RemoveChild(output.sceneHandle, input.sceneHandle);
-                        
-                        var edgeToRemove = graph.edges.Find(e =>
+
+                        var edgeToRemove = graph.transitions.Find(e =>
                             e.OutputNodeGUID == output.sceneHandle.GUID && e.InputNodeGUID == input.sceneHandle.GUID);
-                        graph.edges.Remove(edgeToRemove);
+                        graph.RemoveTransition(edgeToRemove);
 
                         break;
                     }
