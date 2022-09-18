@@ -72,10 +72,12 @@ namespace ThunderNut.SceneManagement.Editor {
             EditorGUILayout.PropertyField(sceneProperty);
             childrenReorderableList.DoLayoutList();
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("stringParameters"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("floatParameters"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("intParameters"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("boolParameters"));
+            using (new EditorGUI.DisabledGroupScope(true)) {
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("stringParameters"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("floatParameters"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("intParameters"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("boolParameters"));
+            }
 
             serializedObject.ApplyModifiedProperties();
         }
