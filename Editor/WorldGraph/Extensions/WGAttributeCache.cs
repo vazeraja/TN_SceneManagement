@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using UnityEditor;
 
 namespace ThunderNut.SceneManagement.Editor {
@@ -88,6 +90,10 @@ namespace ThunderNut.SceneManagement.Editor {
                     $"The passed in Type {nodeType.FullName} was not found in the loaded assemblies as a child class of AbstractMaterialNode");
             }
         }
+        
+        public static Type GetTypeByName(string name) {
+            return AppDomain.CurrentDomain.GetAssemblies().SelectMany(assembly => assembly.GetTypes()).FirstOrDefault(type => type.Name == name);
+        } 
     }
 
 }

@@ -14,10 +14,12 @@ namespace ThunderNut.SceneManagement {
     public class PathAttribute : ContextFilterableAttribute {
         public readonly string path;
         public readonly string dropdownTitle;
+        public readonly bool isVisible;
 
-        public PathAttribute(string path, string dropdownTitle) {
+        public PathAttribute(string path, string dropdownTitle, bool isVisible = true) {
             this.path = path;
             this.dropdownTitle = dropdownTitle;
+            this.isVisible = isVisible;
         }
     }
 

@@ -44,6 +44,9 @@ namespace ThunderNut.SceneManagement.Editor {
             var current = root;
 
             foreach (var entryItems in entryItemsList) {
+                var t = WGAttributeCache.GetTypeByName(entryItems.Last());
+                var attribute = WGAttributeCache.GetAttributeOnNodeType<PathAttribute>(t);
+                if (!attribute.isVisible) continue;
                 for (var index = 0; index < entryItems.Count; index++) {
                     string entryItem = entryItems[index];
                     var match = current.Children.Find(x => x.Name == entryItem);
@@ -53,10 +56,13 @@ namespace ThunderNut.SceneManagement.Editor {
 
                         if (index == entryItems.Count - 1) {
                             // Get the type associated with the leaf item
-                            var type = WGAttributeCache.knownNodeTypes.ToList().Find(x => x.Name == entryItem);
-
+                            // var type = WGAttributeCache.knownNodeTypes.ToList().Find(x => x.Name == entryItem);
+                            // Debug.Log(type.AssemblyQualifiedName);
                             // Get dropdown title from attribute
-                            PathAttribute attr = WGAttributeCache.GetAttributeOnNodeType<PathAttribute>(type);
+                            // var type = Type.GetType(entryItem);
+
+                            var type = WGAttributeCache.GetTypeByName(entryItem);
+                            var attr = WGAttributeCache.GetAttributeOnNodeType<PathAttribute>(type);
 
                             temp = new SearchNodeItem(attr.dropdownTitle, type, userData: type);
                         }
