@@ -13,7 +13,7 @@ namespace ThunderNut.SceneManagement.Editor {
             icon = parameter.Exposed ? Resources.Load<Texture2D>("GraphView/Nodes/BlackboardFieldExposed") : null;
         }
         public override void OnSelected() {
-            graphView.DrawInspector((ExposedParameter) userData);
+            graphView.DrawInspector((Object) userData);
             base.OnSelected();
         }
     }

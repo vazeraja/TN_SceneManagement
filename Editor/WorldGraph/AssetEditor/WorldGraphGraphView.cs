@@ -11,7 +11,6 @@ using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 namespace ThunderNut.SceneManagement.Editor {
-
     public class WorldGraphGraphView : GraphView, IDisposable {
         private readonly EditorWindow editorWindow;
         public readonly WorldGraph graph;
@@ -28,7 +27,8 @@ namespace ThunderNut.SceneManagement.Editor {
         private IMGUIContainer GUIContainer;
         private WorldGraphEditor graphEditor;
 
-        private List<ParameterPropertyNodeView> ParameterNodeViews => graphElements.OfType<ParameterPropertyNodeView>().ToList();
+        private List<ParameterPropertyNodeView> ParameterNodeViews =>
+            graphElements.OfType<ParameterPropertyNodeView>().ToList();
 
         public void Dispose() {
             graphElements.OfType<IWorldGraphNodeView>().ToList().ForEach(node => node.Dispose());
@@ -75,7 +75,8 @@ namespace ThunderNut.SceneManagement.Editor {
 
                 m_SearchWindowProvider.target = c.target;
                 SearcherWindow.Show(editorWindow, m_SearchWindowProvider.LoadSearchWindow(),
-                    item => m_SearchWindowProvider.OnSearcherSelectEntry(item, displayPosition), displayPosition, null);
+                    item => m_SearchWindowProvider.OnSearcherSelectEntry(item, displayPosition),
+                    displayPosition, null);
             };
             edgeConnectorListener = new EdgeConnectorListener(editorWindow, m_SearchWindowProvider);
         }
@@ -163,17 +164,8 @@ namespace ThunderNut.SceneManagement.Editor {
                 case SceneHandle sceneHandle:
                     DrawProperties(sceneHandle, $"{sceneHandle.HandleName} Node", true);
                     break;
-                case FloatParameterField floatParameterField:
-                    DrawProperties(floatParameterField, $"{floatParameterField.Name} Parameter");
-                    break;
-                case IntParameterField intParameterField:
-                    DrawProperties(intParameterField, $"{intParameterField.Name} Parameter");
-                    break;
-                case BoolParameterField boolParameterField:
-                    DrawProperties(boolParameterField, $"{boolParameterField.Name} Parameter");
-                    break;
-                case StringParameterField stringParameterField:
-                    DrawProperties(stringParameterField, $"{stringParameterField.Name} Parameter");
+                case ExposedParameter parameter:
+                    DrawProperties(parameter, $"{parameter.Name} Parameter");
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(objectToDisplay));
@@ -181,19 +173,19 @@ namespace ThunderNut.SceneManagement.Editor {
         }
 
         private void DrawProperties(Object obj, string label, bool isSceneHandle = false) {
-            var serializedParameter = new SerializedObject(obj);
+            var serializedObject = new SerializedObject(obj);
             var fieldInfos = WGHelper.GetFieldInfosWithAttribute(obj, typeof(WGInspectableAttribute));
 
             titleLabel.text = label;
             GUIContainer = new IMGUIContainer(() => {
                 if (!isSceneHandle) {
-                    serializedParameter.Update();
+                    serializedObject.Update();
                     foreach (var field in fieldInfos) {
-                        var prop = serializedParameter.FindProperty(field.Name);
+                        var prop = serializedObject.FindProperty(field.Name);
                         EditorGUILayout.PropertyField(prop);
                     }
 
-                    serializedParameter.ApplyModifiedProperties();
+                    serializedObject.ApplyModifiedProperties();
                 }
                 else {
                     var editor = UnityEditor.Editor.CreateEditor((SceneHandle) obj);
@@ -221,9 +213,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
             var editor = UnityEditor.Editor.CreateEditor(edge);
             titleLabel.text = $"{edge.OutputNode.HandleName} ----> {edge.InputNode.HandleName}";
-            GUIContainer = new IMGUIContainer(() => {
-                editor.OnInspectorGUI();
-            });
+            GUIContainer = new IMGUIContainer(() => { editor.OnInspectorGUI(); });
 
             inspectorContentContainer.Add(GUIContainer);
             inspectorBlackboard.Add(_RootElement);
@@ -251,7 +241,8 @@ namespace ThunderNut.SceneManagement.Editor {
                     }
                     case PortType.Parameter when node is WorldGraphNodeView nodeView: {
                         Debug.Log($"{node.name} Parameter Port Connected");
-                        ExposedParameter parameter = ((ParameterPropertyNodeView) outputPort.node).parameter;
+                        ExposedParameter parameter =
+                            ((ParameterPropertyNodeView) outputPort.node).parameter;
                         nodeView.sceneHandle.AddParameter(parameter);
                         port.PortData.Parameter = parameter;
                         break;
@@ -276,7 +267,8 @@ namespace ThunderNut.SceneManagement.Editor {
                         graph.RemoveChild(output.sceneHandle, input.sceneHandle);
 
                         var edgeToRemove = graph.transitions.Find(e =>
-                            e.OutputNodeGUID == output.sceneHandle.GUID && e.InputNodeGUID == input.sceneHandle.GUID);
+                            e.OutputNodeGUID == output.sceneHandle.GUID &&
+                            e.InputNodeGUID == input.sceneHandle.GUID);
                         graph.RemoveTransition(edgeToRemove);
 
                         break;
@@ -296,9 +288,12 @@ namespace ThunderNut.SceneManagement.Editor {
 
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter) {
             return ports.ToList().Where(endPort =>
-                    ((WorldGraphPort) endPort).PortData.OwnerNodeGUID != ((WorldGraphPort) startPort).PortData.OwnerNodeGUID &&
-                    ((WorldGraphPort) endPort).PortData.PortDirection != ((WorldGraphPort) startPort).PortData.PortDirection &&
-                    ((WorldGraphPort) endPort).PortData.PortType == ((WorldGraphPort) startPort).PortData.PortType)
+                    ((WorldGraphPort) endPort).PortData.OwnerNodeGUID !=
+                    ((WorldGraphPort) startPort).PortData.OwnerNodeGUID &&
+                    ((WorldGraphPort) endPort).PortData.PortDirection !=
+                    ((WorldGraphPort) startPort).PortData.PortDirection &&
+                    ((WorldGraphPort) endPort).PortData.PortType ==
+                    ((WorldGraphPort) startPort).PortData.PortType)
                 .ToList();
         }
 
@@ -306,5 +301,4 @@ namespace ThunderNut.SceneManagement.Editor {
             Undo.RegisterCompleteObjectUndo(graph, name);
         }
     }
-
 }
