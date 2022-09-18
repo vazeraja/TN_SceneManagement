@@ -18,6 +18,8 @@ namespace ThunderNut.SceneManagement.Editor {
 
             EditorGUILayout.HelpBox(new GUIContent("Select Conditions for this Transition"));
             conditionsReorderableList.DoLayoutList();
+            EditorGUILayout.Separator();
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("Conditions"));
 
             serializedObject.ApplyModifiedProperties();
         }
@@ -45,7 +47,6 @@ namespace ThunderNut.SceneManagement.Editor {
                     var stringValue = valueProp.FindPropertyRelative("StringValue").stringValue;
                     var floatValue = valueProp.FindPropertyRelative("FloatValue").floatValue;
                     var intValue = valueProp.FindPropertyRelative("IntValue").intValue;
-                    var boolValue = valueProp.FindPropertyRelative("BoolValue").boolValue;
 
                     float width = rect.width / 2;
 
@@ -98,13 +99,6 @@ namespace ThunderNut.SceneManagement.Editor {
                                     (BoolParamOptions) EditorGUI.EnumPopup(rect, boolParameterField.options);
 
                                 rect.x += width / 2;
-
-                                valueProp.FindPropertyRelative("BoolValue").boolValue = boolParameterField.options switch {
-                                    BoolParamOptions.True => true,
-                                    BoolParamOptions.False => false,
-                                    _ => valueProp.FindPropertyRelative("BoolValue").boolValue
-                                };
-
                                 break;
                         }
                     }

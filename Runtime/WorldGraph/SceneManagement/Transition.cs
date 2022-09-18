@@ -13,7 +13,6 @@ namespace ThunderNut.SceneManagement {
         public string StringValue;
         public float FloatValue;
         public int IntValue;
-        public bool BoolValue;
     }
 
     [Serializable]
@@ -24,8 +23,8 @@ namespace ThunderNut.SceneManagement {
         public Func<bool> FloatIsGreaterThan(FloatParameterField parameter) => () => parameter.Value > Value.FloatValue;
         public Func<bool> FloatIsLessThan(FloatParameterField parameter) => () => parameter.Value < Value.FloatValue;
 
-        public Func<bool> BoolIsTrue(BoolParameterField parameter) => () => parameter.Value == Value.BoolValue;
-        public Func<bool> BoolIsFalse(BoolParameterField parameter) => () => parameter.Value != Value.BoolValue;
+        public Func<bool> BoolIsTrue(BoolParameterField parameter) => () => parameter.Value;
+        public Func<bool> BoolIsFalse(BoolParameterField parameter) => () => !parameter.Value;
 
         public Func<bool> IntIsGreaterThan(IntParameterField parameter) => () => parameter.Value > Value.IntValue;
         public Func<bool> IntIsLessThan(IntParameterField parameter) => () => parameter.Value < Value.IntValue;

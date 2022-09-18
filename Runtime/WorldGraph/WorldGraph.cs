@@ -53,7 +53,7 @@ namespace ThunderNut.SceneManagement {
                 }
 
                 if (conditionsMet.All(x => x)) {
-                    Debug.Log($"All Conditions Met for Transition: {transitions[i]}");
+                    Debug.Log($"All Conditions Met for Transition: {currentTransitions[i]}");
                 }
             }
         }
