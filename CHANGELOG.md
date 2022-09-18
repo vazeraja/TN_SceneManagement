@@ -1,3 +1,10 @@
+## [1.0.30](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.29...v1.0.30) (2022-09-18)
+
+
+### Bug Fixes
+
+* check conditions for current state ([f44796c](https://github.com/vazeraja/TN_SceneManagement/commit/f44796c25cda2fb333a10624a643d3d1027ccec2))
+
 ## [1.0.29](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.28...v1.0.29) (2022-09-13)
 
 
