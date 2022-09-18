@@ -1,3 +1,10 @@
+## [1.0.31](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.30...v1.0.31) (2022-09-18)
+
+
+### Bug Fixes
+
+* disabled parameters in inspector ([b02c0d0](https://github.com/vazeraja/TN_SceneManagement/commit/b02c0d02e7784248d810342786634282f89a33ed))
+
 ## [1.0.30](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.29...v1.0.30) (2022-09-18)
 
 
