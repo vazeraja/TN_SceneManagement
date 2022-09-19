@@ -92,7 +92,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
                 toolbar.changeCheck = UpdateSubWindowsVisibility;
                 toolbar.showGraphSettings = graphView.ShowGraphSettings;
-                
+
                 graphView.graphViewChanged = GraphViewChanged;
                 graphView.inspectorBlackboard = inspectorBlackboard;
                 graphView.exposedParametersBlackboard = exposedParametersBlackboard;
@@ -115,27 +115,28 @@ namespace ThunderNut.SceneManagement.Editor {
                         graph.RemoveSubAsset(nodeView.sceneHandle);
                         break;
                     case BlackboardField blackboardField:
+                        graphView.ClearInspector();
                         ExposedParameter exposedParameter = (ExposedParameter) blackboardField.userData;
-
-                        // Delete if node is present on GraphView
-                        if (exposedParameter.Displayed) {
-                            var paramNode = graphView.GetNodeByGuid(exposedParameter.GUID);
-
-                            // Also Delete Port -- RemovePort function handles the rest 
-                            if (exposedParameter.ConnectedPortGUID != null) {
-                                Edge connectedEdge = graphView.edges.ToList().Find(edge =>
-                                    ((WorldGraphPort) edge.input).PortData.GUID == exposedParameter.ConnectedPortGUID);
-                                var paramPort = ((WorldGraphPort) connectedEdge.input);
-                                paramPort.RemoveParameterPort(paramPort.PortData);
-                            }
-
-                            graphView.RemoveElement(paramNode);
-                        }
-
+                        //
+                        // // Delete if node is present on GraphView
+                        // if (exposedParameter.Displayed) {
+                        //     var paramNode = graphView.GetNodeByGuid(exposedParameter.GUID);
+                        //
+                        //     // Also Delete Port -- RemovePort function handles the rest 
+                        //     if (exposedParameter.ConnectedPortGUID != null) {
+                        //         Edge connectedEdge = graphView.edges.ToList().Find(edge =>
+                        //             ((WorldGraphPort) edge.input).PortData.GUID == exposedParameter.ConnectedPortGUID);
+                        //         var paramPort = ((WorldGraphPort) connectedEdge.input);
+                        //         paramPort.RemoveParameterPort(paramPort.PortData);
+                        //     }
+                        //
+                        //     graphView.RemoveElement(paramNode);
+                        // }
+                        //
                         graph.RemoveParameter(exposedParameter);
                         break;
-                    case ParameterPropertyNodeView parameterNodeView:
-                        parameterNodeView.parameter.Displayed = false;
+                    case ExposedParameterNodeView parameterNodeView:
+                        graph.ExposedParameterViewDatas.Remove(parameterNodeView.data);
                         break;
                 }
             });
@@ -169,16 +170,7 @@ namespace ThunderNut.SceneManagement.Editor {
             {
                 exposedParametersBlackboard.Add(new BlackboardSection {title = "Exposed Variables"});
                 exposedParametersBlackboard.editTextRequested = (_blackboard, element, newValue) => {
-                    var param = (ExposedParameter) ((BlackboardField) element).userData;
-                    var paramNode = graphView.graphElements
-                        .OfType<ParameterPropertyNodeView>()
-                        .ToList()
-                        .Find(x => x.parameter == param);
-
-                    param.Name = newValue;
-                    if (paramNode != null) paramNode.output.portName = newValue;
-
-                    ((BlackboardField) element).text = newValue;
+                    graphView.UpdateBlackboardFieldName(element, newValue); 
                 };
 
                 exposedPropertiesItemMenu = new GenericMenu();
@@ -190,6 +182,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 exposedPropertiesItemMenu.AddItem(new GUIContent("Float"), false, () => {
                     var exposedParameter = graph.CreateParameter("Float");
                     graphView.CreateBlackboardField(exposedParameter);
+
                 });
                 exposedPropertiesItemMenu.AddItem(new GUIContent("Int"), false, () => {
                     var exposedParameter = graph.CreateParameter("Int");

@@ -64,6 +64,12 @@ namespace ThunderNut.SceneManagement.Editor {
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("settingD"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("settingE"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("activeSceneHandle"));
+                
+                EditorGUILayout.Space(10);
+                EditorGUILayout.LabelField("Graph", EditorStyles.boldLabel);
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("allParameters"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("ExposedParameterViewDatas"));
+
             }
 
             // -------------------------------------------- Duration --------------------------------------------

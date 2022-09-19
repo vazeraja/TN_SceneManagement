@@ -18,6 +18,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
         private SerializedProperty childrenProperty;
         private ReorderableList childrenReorderableList;
+        
         private SerializedProperty worldGraphProperty;
         private SerializedProperty activeProperty;
         private SerializedProperty handleNameProperty;
@@ -72,12 +73,9 @@ namespace ThunderNut.SceneManagement.Editor {
             EditorGUILayout.PropertyField(sceneProperty);
             childrenReorderableList.DoLayoutList();
 
-            using (new EditorGUI.DisabledGroupScope(true)) {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("stringParameters"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("floatParameters"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("intParameters"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("boolParameters"));
-            }
+            // using (new EditorGUI.DisabledGroupScope(true)) {
+            //     EditorGUILayout.PropertyField(serializedObject.FindProperty("allParameters"));
+            // }
 
             serializedObject.ApplyModifiedProperties();
         }

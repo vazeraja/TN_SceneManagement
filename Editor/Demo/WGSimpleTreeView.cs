@@ -8,7 +8,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
     public class WGSimpleTreeView : TreeView {
         public Action<ExposedParameter> onDoubleClicked;
-        private List<ExposedParameter> data;
+        [SerializeReference] private List<ExposedParameter> data;
 
         private WGSimpleTreeView(TreeViewState tvs, List<ExposedParameter> data) : base(tvs) {
             this.data = data;
@@ -35,7 +35,7 @@ namespace ThunderNut.SceneManagement.Editor {
             return root;
         }
 
-        public static WGSimpleTreeView Create(ref TreeViewState tvs, List<ExposedParameter> data) {
+        public static WGSimpleTreeView Create(ref TreeViewState tvs, ref List<ExposedParameter> data) {
             tvs ??= new TreeViewState();
             return new WGSimpleTreeView(tvs, data);
         }

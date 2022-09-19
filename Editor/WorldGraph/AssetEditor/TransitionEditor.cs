@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
+using Debug = System.Diagnostics.Debug;
 
 namespace ThunderNut.SceneManagement.Editor {
 
@@ -36,69 +38,90 @@ namespace ThunderNut.SceneManagement.Editor {
                 drawHeaderCallback = rect => EditorGUI.LabelField(rect, conditionsProperty.displayName),
                 elementHeightCallback = index => {
                     var element = conditionsProperty.GetArrayElementAtIndex(index);
-                    var outputProp = element.FindPropertyRelative("Parameter");
-                    return EditorGUI.GetPropertyHeight(outputProp);
+                    var prop = element.FindPropertyRelative("Value");
+                    return EditorGUIUtility.singleLineHeight;
                 },
                 drawElementCallback = (rect, index, active, focused) => {
                     var element = conditionsProperty.GetArrayElementAtIndex(index);
                     var parameterProp = element.FindPropertyRelative("Parameter");
                     var valueProp = element.FindPropertyRelative("Value");
 
-                    var stringValue = valueProp.FindPropertyRelative("StringValue").stringValue;
-                    var floatValue = valueProp.FindPropertyRelative("FloatValue").floatValue;
-                    var intValue = valueProp.FindPropertyRelative("IntValue").intValue;
+                    // var valueObj = valueProp.managedReferenceValue as ConditionValueBase;
+
+                    // var stringValue = valueProp.FindPropertyRelative("StringValue").stringValue;
+                    // var floatValue = valueProp.FindPropertyRelative("FloatValue").floatValue;
+                    // var intValue = valueProp.FindPropertyRelative("IntValue").intValue;
 
                     float width = rect.width / 2;
 
                     SceneHandle sceneHandle = transition.OutputNode;
+                    var allParameters = transition.WorldGraph.ExposedParameterViewDatas
+                        .FindAll(data => data.connectedNode == sceneHandle)
+                        .Select(data => data.parameter)
+                        .ToList();
 
-                    if (sceneHandle != null && sceneHandle.allParameters.Any()) {
+                    if (sceneHandle != null && allParameters.Any()) {
                         rect.width = width;
 
-                        List<ExposedParameter> allParams = sceneHandle.allParameters.ToList();
-
-                        if (EditorGUI.DropdownButton(rect, parameterProp.objectReferenceValue != null
-                            ? new GUIContent(((ExposedParameter) parameterProp.objectReferenceValue).Name)
+                        if (EditorGUI.DropdownButton(rect, parameterProp.managedReferenceValue != null
+                            ? new GUIContent(((ExposedParameter) parameterProp.managedReferenceValue).Name)
                             : new GUIContent("Select a Parameter"), FocusType.Passive)) {
-                            PopupWindow.Show(rect, new ConditionOptionsPopupWindow(allParams, parameterProp) {Width = rect.width});
+                            PopupWindow.Show(rect,
+                                new ConditionOptionsPopupWindow(allParameters, parameterProp, valueProp) {Width = rect.width});
                         }
 
                         rect.x += width + 5;
                         rect.width = width / 2 - 5;
 
-                        switch (parameterProp.objectReferenceValue) {
-                            case StringParameterField stringParameterField:
-                                stringParameterField.options =
-                                    (StringParamOptions) EditorGUI.EnumPopup(rect, stringParameterField.options);
+                        switch (parameterProp.managedReferenceValue) {
+                            case StringParameterField:
 
-                                rect.x += width / 2;
-                                valueProp.FindPropertyRelative("StringValue").stringValue =
-                                    EditorGUI.TextField(rect, GUIContent.none, stringValue);
+                                if (valueProp.managedReferenceValue is StringCondition stringCondition) {
+                                    stringCondition.stringOptions =
+                                        (StringParamOptions) EditorGUI.EnumPopup(rect, stringCondition.stringOptions);
 
-                                break;
-                            case FloatParameterField floatParameterField:
-                                floatParameterField.options =
-                                    (FloatParamOptions) EditorGUI.EnumPopup(rect, floatParameterField.options);
-
-                                rect.x += width / 2;
-                                valueProp.FindPropertyRelative("FloatValue").floatValue =
-                                    EditorGUI.FloatField(rect, GUIContent.none, floatValue);
+                                    rect.x += width / 2;
+                                    stringCondition.Value =
+                                        EditorGUI.TextField(new Rect(rect.x, rect.y + 1, rect.width, rect.height - 5), GUIContent.none,
+                                            stringCondition.Value);
+                                }
 
                                 break;
-                            case IntParameterField intParameterField:
-                                intParameterField.options =
-                                    (IntParamOptions) EditorGUI.EnumPopup(rect, intParameterField.options);
+                            case FloatParameterField:
+                                if (valueProp.managedReferenceValue is FloatCondition floatCondition) {
+                                    floatCondition.floatOptions =
+                                        (FloatParamOptions) EditorGUI.EnumPopup(rect, floatCondition.floatOptions);
 
-                                rect.x += width / 2;
-                                valueProp.FindPropertyRelative("IntValue").intValue =
-                                    EditorGUI.IntField(rect, GUIContent.none, intValue);
+                                    rect.x += width / 2;
+                                    floatCondition.Value =
+                                        EditorGUI.FloatField(new Rect(rect.x, rect.y + 1, rect.width, rect.height - 5),
+                                            GUIContent.none, floatCondition.Value);
+                                }
 
                                 break;
-                            case BoolParameterField boolParameterField:
-                                boolParameterField.options =
-                                    (BoolParamOptions) EditorGUI.EnumPopup(rect, boolParameterField.options);
+                            case IntParameterField:
+                                if (valueProp.managedReferenceValue is IntCondition intCondition) {
+                                    intCondition.intOptions = (IntParamOptions) EditorGUI.EnumPopup(rect, intCondition.intOptions);
 
-                                rect.x += width / 2;
+                                    rect.x += width / 2;
+                                    intCondition.Value =
+                                        EditorGUI.IntField(new Rect(rect.x, rect.y + 1, rect.width, rect.height - 5),
+                                            GUIContent.none, intCondition.Value);
+                                }
+
+                                break;
+                            case BoolParameterField:
+                                if (valueProp.managedReferenceValue is BoolCondition boolCondition) {
+                                    boolCondition.boolOptions =
+                                        (BoolParamOptions) EditorGUI.EnumPopup(rect, boolCondition.boolOptions);
+                                    boolCondition.Value = boolCondition.boolOptions switch {
+                                        BoolParamOptions.True => true,
+                                        BoolParamOptions.False => false,
+                                        _ => boolCondition.Value
+                                    };
+                                }
+
+
                                 break;
                         }
                     }

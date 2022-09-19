@@ -14,12 +14,33 @@ namespace ThunderNut.SceneManagement.Editor {
         private bool m_ShouldClose;
         public float Width;
 
-        public ConditionOptionsPopupWindow(List<ExposedParameter> parameters, SerializedProperty property) {
+        public ConditionOptionsPopupWindow(List<ExposedParameter> parameters, SerializedProperty parameterProperty,
+            SerializedProperty valueProperty) {
             m_SearchField = new SearchField();
-            multiColumnTreeView = WGSimpleTreeView.Create(ref multiColumnTreeViewState, parameters);
+            multiColumnTreeView = WGSimpleTreeView.Create(ref multiColumnTreeViewState, ref parameters);
             multiColumnTreeView.onDoubleClicked = parameter => {
-                property.objectReferenceValue = parameter;
-                property.serializedObject.ApplyModifiedProperties();
+                parameterProperty.managedReferenceValue = parameter;
+                parameterProperty.serializedObject.ApplyModifiedProperties();
+                
+                switch (parameterProperty.managedReferenceValue) {
+                    case StringParameterField:
+                        valueProperty.managedReferenceValue = new StringCondition();
+                        valueProperty.serializedObject.ApplyModifiedProperties();
+                        break;
+                    case FloatParameterField:
+                        valueProperty.managedReferenceValue = new FloatCondition();
+                        valueProperty.serializedObject.ApplyModifiedProperties();
+                        break;
+                    case IntParameterField:
+                        valueProperty.managedReferenceValue = new IntCondition();
+                        valueProperty.serializedObject.ApplyModifiedProperties();
+                        break;
+                    case BoolParameterField:
+                        valueProperty.managedReferenceValue = new BoolCondition();
+                        valueProperty.serializedObject.ApplyModifiedProperties();
+                        break;
+                }
+                
                 ForceClose();
             };
         }

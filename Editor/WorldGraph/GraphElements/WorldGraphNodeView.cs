@@ -193,7 +193,7 @@ namespace ThunderNut.SceneManagement.Editor {
         }
 
         private void PlayScene() {
-            EditorSceneManager.OpenScene(sceneHandle.scene.ScenePath);
+             EditorSceneManager.OpenScene(sceneHandle.scene.ScenePath);
         }
 
         public override void SetPosition(Rect newPos) {

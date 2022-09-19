@@ -10,6 +10,7 @@ namespace ThunderNut.SceneManagement {
     public class WorldGraph : ScriptableObject {
         public List<SceneHandle> sceneHandles;
         [SerializeField] private SceneHandle activeSceneHandle;
+        private Action onStateTransition;
 
         public string settingA;
         public string settingB;
@@ -17,28 +18,12 @@ namespace ThunderNut.SceneManagement {
         public string settingD;
         public string settingE;
 
-        private Action onStateTransition;
+        [SerializeReference] public List<ExposedParameterViewData> ExposedParameterViewDatas;
+        [SerializeReference] public List<ExposedParameter> allParameters;
+        public List<Transition> transitions;
 
-        [SerializeField] private List<StringParameterField> stringParameters;
-        [SerializeField] private List<FloatParameterField> floatParameters;
-        [SerializeField] private List<IntParameterField> intParameters;
-        [SerializeField] private List<BoolParameterField> boolParameters;
-
-        public IEnumerable<ExposedParameter> allParameters {
-            get {
-                List<ExposedParameter> list = new List<ExposedParameter>();
-                list.AddRange(stringParameters);
-                list.AddRange(floatParameters);
-                list.AddRange(intParameters);
-                list.AddRange(boolParameters);
-                return list;
-            }
-        }
-
-        public List<Transition> transitions = new List<Transition>();
 
         private Dictionary<Transition, List<Func<bool>>> allConditionsLookupTable = new Dictionary<Transition, List<Func<bool>>>();
-
         public List<Transition> currentTransitions = new List<Transition>();
         private List<List<Func<bool>>> currentConditions = new List<List<Func<bool>>>();
 
@@ -60,7 +45,7 @@ namespace ThunderNut.SceneManagement {
 
         public void Initialize() {
             InitializeLookupTable();
-            
+
             foreach (var (key, value) in allConditionsLookupTable) {
                 Debug.Log($"Transition: {key} with {value.Count} conditions");
             }
@@ -80,15 +65,15 @@ namespace ThunderNut.SceneManagement {
             foreach (var transition in transitions) {
                 var conditionsToMeet = new List<Func<bool>>();
                 foreach (var condition in transition.Conditions) {
-                    switch (condition.Parameter) {
-                        case StringParameterField stringParameterField: {
-                            switch (stringParameterField.options) {
+                    switch (condition.Value) {
+                        case StringCondition stringCondition: {
+                            switch (stringCondition.stringOptions) {
                                 case StringParamOptions.Equals:
-                                    conditionsToMeet.Add(condition.StringIsEqual(stringParameterField));
+                                    conditionsToMeet.Add(condition.StringIsEqual());
                                     allConditionsLookupTable[transition] = conditionsToMeet;
                                     break;
                                 case StringParamOptions.NotEquals:
-                                    conditionsToMeet.Add(condition.StringNotEqual(stringParameterField));
+                                    conditionsToMeet.Add(condition.StringNotEqual());
                                     allConditionsLookupTable[transition] = conditionsToMeet;
                                     break;
                                 default:
@@ -97,14 +82,14 @@ namespace ThunderNut.SceneManagement {
 
                             break;
                         }
-                        case FloatParameterField floatParameterField: {
-                            switch (floatParameterField.options) {
+                        case FloatCondition floatCondition: {
+                            switch (floatCondition.floatOptions) {
                                 case FloatParamOptions.GreaterThan:
-                                    conditionsToMeet.Add(condition.FloatIsGreaterThan(floatParameterField));
+                                    conditionsToMeet.Add(condition.FloatIsGreaterThan());
                                     allConditionsLookupTable[transition] = conditionsToMeet;
                                     break;
                                 case FloatParamOptions.LessThan:
-                                    conditionsToMeet.Add(condition.FloatIsLessThan(floatParameterField));
+                                    conditionsToMeet.Add(condition.FloatIsLessThan());
                                     allConditionsLookupTable[transition] = conditionsToMeet;
                                     break;
                                 default:
@@ -113,48 +98,48 @@ namespace ThunderNut.SceneManagement {
 
                             break;
                         }
-                        case IntParameterField intParameterField: {
-                            switch (intParameterField.options) {
+                        case IntCondition intCondition: {
+                            switch (intCondition.intOptions) {
                                 case IntParamOptions.Equals:
-                                    conditionsToMeet.Add(condition.IntIsEqual(intParameterField));
+                                    conditionsToMeet.Add(condition.IntIsEqual());
                                     allConditionsLookupTable[transition] = conditionsToMeet;
                                     break;
                                 case IntParamOptions.NotEquals:
-                                    conditionsToMeet.Add(condition.IntNotEqual(intParameterField));
+                                    conditionsToMeet.Add(condition.IntNotEqual());
                                     allConditionsLookupTable[transition] = conditionsToMeet;
                                     break;
                                 case IntParamOptions.GreaterThan:
-                                    conditionsToMeet.Add(condition.IntIsGreaterThan(intParameterField));
+                                    conditionsToMeet.Add(condition.IntIsGreaterThan());
                                     allConditionsLookupTable[transition] = conditionsToMeet;
                                     break;
                                 case IntParamOptions.LessThan:
-                                    conditionsToMeet.Add(condition.IntIsLessThan(intParameterField));
+                                    conditionsToMeet.Add(condition.IntIsLessThan());
                                     allConditionsLookupTable[transition] = conditionsToMeet;
                                     break;
                                 default:
                                     throw new ArgumentOutOfRangeException();
                             }
 
+
                             break;
                         }
-                        case BoolParameterField boolParameterField: {
-                            switch (boolParameterField.options) {
+                        case BoolCondition boolCondition: {
+                            switch (boolCondition.boolOptions) {
                                 case BoolParamOptions.True:
-                                    conditionsToMeet.Add(condition.BoolIsTrue(boolParameterField));
+                                    conditionsToMeet.Add(condition.BoolIsTrue());
                                     allConditionsLookupTable[transition] = conditionsToMeet;
                                     break;
                                 case BoolParamOptions.False:
-                                    conditionsToMeet.Add(condition.BoolIsFalse(boolParameterField));
+                                    conditionsToMeet.Add(condition.BoolIsFalse());
                                     allConditionsLookupTable[transition] = conditionsToMeet;
                                     break;
                                 default:
                                     throw new ArgumentOutOfRangeException();
                             }
 
+
                             break;
                         }
-                        default:
-                            throw new ArgumentOutOfRangeException();
                     }
                 }
             }
@@ -167,23 +152,74 @@ namespace ThunderNut.SceneManagement {
             onStateTransition?.Invoke();
         }
 
+        public void SetString(string name, string value) {
+            var match = (StringParameterField) allParameters.ToList().Find(param => param.Reference == name);
+            match.Value = value;
+        }
+
         public void SetFloat(string name, float value) {
-            floatParameters.ToList().Find(param => param.Reference == name).Value = value;
+            var match = (FloatParameterField)allParameters.ToList().Find(param => param.Reference == name);
+            match.Value = value;
+        }
+ 
+        public void SetInt(string name, int value) {
+            var match = (IntParameterField) allParameters.ToList().Find(param => param.Reference == name);
+            match.Value = value;
         }
 
         public void SetBool(string name, bool value) {
-            boolParameters.ToList().Find(param => param.Reference == name).Value = value;
-        }
-
-        public void SetInt(string name, int value) {
-            intParameters.ToList().Find(param => param.Reference == name).Value = value;
-        }
-
-        public void SetString(string name, string value) {
-            stringParameters.ToList().Find(param => param.Reference == name).Value = value;
+            var match = (BoolParameterField) allParameters.ToList().Find(param => param.Reference == name);
+            match.Value = value;
         }
 
         #if UNITY_EDITOR
+
+        public void SaveAssetsAndSetDirty() {
+            AssetDatabase.SaveAssets();
+            EditorUtility.SetDirty(this);
+        }
+
+        public ExposedParameter CreateParameter(string type) {
+            switch (type) {
+                case "String":
+                    var stringParameter = new StringParameterField();
+                    allParameters.Add(stringParameter);
+                    return stringParameter;
+                case "Float":
+                    var floatParameter = new FloatParameterField();
+                    allParameters.Add(floatParameter);
+                    return floatParameter;
+                case "Int":
+                    var intParameter = new IntParameterField();
+                    allParameters.Add(intParameter);
+                    return intParameter;
+                case "Bool":
+                    var boolParameter = new BoolParameterField();
+                    allParameters.Add(boolParameter);
+                    return boolParameter;
+                default:
+                    return null;
+            }
+        }
+
+        public void RemoveParameter(ExposedParameter parameter) {
+            switch (parameter) {
+                case StringParameterField stringParameterField:
+                    allParameters.Remove(stringParameterField);
+                    break;
+                case FloatParameterField floatParameterField:
+                    allParameters.Remove(floatParameterField);
+                    break;
+                case IntParameterField intParameterField:
+                    allParameters.Remove(intParameterField);
+                    break;
+                case BoolParameterField boolParameterField:
+                    allParameters.Remove(boolParameterField);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
 
         public Transition CreateTransition(SceneHandle output, SceneHandle input) {
             Transition edge = CreateInstance<Transition>();
@@ -200,91 +236,11 @@ namespace ThunderNut.SceneManagement {
             return edge;
         }
 
-        private void SaveAssetsAndSetDirty() {
-            AssetDatabase.SaveAssets();
-            EditorUtility.SetDirty(this); 
-        }
 
         public void RemoveTransition(Transition edge) {
             transitions.Remove(edge);
 
             AssetDatabase.RemoveObjectFromAsset(edge);
-            SaveAssetsAndSetDirty();
-        }
-
-        public ExposedParameter CreateParameter(string type) {
-            switch (type) {
-                case "String":
-                    var stringParameter = (StringParameterField) CreateInstance(typeof(StringParameterField));
-                    stringParameters.Add(stringParameter);
-
-                    if (!Application.isPlaying) AssetDatabase.AddObjectToAsset(stringParameter, this);
-                    SaveAssetsAndSetDirty();
-
-                    return stringParameter;
-                case "Float":
-                    var floatParameter = (FloatParameterField) CreateInstance(typeof(FloatParameterField));
-                    floatParameters.Add(floatParameter);
-
-                    if (!Application.isPlaying) AssetDatabase.AddObjectToAsset(floatParameter, this);
-                    SaveAssetsAndSetDirty();
-
-                    return floatParameter;
-                case "Int":
-                    var intParameter = (IntParameterField) CreateInstance(typeof(IntParameterField));
-                    intParameters.Add(intParameter);
-
-                    if (!Application.isPlaying) AssetDatabase.AddObjectToAsset(intParameter, this);
-                    SaveAssetsAndSetDirty();
-
-                    return intParameter;
-                case "Bool":
-                    var boolParameter = (BoolParameterField) CreateInstance(typeof(BoolParameterField));
-                    boolParameters.Add(boolParameter);
-
-                    if (!Application.isPlaying) AssetDatabase.AddObjectToAsset(boolParameter, this);
-                    SaveAssetsAndSetDirty();
-
-                    return boolParameter;
-                default:
-                    return null;
-            }
-        }
-
-        public void RemoveParameter(ExposedParameter parameter) {
-            switch (parameter) {
-                case StringParameterField stringParameterField:
-                    stringParameters.Remove(stringParameterField);
-
-                    AssetDatabase.RemoveObjectFromAsset(parameter);
-                    SaveAssetsAndSetDirty();
-
-                    break;
-                case FloatParameterField floatParameterField:
-                    floatParameters.Remove(floatParameterField);
-
-                    AssetDatabase.RemoveObjectFromAsset(parameter);
-                    SaveAssetsAndSetDirty();
-
-                    break;
-                case IntParameterField intParameterField:
-                    intParameters.Remove(intParameterField);
-
-                    AssetDatabase.RemoveObjectFromAsset(parameter);
-                    SaveAssetsAndSetDirty();
-
-                    break;
-                case BoolParameterField boolParameterField:
-                    boolParameters.Remove(boolParameterField);
-
-                    AssetDatabase.RemoveObjectFromAsset(parameter);
-                    SaveAssetsAndSetDirty();
-
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
             SaveAssetsAndSetDirty();
         }
 

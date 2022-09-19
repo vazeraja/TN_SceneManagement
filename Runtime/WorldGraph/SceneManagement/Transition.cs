@@ -9,45 +9,90 @@ using UnityEngine.SceneManagement;
 namespace ThunderNut.SceneManagement {
 
     [Serializable]
-    public class ConditionValue {
-        public string StringValue;
-        public float FloatValue;
-        public int IntValue;
+    public class ConditionValueBase { }
+
+    public abstract class ConditionValue<T> : ConditionValueBase {
+        public T Value;
+    }
+
+    [Serializable]
+    public class StringCondition : ConditionValue<string> {
+        public StringParamOptions stringOptions;
+
+        public StringCondition() {
+            Value = "string";
+        }
+    }
+
+    [Serializable]
+    public class FloatCondition : ConditionValue<float> {
+        public FloatParamOptions floatOptions;
+
+        public FloatCondition() {
+            Value = 0f;
+        }
+    }
+
+    [Serializable]
+    public class IntCondition : ConditionValue<int> {
+        public IntParamOptions intOptions;
+
+        public IntCondition() {
+            Value = 0;
+        }
+    }
+
+    [Serializable]
+    public class BoolCondition : ConditionValue<bool> {
+        public BoolParamOptions boolOptions;
+
+        public BoolCondition() {
+            Value = true;
+        }
     }
 
     [Serializable]
     public class Condition {
-        public ExposedParameter Parameter;
-        public ConditionValue Value;
+        [SerializeReference] public ExposedParameter Parameter;
+        [SerializeReference] public ConditionValueBase Value;
 
-        public Func<bool> FloatIsGreaterThan(FloatParameterField parameter) => () => parameter.Value > Value.FloatValue;
-        public Func<bool> FloatIsLessThan(FloatParameterField parameter) => () => parameter.Value < Value.FloatValue;
+        public Func<bool> FloatIsGreaterThan() => () => ((FloatParameterField) Parameter).Value > ((FloatCondition) Value).Value;
+        public Func<bool> FloatIsLessThan() => () => ((FloatParameterField) Parameter).Value < ((FloatCondition) Value).Value;
 
-        public Func<bool> BoolIsTrue(BoolParameterField parameter) => () => parameter.Value;
-        public Func<bool> BoolIsFalse(BoolParameterField parameter) => () => !parameter.Value;
+        public Func<bool> BoolIsTrue() => () => ((BoolParameterField) Parameter).Value;
+        public Func<bool> BoolIsFalse() => () => !((BoolParameterField) Parameter).Value;
 
-        public Func<bool> IntIsGreaterThan(IntParameterField parameter) => () => parameter.Value > Value.IntValue;
-        public Func<bool> IntIsLessThan(IntParameterField parameter) => () => parameter.Value < Value.IntValue;
-        public Func<bool> IntIsEqual(IntParameterField parameter) => () => parameter.Value == Value.IntValue;
-        public Func<bool> IntNotEqual(IntParameterField parameter) => () => parameter.Value != Value.IntValue;
-        
-        public Func<bool> StringIsEqual(StringParameterField parameter) => () => parameter.Value == Value.StringValue;
-        public Func<bool> StringNotEqual(StringParameterField parameter) => () => parameter.Value != Value.StringValue;
+        public Func<bool> IntIsGreaterThan() => () => ((IntParameterField) Parameter).Value > ((IntCondition) Value).Value;
+        public Func<bool> IntIsLessThan() => () => ((IntParameterField) Parameter).Value < ((IntCondition) Value).Value;
+        public Func<bool> IntIsEqual() => () => ((IntParameterField) Parameter).Value == ((IntCondition) Value).Value;
+        public Func<bool> IntNotEqual() => () => ((IntParameterField) Parameter).Value != ((IntCondition) Value).Value;
 
-    }
+        public Func<bool> StringIsEqual() => () => ((StringParameterField) Parameter).Value == ((StringCondition) Value).Value;
+        public Func<bool> StringNotEqual() => () => ((StringParameterField) Parameter).Value != ((StringCondition) Value).Value;
+    } 
 
-    public class Transition : ScriptableObject {
+    public class Transition : ScriptableObject, ISerializationCallbackReceiver {
         public WorldGraph WorldGraph;
 
         public string OutputNodeGUID;
         public string InputNodeGUID;
         public SceneHandle OutputNode;
         public SceneHandle InputNode;
-        
-        public List<Condition> Conditions = new List<Condition>();
+
+        public List<Condition> Conditions;
 
         public override string ToString() {
             return $"{OutputNode.HandleName} ---> {InputNode.HandleName}";
+        }
+
+        public void OnBeforeSerialize() { }
+
+        public void OnAfterDeserialize() {
+            foreach (var condition in Conditions) {
+                if (condition.Parameter == null) continue;
+                var match = WorldGraph.allParameters.Find(param => param.GUID == condition.Parameter.GUID);
+                condition.Parameter = match;
+            }
         }
     }
 

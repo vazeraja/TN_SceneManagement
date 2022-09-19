@@ -6,6 +6,8 @@ namespace ThunderNut.SceneManagement {
         Equals,
         NotEquals,
     }
+    
+    [Serializable]
     public class StringParameterField : ParameterField<string> {
         public StringParamOptions options = StringParamOptions.Equals;
         

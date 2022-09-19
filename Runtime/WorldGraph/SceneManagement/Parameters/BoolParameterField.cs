@@ -6,6 +6,7 @@ namespace ThunderNut.SceneManagement {
         True,
         False,
     }
+    [Serializable]
     public class BoolParameterField : ParameterField<bool> {
         public BoolParamOptions options = BoolParamOptions.True;
         

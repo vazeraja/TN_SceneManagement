@@ -1,4 +1,5 @@
-﻿using UnityEditor.Experimental.GraphView;
+﻿using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace ThunderNut.SceneManagement.Editor {
@@ -13,8 +14,8 @@ namespace ThunderNut.SceneManagement.Editor {
             icon = parameter.Exposed ? Resources.Load<Texture2D>("GraphView/Nodes/BlackboardFieldExposed") : null;
         }
         public override void OnSelected() {
-            graphView.DrawInspector((Object) userData);
             base.OnSelected();
+            graphView.DrawInspector((ExposedParameter)userData);
         }
     }
 
