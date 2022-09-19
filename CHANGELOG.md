@@ -1,3 +1,10 @@
+## [1.0.35](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.34...v1.0.35) (2022-09-18)
+
+
+### Bug Fixes
+
+* update Transition.cs and TransitionEditor.cs ([7d5c9b5](https://github.com/vazeraja/TN_SceneManagement/commit/7d5c9b5de10c670b7b2ba4d32d8c352ef5211cb2))
+
 ## [1.0.34](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.33...v1.0.34) (2022-09-18)
 
 
