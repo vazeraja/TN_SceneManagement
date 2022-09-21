@@ -1,3 +1,10 @@
+## [1.0.36](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.35...v1.0.36) (2022-09-19)
+
+
+### Bug Fixes
+
+* stopped using scriptable objects for parameters ([ab7cfd4](https://github.com/vazeraja/TN_SceneManagement/commit/ab7cfd463abdb1371f600e443a1c5d56abb97550))
+
 ## [1.0.35](https://github.com/vazeraja/TN_SceneManagement/compare/v1.0.34...v1.0.35) (2022-09-18)
 
 
