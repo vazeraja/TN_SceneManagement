@@ -93,7 +93,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 toolbar.changeCheck = UpdateSubWindowsVisibility;
                 toolbar.showGraphSettings = graphView.ShowGraphSettings;
 
-                graphView.graphViewChanged = GraphViewChanged;
+                graphView.graphViewChanged = OnGraphViewChanged;
                 graphView.inspectorBlackboard = inspectorBlackboard;
                 graphView.exposedParametersBlackboard = exposedParametersBlackboard;
 
@@ -106,39 +106,29 @@ namespace ThunderNut.SceneManagement.Editor {
             graphView.Initialize();
             graphView.RegisterPortCallbacks();
         }
-
-
-        private GraphViewChange GraphViewChanged(GraphViewChange graphViewChange) {
+        private GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange) {
             graphViewChange.elementsToRemove?.ForEach(elem => {
+                graphView.ClearInspector();
                 switch (elem) {
                     case WorldGraphNodeView nodeView:
                         graph.RemoveSubAsset(nodeView.sceneHandle);
                         break;
+                    case WorldGraphEdge edge:
+                        break;
                     case BlackboardField blackboardField:
-                        graphView.ClearInspector();
                         ExposedParameter exposedParameter = (ExposedParameter) blackboardField.userData;
-                        //
-                        // // Delete if node is present on GraphView
-                        // if (exposedParameter.Displayed) {
-                        //     var paramNode = graphView.GetNodeByGuid(exposedParameter.GUID);
-                        //
-                        //     // Also Delete Port -- RemovePort function handles the rest 
-                        //     if (exposedParameter.ConnectedPortGUID != null) {
-                        //         Edge connectedEdge = graphView.edges.ToList().Find(edge =>
-                        //             ((WorldGraphPort) edge.input).PortData.GUID == exposedParameter.ConnectedPortGUID);
-                        //         var paramPort = ((WorldGraphPort) connectedEdge.input);
-                        //         paramPort.RemoveParameterPort(paramPort.PortData);
-                        //     }
-                        //
-                        //     graphView.RemoveElement(paramNode);
-                        // }
-                        //
+
+                        if (graphView.GetNodeByGuid(exposedParameter.GUID) is ExposedParameterNodeView paramNode) {
+                            graphView.RemoveParameterGraphNode(paramNode);
+                        }
+                        
                         graph.RemoveParameter(exposedParameter);
                         break;
                     case ExposedParameterNodeView parameterNodeView:
                         graph.ExposedParameterViewDatas.Remove(parameterNodeView.data);
                         break;
                 }
+                graphView.UpdateSerializedProperties();
             });
 
             graphViewChange.edgesToCreate?.ForEach(edgeView => { });

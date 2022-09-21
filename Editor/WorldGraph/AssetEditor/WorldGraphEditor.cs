@@ -69,6 +69,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 EditorGUILayout.LabelField("Graph", EditorStyles.boldLabel);
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("allParameters"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("ExposedParameterViewDatas"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("transitions"));
 
             }
 

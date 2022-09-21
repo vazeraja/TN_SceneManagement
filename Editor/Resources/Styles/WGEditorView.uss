@@ -83,7 +83,7 @@ WorldGraphEditorView > #content > #inspector {
     bottom: 0;
 }
 
-#resizeBorderFrame > .resize.horzontal.left {
+#resizeBorderFrame > .resize.horizontal.left {
     left: 0;
 }
 
@@ -99,109 +99,4 @@ WorldGraphEditorView > #content > #inspector {
     left: 0;
 }
 
-.nodeEditor {
-    border-color: rgb(79, 79, 79);
-    border-bottom-width: 1px;
-    padding-top: 10px;
-}
 
-NodeEditorHeaderView {
-    padding-left: 16px;
-    padding-right: 16px;
-    padding-bottom: 10px;
-    flex-direction: row;
-}
-
-NodeEditorHeaderView > #preType {
-    margin-left: 10px;
-}
-
-NodeEditorHeaderView > #preType,
-NodeEditorHeaderView > #postType,
-NodeEditorHeaderView > #type {
-    color: rgb(180, 180, 180);
-}
-
-NodeEditorHeaderView > #title {
-    color: rgb(180, 180, 180);
-    -unity-font-style: bold;
-}
-
-.nodeEditor > .section {
-    padding-bottom: 10px;
-}
-
-.nodeEditor > .section.hidden {
-    height: 0;
-    padding-bottom: 0;
-}
-
-.nodeEditor > .section > .title {
-    color: rgb(180, 180, 180);
-    -unity-font-style: bold;
-    padding-left: 16px;
-    padding-right: 16px;
-    padding-bottom: 2px;
-}
-
-.nodeEditor > .section > #slots {
-    flex-direction: column;
-    padding-left: 15px;
-    padding-right: 15px;
-}
-
-.nodeEditor > .section#surfaceOptions {
-    padding-left: 15px;
-    padding-right: 15px;
-}
-
-IMGUISlotEditorView {
-    flex-direction: column;
-    padding-bottom: 2px;
-}
-
-ObjectControlView {
-    flex-direction: row;
-}
-
-ObjectControlView > ObjectField {
-    flex: 1;
-}
-
-PropertyControlView {
-    padding-left: 8px;
-    padding-right: 8px;
-    padding-top: 4px;
-    padding-bottom: 4px;
-}
-
-.stack-node {
-    --separator-extent: 6;
-}
-
-/* TEMP STUFF THAT SHOULD ACTUALLY STAY IN GRAPHVIEW */
-
-.unity-Doublefield-input {
-    min-height: 15px;
-    margin-left: 4px;
-    margin-top: 2px;
-    margin-right: 4px;
-    margin-bottom: 2px;
-    padding-left: 3px;
-    padding-top: 1px;
-    padding-right: 3px;
-    padding-bottom: 2px;
-    -unity-slice-left: 3;
-    -unity-slice-top: 3;
-    -unity-slice-right: 3;
-    -unity-slice-bottom: 3;
-    --unity-selection-color: rgba(61,128,223,166);
-    cursor: text;
-    color: #B4B4B4;
-    background-image: resource("Builtin Skins/DarkSkin/Images/TextField.png");
-    --unity-cursor-color:#B4B4B4;
-}
-
-.unity-Doublefield-input:focus {
-    background-image: resource("Builtin Skins/DarkSkin/Images/TextField focused.png");
-}

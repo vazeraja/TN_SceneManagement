@@ -22,11 +22,7 @@ namespace ThunderNut.SceneManagement.Editor {
             set => m_Selected = value;
         }
 
-        private WorldGraph m_WorldGraph;
-        public WorldGraph worldGraph {
-            get => m_WorldGraph;
-            set => m_WorldGraph = value;
-        }
+        private WorldGraph worldGraph { get; set; }
 
         private WorldGraphEditorView m_GraphEditorView;
         private WorldGraphEditorView graphEditorView {
@@ -41,12 +37,8 @@ namespace ThunderNut.SceneManagement.Editor {
 
                 // ReSharper disable once InvertIf
                 if (m_GraphEditorView != null) {
-                    m_GraphEditorView.toolbar.saveRequested += () => { };
-                    m_GraphEditorView.toolbar.saveAsRequested += () => { };
                     m_GraphEditorView.toolbar.showInProjectRequested += PingAsset;
                     m_GraphEditorView.toolbar.refreshRequested += Refresh;
-                    m_GraphEditorView.toolbar.isCheckedOut += () => false;
-                    m_GraphEditorView.toolbar.checkOut += () => { };
                     m_GraphEditorView.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
                     m_FrameAllAfterLayout = true;
                     rootVisualElement.Add(graphEditorView);
@@ -136,7 +128,7 @@ namespace ThunderNut.SceneManagement.Editor {
             catch (Exception e) {
                 m_HasError = true;
                 m_GraphEditorView = null;
-                m_WorldGraph = null;
+                worldGraph = null;
                 Debug.LogException(e);
                 throw;
             }
@@ -146,9 +138,7 @@ namespace ThunderNut.SceneManagement.Editor {
             worldGraph = null;
             graphEditorView = null;
         }
-
-        public void Initialize(WorldGraphEditorWindow other) { }
-
+        
         public void Initialize(string assetGuid) {
             try {
                 WorldGraph asset = AssetDatabase.LoadAssetAtPath<WorldGraph>(AssetDatabase.GUIDToAssetPath(assetGuid));
@@ -175,15 +165,16 @@ namespace ThunderNut.SceneManagement.Editor {
 
                 Repaint();
             }
-            catch (Exception) {
+            catch (Exception e) {
                 m_HasError = true;
-                m_WorldGraph = null;
+                worldGraph = null;
                 m_GraphEditorView = null;
+                Debug.LogException(e);
                 throw;
             }
         }
 
-        public void UpdateTitle() {
+        private void UpdateTitle() {
             string assetPath = AssetDatabase.GUIDToAssetPath(selectedGuid);
             string graphName = Path.GetFileNameWithoutExtension(assetPath);
 
@@ -205,23 +196,6 @@ namespace ThunderNut.SceneManagement.Editor {
             }
             titleContent = new GUIContent(newTitle, icon);
         }
-
-        private void SaveAs() {
-            SaveAsImplementation(true);
-        }
-
-        // ReSharper disable once UnusedMethodReturnValue.Local
-        private string SaveAsImplementation(bool openWhenSaved) {
-            string savedFilePath = "";
-            if (openWhenSaved) {
-                Debug.Log("TODO: Implement SaveAsImplementation()");
-                return savedFilePath;
-            }
-            else {
-                return "TODO: Implement SaveAsImplementation()";
-            }
-        }
-
         private void PingAsset() {
             string path = AssetDatabase.GUIDToAssetPath(selectedGuid);
             if (selectedGuid == null) return;
@@ -230,7 +204,7 @@ namespace ThunderNut.SceneManagement.Editor {
             Selection.activeObject = asset;
         }
 
-        public void Refresh() {
+        private void Refresh() {
             OnDisable();
             OnEnable();
         }

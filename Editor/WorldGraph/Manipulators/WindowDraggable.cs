@@ -27,14 +27,12 @@ namespace ThunderNut.SceneManagement.Editor {
             m_Active = false;
             m_WindowDockingLayout = new WindowDockingLayout();
 
-            if (container != null)
-                container.RegisterCallback<GeometryChangedEvent>(OnParentGeometryChanged);
+            container?.RegisterCallback<GeometryChangedEvent>(OnParentGeometryChanged);
         }
 
         protected override void RegisterCallbacksOnTarget()
         {
-            if (m_Handle == null)
-                m_Handle = target;
+            m_Handle ??= target;
             m_Handle.RegisterCallback(new EventCallback<MouseDownEvent>(OnMouseDown));
             m_Handle.RegisterCallback(new EventCallback<MouseMoveEvent>(OnMouseMove));
             m_Handle.RegisterCallback(new EventCallback<MouseUpEvent>(OnMouseUp));
@@ -47,8 +45,7 @@ namespace ThunderNut.SceneManagement.Editor {
             m_Handle.UnregisterCallback(new EventCallback<MouseMoveEvent>(OnMouseMove));
             m_Handle.UnregisterCallback(new EventCallback<MouseUpEvent>(OnMouseUp));
             target.UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
-            if (m_GraphView != null)
-                m_GraphView.UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+            m_GraphView?.UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
         }
 
         void OnMouseDown(MouseDownEvent evt)
@@ -60,8 +57,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 parent = parent.parent;
             m_GraphView = parent as GraphView;
 
-            if (m_GraphView != null)
-                m_GraphView.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+            m_GraphView?.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
 
             // m_LocalMouseOffset is offset from the target element's (0, 0) to the
             // to the mouse position.
@@ -71,26 +67,23 @@ namespace ThunderNut.SceneManagement.Editor {
             evt.StopImmediatePropagation();
         }
 
-        void OnMouseMove(MouseMoveEvent evt)
-        {
-            if (m_Active)
-            {
-                // The mouse position of is corrected according to the offset within the target
-                // element (m_LocalWorldOffset) to set the position relative to the mouse position
-                // when the dragging started.
-                Vector2 position = target.parent.WorldToLocal(evt.mousePosition) - m_LocalMosueOffset;
+        void OnMouseMove(MouseMoveEvent evt) {
+            if (!m_Active) return;
+            // The mouse position of is corrected according to the offset within the target
+            // element (m_LocalWorldOffset) to set the position relative to the mouse position
+            // when the dragging started.
+            Vector2 position = target.parent.WorldToLocal(evt.mousePosition) - m_LocalMosueOffset;
 
-                // Make sure that the object remains in the parent window
-                position.x = Mathf.Clamp(position.x, 0f, target.parent.layout.width - target.layout.width);
-                position.y = Mathf.Clamp(position.y, 0f, target.parent.layout.height - target.layout.height);
+            // Make sure that the object remains in the parent window
+            position.x = Mathf.Clamp(position.x, 0f, target.parent.layout.width - target.layout.width);
+            position.y = Mathf.Clamp(position.y, 0f, target.parent.layout.height - target.layout.height);
 
-                // While moving, use only the left and top position properties,
-                // while keeping the others NaN to not affect layout.
-                target.style.left = position.x;
-                target.style.top = position.y;
-                target.style.right = float.NaN;
-                target.style.bottom = float.NaN;
-            }
+            // While moving, use only the left and top position properties,
+            // while keeping the others NaN to not affect layout.
+            target.style.left = position.x;
+            target.style.top = position.y;
+            target.style.right = float.NaN;
+            target.style.bottom = float.NaN;
         }
 
         void OnMouseUp(MouseUpEvent evt)

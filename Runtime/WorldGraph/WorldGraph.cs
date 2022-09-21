@@ -20,14 +20,14 @@ namespace ThunderNut.SceneManagement {
 
         [SerializeReference] public List<ExposedParameterViewData> ExposedParameterViewDatas;
         [SerializeReference] public List<ExposedParameter> allParameters;
-        public List<Transition> transitions;
+        [SerializeReference] public List<Transition> transitions;
 
 
         private Dictionary<Transition, List<Func<bool>>> allConditionsLookupTable = new Dictionary<Transition, List<Func<bool>>>();
         public List<Transition> currentTransitions = new List<Transition>();
         private List<List<Func<bool>>> currentConditions = new List<List<Func<bool>>>();
 
-        public void CheckTransitions() {
+        public void CheckTransitions() {  
             for (var i = 0; i < currentConditions.Count; i++) {
                 var conditionsPerTransition = currentConditions[i];
                 var conditionsMet = new bool[conditionsPerTransition.Count];
@@ -35,7 +35,7 @@ namespace ThunderNut.SceneManagement {
                 for (var index = 0; index < conditionsPerTransition.Count; index++) {
                     Func<bool> condition = conditionsPerTransition[index];
                     conditionsMet[index] = condition();
-                }
+                } 
 
                 if (conditionsMet.All(x => x)) {
                     Debug.Log($"All Conditions Met for Transition: {currentTransitions[i]}");
@@ -66,7 +66,7 @@ namespace ThunderNut.SceneManagement {
                 var conditionsToMeet = new List<Func<bool>>();
                 foreach (var condition in transition.Conditions) {
                     switch (condition.Value) {
-                        case StringCondition stringCondition: {
+                        case StringCondition stringCondition:
                             switch (stringCondition.stringOptions) {
                                 case StringParamOptions.Equals:
                                     conditionsToMeet.Add(condition.StringIsEqual());
@@ -81,8 +81,7 @@ namespace ThunderNut.SceneManagement {
                             }
 
                             break;
-                        }
-                        case FloatCondition floatCondition: {
+                        case FloatCondition floatCondition:
                             switch (floatCondition.floatOptions) {
                                 case FloatParamOptions.GreaterThan:
                                     conditionsToMeet.Add(condition.FloatIsGreaterThan());
@@ -97,8 +96,7 @@ namespace ThunderNut.SceneManagement {
                             }
 
                             break;
-                        }
-                        case IntCondition intCondition: {
+                        case IntCondition intCondition:
                             switch (intCondition.intOptions) {
                                 case IntParamOptions.Equals:
                                     conditionsToMeet.Add(condition.IntIsEqual());
@@ -120,10 +118,8 @@ namespace ThunderNut.SceneManagement {
                                     throw new ArgumentOutOfRangeException();
                             }
 
-
                             break;
-                        }
-                        case BoolCondition boolCondition: {
+                        case BoolCondition boolCondition:
                             switch (boolCondition.boolOptions) {
                                 case BoolParamOptions.True:
                                     conditionsToMeet.Add(condition.BoolIsTrue());
@@ -137,9 +133,7 @@ namespace ThunderNut.SceneManagement {
                                     throw new ArgumentOutOfRangeException();
                             }
 
-
                             break;
-                        }
                     }
                 }
             }
@@ -148,7 +142,7 @@ namespace ThunderNut.SceneManagement {
         private void TransitionToState(SceneHandle nextState) {
             activeSceneHandle.Exit();
             activeSceneHandle = nextState;
-            activeSceneHandle.Enter();
+            activeSceneHandle.Enter(); 
             onStateTransition?.Invoke();
         }
 
@@ -222,26 +216,20 @@ namespace ThunderNut.SceneManagement {
         }
 
         public Transition CreateTransition(SceneHandle output, SceneHandle input) {
-            Transition edge = CreateInstance<Transition>();
-            edge.name = nameof(Transition);
-            edge.WorldGraph = this;
-            edge.OutputNodeGUID = output.GUID;
-            edge.OutputNode = output;
-            edge.InputNodeGUID = input.GUID;
-            edge.InputNode = input;
+            Transition edge = new Transition {
+                WorldGraph = this,
+                OutputNodeGUID = output.GUID,
+                OutputNode = output,
+                InputNodeGUID = input.GUID,
+                InputNode = input
+            };
             transitions.Add(edge);
-
-            if (!Application.isPlaying) AssetDatabase.AddObjectToAsset(edge, this);
-            SaveAssetsAndSetDirty();
             return edge;
         }
 
 
         public void RemoveTransition(Transition edge) {
             transitions.Remove(edge);
-
-            AssetDatabase.RemoveObjectFromAsset(edge);
-            SaveAssetsAndSetDirty();
         }
 
         public void AddChild(SceneHandle parent, SceneHandle child) {

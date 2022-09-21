@@ -69,9 +69,13 @@ namespace ThunderNut.SceneManagement {
 
         public Func<bool> StringIsEqual() => () => ((StringParameterField) Parameter).Value == ((StringCondition) Value).Value;
         public Func<bool> StringNotEqual() => () => ((StringParameterField) Parameter).Value != ((StringCondition) Value).Value;
-    } 
+    }
 
-    public class Transition : ScriptableObject, ISerializationCallbackReceiver {
+    [Serializable]
+    public class TransitionBase { }
+
+    [Serializable]
+    public class Transition : TransitionBase, ISerializationCallbackReceiver {
         public WorldGraph WorldGraph;
 
         public string OutputNodeGUID;
@@ -80,19 +84,20 @@ namespace ThunderNut.SceneManagement {
         public SceneHandle InputNode;
 
         public List<Condition> Conditions;
-
+  
         public override string ToString() {
             return $"{OutputNode.HandleName} ---> {InputNode.HandleName}";
         }
 
-        public void OnBeforeSerialize() { }
+        public void OnBeforeSerialize() {
+            // foreach (var condition in Conditions) {
+            //     if (condition.Parameter == null) continue;
+            //     var match = WorldGraph.allParameters.Find(param => param.GUID == condition.Parameter.GUID);
+            //     condition.Parameter = match;
+            // }
+        }
 
         public void OnAfterDeserialize() {
-            foreach (var condition in Conditions) {
-                if (condition.Parameter == null) continue;
-                var match = WorldGraph.allParameters.Find(param => param.GUID == condition.Parameter.GUID);
-                condition.Parameter = match;
-            }
         }
     }
 

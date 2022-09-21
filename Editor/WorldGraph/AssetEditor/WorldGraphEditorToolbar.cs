@@ -41,7 +41,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
                 GUILayout.Space(6);
                 if (GUILayout.Button("Save As...", EditorStyles.toolbarButton)) {
-                    saveAsRequested();
+                    saveAsRequested?.Invoke();
                 }
 
                 GUILayout.Space(6);
@@ -85,7 +85,7 @@ namespace ThunderNut.SceneManagement.Editor {
             string serializedUserViewSettings = JsonUtility.ToJson(m_UserViewSettings);
             EditorUserSettings.SetConfigValue(k_UserViewSettings, serializedUserViewSettings);
 
-            changeCheck();
+            changeCheck?.Invoke();
         }
 
         public void Dispose() {

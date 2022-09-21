@@ -109,6 +109,7 @@ namespace ThunderNut.SceneManagement.Editor {
                 CreateBlackboardField(exposedParam);
             }
 
+            // ------------------ Connect Parameters  ------------------
             foreach (var parameterViewData in graph.ExposedParameterViewDatas) {
                 var parameterView = CreateParameterGraphNode(parameterViewData);
 
@@ -121,20 +122,6 @@ namespace ThunderNut.SceneManagement.Editor {
                     AddElement(edge);
                 }
             }
-            // ------------------ Connect Parameters  ------------------
-            // foreach (var sceneHandle in graph.sceneHandles) {
-            //     WorldGraphNodeView baseView = (WorldGraphNodeView) GetNodeByGuid(sceneHandle.GUID);
-            //     List<WorldGraphPort> ports = baseView.inputContainer.Query<WorldGraphPort>().ToList();
-            //     foreach (var parameter in sceneHandle.allParameters) {
-            //         ExposedParameterNodeView paramView = (ExposedParameterNodeView) GetNodeByGuid(parameter.GUID);
-            //         foreach (var port in ports) {
-            //             if (parameter.ConnectedPortGUID == port.PortData.GUID) {
-            //                 WorldGraphEdge t = ((WorldGraphPort) paramView.output).ConnectTo<WorldGraphEdge>(port);
-            //                 AddElement(t);
-            //             }
-            //         }
-            //     }
-            // }
         }
 
         private void CreateNode(Type type, Vector2 position) {
@@ -162,6 +149,7 @@ namespace ThunderNut.SceneManagement.Editor {
             var parameterNodeView = new ExposedParameterNodeView(viewData, outputPortView);
 
             AddElement(parameterNodeView);
+            UpdateSerializedProperties();
 
             return parameterNodeView;
         }
@@ -181,7 +169,21 @@ namespace ThunderNut.SceneManagement.Editor {
 
             var parameterNodeView = new ExposedParameterNodeView(parameterViewData, outputPortView);
             AddElement(parameterNodeView);
-            
+
+            UpdateSerializedProperties();
+        }
+
+        public void RemoveParameterGraphNode(ExposedParameterNodeView view) {
+            string portGuid = view.data.connectedPortGUID;
+            if (portGuid != null) {
+                Edge connectedEdge = edges.ToList().Find(edge => ((WorldGraphPort) edge.input).PortData.GUID == portGuid);
+                connectedEdge.input.Disconnect(connectedEdge);
+                connectedEdge.output.Disconnect(connectedEdge);
+            }
+
+            graph.ExposedParameterViewDatas.Remove(view.data);
+            RemoveElement(view);
+
             UpdateSerializedProperties();
         }
 
@@ -205,10 +207,10 @@ namespace ThunderNut.SceneManagement.Editor {
         public void DrawInspector(SceneHandle sceneHandle) {
             inspectorBlackboard.Clear();
             inspectorContentContainer.Clear();
-            
+
             var serializedObject = new SerializedObject(sceneHandle);
             var fieldInfos = WGHelper.GetFieldInfosWithAttribute(sceneHandle, typeof(WGInspectableAttribute));
-            
+
             titleLabel.text = $"{sceneHandle.HandleName} Node";
             IMGUIContainer GUIContainer = new IMGUIContainer(() => {
                 foreach (var fieldInfo in fieldInfos) {
@@ -218,7 +220,6 @@ namespace ThunderNut.SceneManagement.Editor {
 
             inspectorContentContainer.Add(GUIContainer);
             inspectorBlackboard.Add(_RootElement);
-
         }
 
         public void DrawInspector(ExposedParameter parameter) {
@@ -227,7 +228,7 @@ namespace ThunderNut.SceneManagement.Editor {
 
             var allParamsProp = serializedGraph.FindProperty("allParameters");
             var propertyMatch = GetPropertyMatch(allParamsProp, parameter);
-            
+
             titleLabel.text = $"{parameter.Name} Parameter";
             IMGUIContainer GUIContainer = new IMGUIContainer(() => {
                 serializedGraph.Update();
@@ -240,16 +241,29 @@ namespace ThunderNut.SceneManagement.Editor {
                 serializedGraph.ApplyModifiedProperties();
             });
 
+
             inspectorContentContainer.Add(GUIContainer);
             inspectorBlackboard.Add(_RootElement);
         }
+
         public void DrawInspector(Transition transition) {
             inspectorBlackboard.Clear();
             inspectorContentContainer.Clear();
 
-            var editor = UnityEditor.Editor.CreateEditor(transition);
+            var allTransitionsProp = serializedGraph.FindProperty("transitions");
+            var propertyMatch = GetPropertyMatch(allTransitionsProp, transition);
+
             titleLabel.text = transition.ToString();
-            IMGUIContainer GUIContainer = new IMGUIContainer(() => { editor.OnInspectorGUI(); });
+            IMGUIContainer GUIContainer = new IMGUIContainer(() => {
+                serializedGraph.Update();
+
+                // EditorGUILayout.PropertyField(propertyMatch.FindPropertyRelative("OutputNode"));
+                // EditorGUILayout.PropertyField(propertyMatch.FindPropertyRelative("InputNode"));
+                EditorGUILayout.PropertyField(propertyMatch);
+                EditorGUILayout.PropertyField(propertyMatch.FindPropertyRelative("Conditions"));
+
+                serializedGraph.ApplyModifiedProperties();
+            });
 
             inspectorContentContainer.Add(GUIContainer);
             inspectorBlackboard.Add(_RootElement);
@@ -272,7 +286,8 @@ namespace ThunderNut.SceneManagement.Editor {
             inspectorContentContainer.Clear();
         }
 
-        private void UpdateSerializedProperties() {
+        public void UpdateSerializedProperties() {
+            EditorUtility.SetDirty(graph);
             serializedGraph = new SerializedObject(graph);
         }
 
@@ -305,12 +320,10 @@ namespace ThunderNut.SceneManagement.Editor {
 
                         graph.AddChild(output.sceneHandle, input.sceneHandle);
                         graph.CreateTransition(output.sceneHandle, input.sceneHandle);
+
                         break;
                     }
                     case PortType.Parameter when node is WorldGraphNodeView nodeView: {
-                        // ExposedParameter parameter = (ExposedParameter)((ExposedParameterNodeView) outputPort.node).userData;
-                        // nodeView.sceneHandle.AddParameter(parameter);
-                        // port.PortData.Parameter = parameter;
                         break;
                     }
                     case PortType.Parameter when node is ExposedParameterNodeView propertyNodeView:
@@ -321,6 +334,7 @@ namespace ThunderNut.SceneManagement.Editor {
                         param.connectedPortGUID = inputPort.PortData.GUID;
                         break;
                 }
+
             };
             worldGraphPort.OnDisconnected += (node, port, edge) => {
                 WorldGraphPort outputPort = (WorldGraphPort) edge.output;
@@ -342,8 +356,6 @@ namespace ThunderNut.SceneManagement.Editor {
                         break;
                     }
                     case PortType.Parameter when node is WorldGraphNodeView nodeView:
-                        // nodeView.sceneHandle.RemoveParameter(port.PortData.Parameter);
-                        // port.PortData.Parameter = null;
                         break;
                     case PortType.Parameter when node is ExposedParameterNodeView propertyNodeView:
                         var param = propertyNodeView.GetViewData();

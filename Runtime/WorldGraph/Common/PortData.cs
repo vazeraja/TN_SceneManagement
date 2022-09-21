@@ -17,8 +17,6 @@ namespace ThunderNut.SceneManagement {
         public string PortCapacity;
         public PortType PortType;
         public Color PortColor;
-
-        [SerializeReference] public ExposedParameter Parameter;
     }  
 
 }
